@@ -1,0 +1,148 @@
+$button-spacing: 0.5rem;
+
+.button {
+  background-color: $color-highlight;
+  border: 0.1rem solid $color-highlight;
+  border-radius: $border-radius-input;
+  color: $color-bg;
+  cursor: pointer;
+  display: inline-block;
+  font-family: $font-face-primary;
+  font-size: $font-size-base;
+  font-weight: 400;
+  height: 2.2em;
+  min-width: 6em;
+  line-height: 2.1em;
+  padding: 0 1em;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  margin-right: $button-spacing;
+  margin-bottom: 0.5em;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.small {
+    font-size: 1.4rem;
+    padding: 0 0.8em;
+  }
+
+  &:focus,
+  &:hover {
+    background-color: $color-primary;
+    border-color: $color-primary;
+    color: $color-bg;
+    outline: 0;
+  }
+
+  &[disabled],
+  &.disabled {
+    cursor: default !important;
+    opacity: 0.5;
+
+    &:focus,
+    &:hover {
+      background-color: $color-highlight;
+      border-color: $color-highlight;
+    }
+  }
+
+  &.button-block {
+    display: block;
+    width: 100%;
+  }
+
+  &.button-outline {
+    background-color: transparent;
+    color: $color-highlight;
+
+    &:focus,
+    &:hover {
+      background-color: transparent;
+      border-color: $color-primary;
+      color: $color-primary;
+    }
+
+    &[disabled],
+    &.disabled {
+      &:focus,
+      &:hover {
+        border-color: inherit;
+        color: $color-highlight;
+      }
+    }
+  }
+
+  &.button-clear {
+    background-color: transparent;
+    border-color: transparent;
+    color: $color-highlight;
+
+    &:focus,
+    &:hover {
+      background-color: transparent;
+      border-color: transparent;
+      color: $color-primary;
+    }
+
+    &[disabled],
+    &.disabled {
+      &:focus,
+      &:hover {
+        color: $color-highlight;
+      }
+    }
+  }
+}
+
+.button-group {
+  > * {
+    vertical-align: top;
+  }
+
+  &:not(:last-child) {
+    margin-right: $button-spacing;
+  }
+
+  & > button,
+  & > .button {
+    border-radius: 0;
+
+    &:first-child {
+      border-radius: $border-radius-input 0 0 $border-radius-input;
+    }
+
+    &:last-child {
+      border-radius: 0 $border-radius-input $border-radius-input 0;
+    }
+
+    &:not(:last-child) {
+      border-right-color: $color-primary;
+      margin-right: 0;
+    }
+  }
+
+  & > * > button,
+  & > * > .button {
+    border-radius: 0;
+  }
+
+  & > :first-child > .button {
+    border-radius: $border-radius-input 0 0 $border-radius-input;
+  }
+
+  & > :not(:last-child) > .button {
+    border-right-color: $color-primary;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: $responsive-mobile-browser-width) {
+  button,
+  .button {
+    display: block;
+    width: 100%;
+  }
+}

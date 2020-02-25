@@ -1,0 +1,19 @@
+.logo, .logo:hover {
+  display: block;
+  font-size: 1.8rem;
+  width: 7.5em;
+  white-space: nowrap;
+  line-height: 2em;
+  color: inherit;
+  letter-spacing: -1px;
+
+  img {
+    height: 2.4rem;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+    margin: -0.4em 0px 0px .1em;
+    background-color: transparent;
+  }
+}

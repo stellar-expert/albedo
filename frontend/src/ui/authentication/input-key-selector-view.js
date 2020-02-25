@@ -1,0 +1,42 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import {StrKey} from 'stellar-base'
+import actionContext from '../../state/action-context'
+import accountManager from '../../state/account-manager'
+
+class InputKeySelectorView extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {secret: '', isValid: false}
+    }
+
+    setKey(secret) {
+        secret = secret.replace(/[^a-zA-Z\d]/g, '')
+        this.setState({secret, isValid: StrKey.isValidEd25519SecretSeed(secret)})
+    }
+
+    sign() {
+        const {secret, isValid} = this.state
+        if (isValid) {
+            actionContext.secret = secret
+            actionContext.confirmRequest()
+                .catch(err => console.error(err))
+            accountManager.directKeyInput = false
+        }
+    }
+
+    render() {
+        return <div>
+            <div className="dimmed">Provide a secret key you'd like to use:</div>
+            <div className="space">
+                <input type="text" onChange={e => this.setKey(e.target.value)}
+                       placeholder="Secret key starting with 'S', like 'SAK4...2PLT'"/>
+            </div>
+            <div>
+                <button className="button" onClick={() => this.sign()}>Sign directly</button>
+            </div>
+        </div>
+    }
+}
+
+export default InputKeySelectorView

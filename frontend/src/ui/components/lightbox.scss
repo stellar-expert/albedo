@@ -1,0 +1,33 @@
+.lightbox {
+  max-width: 60rem;
+  margin-left: calc(50% - 30rem);
+  position: fixed;
+  top: 1em;
+  left: 0;
+  z-index: 1000;
+
+  &:before {
+    content: '';
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: $color-alt-bg;
+  }
+
+  & .lightbox-inner {
+    position: relative;
+    box-shadow: 0 2px 6px -1px $color-alt-bg;
+    background: $color-bg;
+    padding: 3rem;
+  }
+}
+
+@media (max-width: $responsive-mobile-browser-width) {
+  .lightbox {
+    margin: 0;
+    max-width: 100%;
+  }
+}

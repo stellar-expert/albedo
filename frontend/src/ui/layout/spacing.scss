@@ -1,0 +1,50 @@
+fieldset,
+input:not([type=checkbox]),
+select,
+textarea {
+  margin-bottom: 1.5rem;
+}
+
+ol,
+p,
+pre,
+table {
+  margin-bottom: 1.5rem;
+}
+
+
+.space {
+  margin-top: 1.5rem;
+}
+
+.double-space {
+  margin-top: 4rem;
+}
+
+.block-indent {
+  padding-left: 3rem;
+}
+
+@media (max-width: $responsive-mobile-browser-width) {
+  .block-indent-screen {
+    padding-left: 0;
+  }
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.word-break {
+  word-break: break-all;
+}
+
+.text-overflow {
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.tight {
+  letter-spacing: -0.05em;
+}

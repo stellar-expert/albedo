@@ -1,0 +1,47 @@
+.account-menu {
+  position: relative;
+
+  .active-block{
+    background: $color-alt-bg;
+    padding: 0.8em 1em 0.6em;
+  }
+
+  .options {
+    visibility: hidden;
+    position: absolute;
+    z-index: 2;
+    top: -0.4em;
+    right: -.85em;
+    min-width: 100%;
+    background: #FFF;
+    border: 1px solid rgba(192, 192, 192, 0.4);
+    border-radius: 2px;
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2);
+
+    &.visible {
+      visibility: visible;
+    }
+
+    .active-account-actions {
+      white-space: nowrap;
+    }
+
+    li {
+      padding: 0.4em 1em;
+      margin: 0;
+      cursor: pointer;
+      white-space: nowrap;
+
+      &.separator {
+        border-bottom: 1px solid $color-contrast-border;
+      }
+    }
+  }
+
+  .id {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 160px;
+    display: inline-block;
+  }
+}

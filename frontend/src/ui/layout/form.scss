@@ -1,0 +1,53 @@
+input:not([type='checkbox']):not([type='radio']),
+textarea,
+select {
+  appearance: none;
+  background-color: $color-bg;
+  border: 1px solid $color-contrast-border;
+  border-radius: $border-radius-input;
+  box-shadow: none;
+  box-sizing: inherit;
+  font-size: $font-size-base;
+  font-family: $font-face-primary;
+  color: $color-text;
+  height: 4rem;
+  padding: 0.6rem 1rem;
+  width: 100%;
+
+  &:focus {
+    border-color: $color-highlight;
+    outline: 0;
+  }
+}
+
+textarea {
+  min-height: 4em;
+}
+
+label,
+legend {
+  display: block;
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+fieldset {
+  border-width: 0;
+  padding: 0;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  display: inline;
+  margin-left: 0;
+}
+
+.label-inline {
+  display: inline-block;
+  font-weight: normal;
+  margin-left: 0.5rem;
+}
+
+::placeholder {
+  color: $color-contrast-border;
+}

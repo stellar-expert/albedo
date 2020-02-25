@@ -1,0 +1,10 @@
+a {
+  color: $color-primary;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:focus,
+  &:hover {
+    color: lighten(saturate($color-primary, 20%), 10%);
+  }
+}

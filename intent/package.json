@@ -1,0 +1,45 @@
+{
+  "name": "albedo-intent",
+  "private": true,
+  "version": "0.2.7",
+  "description": "Albedo client library",
+  "author": "StellarExpertTeam<info@stellar.expert>",
+  "license": "MIT",
+  "homepage": "https://github.com/stellar-expert/albedo",
+  "bugs": {
+    "url": "https://github.com/stellar-expert/albedo/issues",
+    "email": "info@stellar.expert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stellar-expert/albedo.git"
+  },
+  "scripts": {
+    "build": "webpack --mode=production --config ./webpack.config.js"
+  },
+  "main": "./lib/intent.albedo.link.js",
+  "keywords": [
+    "stellar",
+    "SSO",
+    "signer",
+    "intent",
+    "multi-sig"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/plugin-proposal-private-methods": "^7.4.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/register": "^7.4.4",
+    "babel-loader": "^8.0.5",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "sinon": "^6.3.5",
+    "terser-webpack-plugin": "^1.2.3",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  }
+}

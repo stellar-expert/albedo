@@ -1,0 +1,16 @@
+.loader {
+  text-align: center;
+  font-size: 2.4rem;
+  padding: 1em;
+  margin: auto;
+  width: 3em;
+  animation: fa-spin 1.6s linear infinite;
+  color: #AAA;
+  &.small {
+    font-size: 1.8rem;
+  }
+  &:before {
+    content: "\f110";
+    font-family: FontAwesome;
+  }
+}

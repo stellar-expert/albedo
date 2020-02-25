@@ -1,0 +1,36 @@
+.avatar {
+  display: inline-block;
+  position: relative;
+  background: center center no-repeat;
+  background-size: cover;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(6, 145, 183, 0.3);
+  vertical-align: middle;
+  margin-right: 0.4em;
+  box-sizing: content-box;
+
+  &:before {
+    content: "";
+    position: absolute;
+    right: -2px;
+    bottom: -4px;
+    border-radius: 50%;
+    background-color: #CCC;
+    width: 12px;
+    height: 12px;
+    display: block;
+    border: 2px solid #FFF;
+  }
+  &.decrypted:before {
+    background-color: #41D509;
+  }
+  &.large{
+    width: 64px;
+    height: 64px;
+    &:before{
+      content: none;
+    }
+  }
+}

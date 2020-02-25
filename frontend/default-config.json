@@ -1,0 +1,17 @@
+{
+  "apiEndpoint": "http://localhost:1237",
+  "networks": {
+    "public": {
+      "explorer": "https://stellar.expert/explorer/public/",
+      "horizon": "https://horizon.stellar.org"
+    },
+    "testnet": {
+      "explorer": "https://stellar.expert/explorer/testnet/",
+      "horizon": "https://horizon-testnet.stellar.org"
+    }
+  },
+  "appManifest": {
+    "appUrl": "https://albedo.link",
+    "email": "support@albedo.link"
+  }
+}
