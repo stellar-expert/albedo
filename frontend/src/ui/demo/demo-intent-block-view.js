@@ -3,10 +3,11 @@ import PropTypes from 'prop-types'
 import cn from 'classnames'
 import allDemos from './all-demos'
 import Highlight from '../components/highlight'
-import Intent, {intentInterface} from 'albedo-intent'
+import intent, {intentInterface} from 'albedo-intent'
 import demoNav from './demo-nav-model'
+import {CopyToClipboard} from 'react-copy-to-clipboard'
 
-Intent.frontendUrl = location.origin
+intent.frontendUrl = location.origin
 
 function formatOutput(output) {
     return JSON.stringify(output, null, '  ')
@@ -65,7 +66,7 @@ class IntentBlock extends Component {
         this.setState({inProgress: true})
         try {
             //invoke dynamically
-            new Function('albedo', `return ${this.generateInvocation()}`)(Intent)
+            new Function('albedo', `return ${this.generateInvocation()}`)(intent)
                 .then((res) => this.setState({
                     result: formatOutput(res),
                     inProgress: false,
@@ -106,7 +107,7 @@ class IntentBlock extends Component {
             }
 
         const formattedArgs = !args.length ? '' : `{
-${args.join(', \n')}
+${args.join(',\n')}
 }`
 
         const method = intent.replace(/_([a-z])/g, g => g[1].toUpperCase())
@@ -150,20 +151,17 @@ ${args.join(', \n')}
 
     renderResult() {
         const {result, error} = this.state
-        return result && <Highlight className={cn('result', {error})}>{result}</Highlight>
+        return result && <Highlight className={cn('result', {error})} lang="json">{result}</Highlight>
     }
 
     render() {
         const {intent} = this.props,
-            {title, description, implicitFlow, inProgress} = this.state
+            {title, description, implicitFlow, inProgress} = this.state,
+            example = this.generateExample()
 
         return <div className="intent-block" style={{paddingBottom: '2em'}}>
-            <h3 id={intent}><code>{intent}</code> - {title}</h3>
+            <h2 id={intent}>{title} - <code>{intent}</code></h2>
             <div className="intent-description">{description}</div>
-            <div className="space">
-                <b>Example</b>
-                <Highlight>{this.generateExample()}</Highlight>
-            </div>
             <div className="space">
                 <b>Parameters</b>
                 {this.renderParameters()}
@@ -173,6 +171,12 @@ ${args.join(', \n')}
                                                              onClick={() => demoNav.section = 'implicit_flow'}>implicit
                 flow</a> permissions were granted and "pubkey" parameter set.
             </div>}
+            <div className="space">
+                <b>Code</b> <CopyToClipboard text={example}>
+                <a href="#" className="fa fa-copy active-icon" title="Copy script to clipboard"/>
+            </CopyToClipboard>
+                <Highlight>{example}</Highlight>
+            </div>
             <div className="space">
                 <button className="button request" style={{minWidth: '40%'}} disabled={inProgress}
                         onClick={() => this.exec()}>Try it

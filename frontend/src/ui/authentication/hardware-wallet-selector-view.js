@@ -4,7 +4,7 @@ import cn from 'classnames'
 import AlbedoSigner from '../../util/hw-signer/hw-signer'
 import Actions from '../components/actions-block'
 import {ACCOUNT_TYPES} from '../../state/account'
-import appSettings from '../../app-settings'
+import appSettings from '../../state/app-settings'
 
 class HardwareWalletSelectorView extends Component {
     state = {

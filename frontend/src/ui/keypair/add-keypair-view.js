@@ -5,6 +5,7 @@ import {StrKey, Keypair} from 'stellar-base'
 import actionContext from '../../state/action-context'
 import accountManager from '../../state/account-manager'
 import AccountKeypair from '../../state/account-keypair'
+import authorizationService from '../../state/authorization'
 import errors from '../../util/errors'
 import {formatAddress} from '../../util/formatter'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
@@ -56,7 +57,7 @@ class AddKeypairView extends React.Component {
 
         try {
             //request user confirmation
-            const credentials = await window.requestAuthorization(activeAccount)
+            const credentials = await authorizationService.requestAuthorization(activeAccount)
             //fetch fresh data from the server to minimize collisions possibility
             await activeAccount.load(credentials)
             //get sensitive keypairs data

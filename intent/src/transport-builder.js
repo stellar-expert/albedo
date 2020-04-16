@@ -5,7 +5,7 @@ import TransportHandler from './transport-handler'
  * @param {String} frontendUrl - URL of the Albedo frontend.
  * @return {TransportHandler}
  */
-function createDialogWindow(frontendUrl) {
+function createDialogTransport(frontendUrl) {
     const url = `${frontendUrl}/confirm`,
         w = 440,
         h = 600,
@@ -18,33 +18,46 @@ function createDialogWindow(frontendUrl) {
         top = ((currentWindowHeight / 2) - (h / 2)) + dualScreenTop
 
     const dialogWindow = window.open(url, 'auth.albedo.link', `height=${h},width=${w},top=${top},left=${left},menubar=0,toolbar=0,location=0,status=0,personalbar=0,scrollbars=0,dependent=1`)
-    return new TransportHandler(dialogWindow)
+    return new TransportHandler(dialogWindow, true)
 }
 
-let implicitTransportInstance = null
+let sharedTransport = null
 
 /**
- * Create implicit transport.
+ * Create implicit transport based on hidden iframe.
  * @param {String} frontendUrl - URL of the Albedo frontend.
  * @return {TransportHandler}
  */
-function createHiddenFrame(frontendUrl) {
+function createIframeTransport(frontendUrl) {
     //check if already initialized
-    if (implicitTransportInstance) return implicitTransportInstance
-
-    const iframe = document.createElement('iframe')
-    Object.assign(iframe, {
-        width: 0,
-        height: 0,
-        border: 0,
-        referrerpolicy: 'origin',
-        position: 'absolute',//???
-        style: '',
-        src: `${frontendUrl}/implicit`
-    })
-    document.body.appendChild(iframe)
-    implicitTransportInstance = new TransportHandler(iframe.contentWindow, true)
-    return implicitTransportInstance
+    if (!sharedTransport) {
+        const iframe = document.createElement('iframe')
+        Object.assign(iframe, {
+            width: 0,
+            height: 0,
+            border: 0,
+            referrerpolicy: 'origin',
+            position: 'absolute',//???
+            style: '',
+            src: `${frontendUrl}/implicit`
+        })
+        document.body.appendChild(iframe)
+        sharedTransport = new TransportHandler(iframe.contentWindow)
+    }
+    return sharedTransport
 }
 
-export {createDialogWindow, createHiddenFrame}
+/**
+ * Create a transport on top of the extension API.
+ * @return {TransportHandler}
+ */
+function createExtensionTransport() {
+    if (!sharedTransport) {
+        sharedTransport = new TransportHandler(window)
+        sharedTransport.prepareRequestParams = params => ({albedoExtensionRequest: params})
+        sharedTransport.markLoaded()
+    }
+    return sharedTransport
+}
+
+export {createDialogTransport, createIframeTransport, createExtensionTransport}

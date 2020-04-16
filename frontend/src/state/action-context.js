@@ -2,7 +2,6 @@ import {observable, action, runInAction, computed} from 'mobx'
 import {Transaction} from 'stellar-sdk'
 import {intentInterface} from 'albedo-intent'
 import accountManager from './account-manager'
-import {restoreImplicitSession} from '../storage/session-storage'
 import responder from '../actions/responder'
 import {dispatchIntentResponse, handleIntentResponseError} from '../actions/callback-dispatcher'
 import errors from '../util/errors'
@@ -10,30 +9,18 @@ import {parseQuery, parseStellarLink} from '../util/url-utils'
 import TxContext from './tx-context'
 import {whitelist} from '../../implicit-flow-whitelist'
 import {resolveNetworkParams} from '../util/network-resolver'
+import {restoreImplicitSession} from '../storage/session-storage'
 
 /**
  * Provides context for initiated action.
  */
 class ActionContext {
-    constructor() {
-        /*autorun(() => {
-            if (this.confirmed) {
-                responder.confirm(this)
-                    .then(res => dispatchIntentResponse(res, this))
-                    .catch(err => handleIntentResponseError(err, this))
-                    .then(() => __history.push('/'))
-            }
-        }, {delay: 100})*/
-    }
-
     get isInsideFrame() {
         return window !== window.top
     }
 
     @computed
     get isImplicitIntent() {
-        //check if we are inside iframe
-        if (!this.isInsideFrame) return false
         //the intent should be available
         if (!this.intent) return false
         const {pubkey, session} = this.intentParams
@@ -42,7 +29,9 @@ class ActionContext {
         //check that implicit flow is available for current intent
         const intentDescriptor = intentInterface[this.intent]
         if (!intentDescriptor.implicitFlow) return false
-        //looks like it's a
+        //try to find corresponding session
+        if (!restoreImplicitSession(session)) return false
+        //looks ok
         return true
     }
 
@@ -103,6 +92,7 @@ class ActionContext {
      */
     @action
     async setContext(params) {
+        this.reset()
         if (params.sep0007link) {
             params = parseStellarLink(params.sep0007link)
         }
@@ -159,7 +149,7 @@ class ActionContext {
         //validate implicit flow request preconditions
         if (intent === 'implicit_flow') {
             let {intents = [], app_origin} = intentParams
-            if (app_origin !== window.origin && !whitelist.includes(app_origin)) {
+            if (app_origin !== window.origin && whitelist.length && !whitelist.includes(app_origin)) {
                 this.intentErrors = `Origin "${app_origin}" is not allowed to request implicit flow permissions.`
                 return this.rejectRequest()
             }
@@ -168,7 +158,6 @@ class ActionContext {
             }
             if (!(intents instanceof Array) || !intents.length) {
                 //TODO: reject intent immediately if possible
-                errors.actionRejectedByUser
                 this.intentErrors = `No intents were specified for the implicit mode.`
                 return this.rejectRequest()
             }
@@ -214,25 +203,31 @@ class ActionContext {
             if (!this.response) return
             if (!this.txContext || this.txContext.isFullySigned) {
                 //TODO: do not auto-submit tx to the network
-                await this.finalize()
+                return await this.finalize()
             }
         } catch (e) {
             console.error(e)
             this.intentErrors = e.message
 
             if (this.isImplicitIntent) {
-                this.rejectRequest(e)
+                return this.rejectRequest(e)
             }
         }
     }
 
+    /**
+     * Send response back to the caller window and reset action context state - only for interactive flow.
+     * @return {Promise<Object>}
+     */
     @action
     async finalize() {
         if (!this.intent) return //likely it was called after the response has been submitted
-        if (!this.response) throw new Error('Tried to finalize the action without a response.')
         try {
-            await dispatchIntentResponse(this.response, this)
+            if (!this.response)
+                throw new Error('Tried to finalize the action without a response.')
+            const res = await dispatchIntentResponse(this.response, this)
             this.reset()
+            return res
         } catch (e) {
             console.error(e)
             this.intentErrors = e
@@ -249,8 +244,16 @@ class ActionContext {
         if (!error && this.intentErrors) {
             error = errors.invalidIntentRequest(this.intentErrors)
         }
-        handleIntentResponseError(error || errors.actionRejectedByUser, this)
-        this.reset()
+        return handleIntentResponseError(error || errors.actionRejectedByUser, this)
+            .then(res => {
+                this.reset()
+                return res
+            })
+            .catch(e => {
+                this.reset()
+                return e
+            })
+
     }
 
     /**
@@ -289,9 +292,7 @@ class ActionContext {
     }
 }
 
-
 const actionContext = new ActionContext()
-
 
 window.addEventListener('unload', function () {
     actionContext.rejectRequest()

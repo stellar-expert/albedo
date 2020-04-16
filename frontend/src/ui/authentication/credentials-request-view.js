@@ -4,7 +4,6 @@ import {parseQuery} from '../../util/url-utils'
 import {ACCOUNT_TYPES} from '../../state/account'
 import DialogContainer from '../layout/dialog-container-view'
 import Actions from '../components/actions-block'
-import Lightbox from '../components/lightbox'
 import HardwareWalletSelectorView from './hardware-wallet-selector-view'
 
 class CredentialsRequestView extends React.Component {
@@ -33,8 +32,6 @@ class CredentialsRequestView extends React.Component {
         requestPasswordConfirmation: PropTypes.bool,
         //request 2FA code
         //requestTotp: PropTypes.bool,
-        //show in modal dialog
-        modal: PropTypes.bool,
         //action is in progress
         inProgress: PropTypes.bool,
         //whether to show "create account" link or not
@@ -44,12 +41,14 @@ class CredentialsRequestView extends React.Component {
         //whether to show hardware wallet options
         noHW: PropTypes.bool,
         //default values for requested fields
-        defaults: PropTypes.object
+        defaults: PropTypes.object,
+        //error message provided from a top level component
+        error: PropTypes.string
     }
 
     get defaultState() {
         return {
-            email: '',
+            email: this.props?.email ||'',
             password: '',
             confirmation: '',
             totp: '',
@@ -76,6 +75,7 @@ class CredentialsRequestView extends React.Component {
         const validationError = this.validate()
         if (validationError) {
             this.setState({validationError})
+            this.setState(this.defaultState)
         } else {
             const {email, password, totp} = this.state
             this.setState(this.defaultState)
@@ -111,8 +111,8 @@ class CredentialsRequestView extends React.Component {
     validate() {
         const {email, password, confirmation, totp} = this.state
         if (this.props.requestEmail && !/^\S+@\S+.\S+$/.test(email)) return 'Invalid email'
-        if (this.props.requestPassword && password.length < 8) return 'Password too short'
-        if (this.props.requestPasswordConfirmation && password !== confirmation) return 'Passwords do not match'
+        if (this.props.requestPassword && password && password.length < 8) return 'Password too short'
+        if (this.props.requestPasswordConfirmation && password && password !== confirmation) return 'Passwords do not match'
         //if (this.props.requestTotp && totp.length !== 6) return 'Invalid 2FA code'
         return null
     }
@@ -183,8 +183,9 @@ class CredentialsRequestView extends React.Component {
     }
 
     renderErrors() {
-        const {validationError} = this.state
-        if (validationError) return <div className="error space">Error: {validationError}</div>
+        const {validationError, password} = this.state,
+            error = validationError || (!password && this.props.error)
+        if (error) return <div className="error space">Error: {error}</div>
     }
 
     renderContent() {
@@ -192,9 +193,9 @@ class CredentialsRequestView extends React.Component {
         return <>
             <h2>{title}</h2>
             <div className="space"/>
-            <form onSubmit={e => this.submit(e)} action="/credentials" method="POST" target="dummy">
+            <div>
                 {this.renderFields()}
-            </form>
+            </div>
             {this.renderControls()}
             {this.renderErrors()}
             {!noRegistrationLink && <div className="text-center dimmed">
@@ -204,7 +205,7 @@ class CredentialsRequestView extends React.Component {
                 Already registered?<br/><a href="/login">Log in to existing account</a>
             </div>}
             {!noHW && <>
-                <hr className="double-space" title="or use hardware wallet"/>
+                <hr style={{margin: '3rem 0'}} title="or use hardware wallet"/>
                 <HardwareWalletSelectorView requirePublicKey onConfirm={data => this.hardwareLogin(data)}/>
             </>}
             {children || null}
@@ -212,10 +213,7 @@ class CredentialsRequestView extends React.Component {
     }
 
     render() {
-        const {modal} = this.props
-        return modal ?
-            <Lightbox>{this.renderContent()}</Lightbox> :
-            <DialogContainer>{this.renderContent()}</DialogContainer>
+        return <DialogContainer>{this.renderContent()}</DialogContainer>
     }
 }
 

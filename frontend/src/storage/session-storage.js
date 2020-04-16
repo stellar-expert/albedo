@@ -1,4 +1,4 @@
-import {generateRandomEncryptionKey, encryptDataAes, decryptDataAes, encodeBase64} from '../util/crypto-utils'
+import {generateRandomEncryptionKey, encryptDataAes, decryptDataAes} from '../util/crypto-utils'
 
 const sessionPrefix = 'session_'
 

@@ -64,7 +64,7 @@ function IntentTextDescriptionView() {
                                                                      amount={intentParams.amount}/>{' '}
                 to <b><Address account={intentParams.destination}/></b>.
             </>
-        case 'buy_tokens':
+        case 'exchange':
             return <>
                 The application requested permission to exchange max{' '}
                 <FormattedAmount params={intentParams} prefix="sell_" amount={intentParams.amount}/>{' '}

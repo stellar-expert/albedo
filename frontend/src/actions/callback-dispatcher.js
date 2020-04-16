@@ -1,5 +1,6 @@
 import errors from '../util/errors'
-import {intentErrors} from 'albedo-intent'
+import {isInsideExtensionBackgroundScript} from '../util/extension-utils'
+import actionContext from '../state/action-context'
 
 const urlSchema = 'url:'
 
@@ -46,6 +47,10 @@ function locateCallerWindow(actionContext) {
 function dispatchIntentResponse(res, actionContext) {
     const {callback, __reqid} = actionContext.intentParams
     res.__reqid = __reqid
+    //handle the implicit flow in the background script case
+    if (isInsideExtensionBackgroundScript())
+        return Promise.resolve(res)
+
     return callback ? execCallback(callback, res) : postMessage(res, actionContext)
 }
 
@@ -58,19 +63,16 @@ function handleIntentResponseError(error, actionContext) {
     if (!error) {
         error = errors.actionRejectedByUser
     }
-    const {callback, __reqid} = actionContext.intentParams
+    error = errors.prepareErrorDescription(error, actionContext.intentParams)
+    //invocation from background script - extension messaging system will handle the response
+    if (isInsideExtensionBackgroundScript())
+        return Promise.reject(error)
+
+    const {callback} = actionContext.intentParams
     if (callback) {
         alert(error.message || error)
     } else {
-        if ((error instanceof Error) && error.code) { //prepare for the serialization before sending via postMessage
-            //find a relevant standard intent error by code
-            const stdError = Object.values(intentErrors).find(stdError => stdError.code === error.code)
-            if (stdError) {
-                error = Object.assign({}, stdError, {ext: error.ext})
-            }
-        }
-        const errorDescription = {error: error || intentErrors.unhandledError, __reqid}
-        postMessage(errorDescription, actionContext)
+        return postMessage(error, actionContext)
             .catch(e => console.error(e))
     }
 }

@@ -153,7 +153,7 @@ class Intent {
     }
 
     /**
-     * Request buying a specific amount of tokens on Stellar DEX.
+     * Request token exchange on Stellar DEX.
      * @param {Object} params - Intent parameters.
      * @param {String} params.destination - Payment destination address.
      * @param {String} params.amount - Amount to pay.
@@ -164,8 +164,8 @@ class Intent {
      * @param {String} [params.buy_asset_issuer] - [Optional] Selling asset issuer (if not set XLM is implied).
      * @return {Promise<Object>}
      */
-    buyTokens(params) {
-        return this.request('buy_tokens', params)
+    exchange(params) {
+        return this.request('exchange', params)
     }
 
     /**

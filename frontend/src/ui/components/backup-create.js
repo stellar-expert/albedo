@@ -1,5 +1,4 @@
 import React from 'react'
-import Lightbox from '../components/lightbox'
 import styles from './backup-create.scss'
 import {retrieveRecentAccount} from '../../storage/account-storage'
 import accountManager from '../../state/account-manager'

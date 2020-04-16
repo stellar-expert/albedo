@@ -51,6 +51,9 @@ class AccountKeypair {
      */
     path = null
 
+    @observable
+    nameEditorVisible = false
+
     /**
      * Title to display in UI.
      * @returns {String}

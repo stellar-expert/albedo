@@ -29,11 +29,11 @@ export default class LoginPageView extends React.Component {
             //restore default state
             this.setState({inProgress: false})
             //route
-            __history.push(actionContext.intent ? '/confirm' : '/')
+            __history.push(actionContext.intent ? '/confirm' : '/account')
         } catch (e) {
             console.error(e)
             if (!e.status) {
-                e = errors.unhandledError
+                e = errors.unhandledError()
             }
             this.setState({inProgress: false})
             alert(e.message)

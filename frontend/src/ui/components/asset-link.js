@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {formatAssetUnifiedLink} from '../../util/formatter'
 import AccountAddressView from './account-address'
-import appSetting from '../../app-settings'
+import appSetting from '../../state/app-settings'
 
 function normalizeAsset(asset) {
     const {code, issuer} = asset

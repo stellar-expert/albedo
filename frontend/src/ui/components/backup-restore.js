@@ -21,7 +21,7 @@ class RestoreView extends React.Component {
                 const reader = new FileReader()
                 reader.onload = async (event) => {
                     const backupContent = event.target.result
-                    const credentials = await activeAccount.getCredentials(false) // TODO: request OTP
+                    const credentials = await activeAccount.getCredentials(false)
                     const decryptedKeypairs = Crypto.AES.decrypt(backupContent, credentials.account.id + credentials.password).toString(Crypto.enc.Utf8)
                     const keypairs = JSON.parse(decryptedKeypairs)
                     keypairs.forEach(keypair => {

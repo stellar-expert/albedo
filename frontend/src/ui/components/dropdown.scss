@@ -3,9 +3,6 @@
 
   display: inline-block;
   position: relative;
-  //reset styles
-  font-weight: $font-weight-base;
-  line-height: $font-line-height-base;
   padding-right: 0.3em;
 
   .dd-toggle {
@@ -45,6 +42,8 @@
     z-index: 10;
     display: none;
     text-align: left;
+    font-weight: $font-weight-base;
+    line-height: $font-line-height-base;
     font-size: $font-size-base;
     font-family: $font-face-primary;
     color: $color-primary;
