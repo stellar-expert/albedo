@@ -106,7 +106,7 @@ const intentInterface = {
         },
         returns: ['pubkey']
     },
-    buy_tokens: {
+    exchange: {
         risk: 'high',
         title: 'Purchase tokens',
         unsafe: true,

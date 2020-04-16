@@ -11,7 +11,7 @@ import {
     loadAccountDataFromBrowserStorage,
     persistAccountServerSide, loadAccountFromServer
 } from '../storage/account-storage'
-import notificationService from './notifications'
+import {saveCredentialsInExtensionStorage} from '../storage/extension-auth-storage'
 
 const ACCOUNT_TYPES = {
     STORED_ACCOUNT: 0,
@@ -127,8 +127,11 @@ class Account {
     async load(credentials) {
         this.verifyCredentials(credentials)
         const {data, version} = await loadAccountFromServer(credentials)
+        if (version === undefined) throw new Error('Invalid account metadata.')
         this.loadSensitiveData(credentials, data)
-        if (this.version !== version) throw new Error(`Encrypted data version mismatch.`)
+        if (this.version > version) throw new Error(`Encrypted data version mismatch.`)
+        //store in extension if allowed
+        await saveCredentialsInExtensionStorage(credentials)
         persistAccountInBrowser(this)
         return this
     }

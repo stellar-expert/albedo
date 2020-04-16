@@ -2,7 +2,7 @@ import {Keypair} from 'stellar-base'
 import shajs from 'sha.js'
 import Account, {ACCOUNT_TYPES} from '../state/account'
 import HwSigner from '../util/hw-signer/hw-signer'
-import appSettings from '../app-settings'
+import appSettings from '../state/app-settings'
 
 class ActionExecutionContext {
     /**

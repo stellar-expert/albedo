@@ -54,7 +54,7 @@ class Credentials {
         //account should be present
         if (!this.account || !this.account.id) return false
         //check password
-        if (!this.password) return false
+        if (!this.encryptionKey||!this.authKey) return false
         if (requireTotpCode) {
             //check TOTP code
             if (!this.totp) return false
@@ -65,22 +65,21 @@ class Credentials {
         return true
     }
 
-    static async create(params = {}) {
-        const encryptionKey = await computeArgon2Hash(params.account.id + params.password),
-            authKey = derivePublicKeyFromSecret(encryptionKey),
-            res = new Credentials()
+    static async create({account, password, totp, totpKey, encryptionKey}) {
+        if (!encryptionKey) {
+            encryptionKey = await computeArgon2Hash(account.id + password)
+        }
+        const authKey = derivePublicKeyFromSecret(encryptionKey)
 
-        Object.assign(res, {
-            account: params.account,
-            password: params.password,
-            totp: params.totp,
-            totpKey: params.totpKey,
+        return Object.assign(new Credentials(), {
+            account,
+            password,
+            totp,
+            totpKey,
             timestamp: new Date(),
             encryptionKey,
             authKey
         })
-        //Object.freeze(res)
-        return res
     }
 }
 

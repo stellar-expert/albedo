@@ -95,7 +95,7 @@ class AccountManager {
         if (i >= 0) {
             //replace existing account
             this.accounts.splice(i, 1, account)
-            //TODO: check the existing account properties and merge them
+            //TODO: check existing account properties and merge them
         } else {
             this.accounts.push(account)
         }

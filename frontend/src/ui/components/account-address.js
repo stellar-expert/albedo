@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import appSettings from '../../app-settings'
+import appSettings from '../../state/app-settings'
 import './account-address.scss'
 
 const defaultStyle = {

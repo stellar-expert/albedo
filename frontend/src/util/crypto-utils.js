@@ -71,7 +71,6 @@ function decodeBase64(encoded) {
  * @return {String}
  */
 function encryptDataAes(plainData, encryptionKey) {
-    //TODO: use stronger hash for encryption keys passed as strings - default hash might be not good enough
     validateNonEmpty(plainData, 'plainData')
     const rawData = AES.utils.utf8.toBytes(plainData)
     if (typeof encryptionKey === 'string') {

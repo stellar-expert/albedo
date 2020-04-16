@@ -3,10 +3,8 @@ import PropTypes from 'prop-types'
 import cn from 'classnames'
 
 function ActionsBlock({children, className}) {
-    return <div className="actions">
-        <div className={cn('space', className)}>
-            {children}
-        </div>
+    return <div className={cn('actions', className)}>
+        {children}
     </div>
 }
 

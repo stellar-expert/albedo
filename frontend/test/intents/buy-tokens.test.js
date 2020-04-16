@@ -1,6 +1,6 @@
 import {Transaction, Asset} from 'stellar-sdk'
 
-import {registerMessageListeners} from '../../src/message-listeners'
+import {registerMessageListeners} from '../../src/util/message-listeners'
 import {fakeWindow, setupFakeWindow} from '../util/fake-window'
 import actionContext from '../../src/state/action-context'
 import {setupAccountManager, publicKey, privateKey} from '../util/fake-account-manager'
@@ -8,7 +8,7 @@ import {setupAccountManager, publicKey, privateKey} from '../util/fake-account-m
 jest.mock('../../src/util/horizon-connector')
 
 const fakeIntent = {
-    intent: 'buy_tokens',
+    intent: 'exchange',
     max_price: '1',
     amount: '1',
     buy_asset_code: 'FGF',
@@ -43,7 +43,7 @@ describe('Intent - buy tokens', () => {
 
         //expect(actionContext.intentErrors).toBeNull()
         expect(fakeWindow.checkIfExpectedResultReturned({
-            intent: 'buy_tokens',
+            intent: 'exchange',
             pubkey: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2'
         })).toBeTruthy()
 

@@ -1,0 +1,93 @@
+.feature-block {
+  position: relative;
+  display: block;
+  padding: 1em 3em !important;
+  color: #fff;
+
+  h2 {
+    margin-top: 0;
+  }
+
+  > * {
+    position: relative;
+  }
+
+  &:before {
+    content: '';
+    display: block;
+    $feature-bg-color: transparentize($color-highlight, 0.2);
+    background: $feature-bg-color;
+    position: absolute;
+    top: -1em;
+    left: -0.5em;
+    right: -0.5em;
+    bottom: -1em;
+    transform: skew(35deg);
+  }
+
+  &.column:nth-child(2n) {
+    margin-left: 50% !important;
+  }
+
+  @media all and (max-width: $responsive-mobile-browser-width) {
+    padding: 1em 2em !important;
+
+    &:before {
+      top: 0.2em;
+      left: 0;
+      right: 0;
+      bottom: 0.2em;
+      transform: skew(16deg);
+    }
+    &.column:nth-child(2n) {
+      margin-left: 0 !important;
+    }
+  }
+}
+
+.intro-cta {
+  > * {
+    display: inline-block;
+    vertical-align: top;
+    @media all and (max-width: $responsive-mobile-browser-width) {
+      display: block;
+    }
+  }
+
+
+  > :last-child {
+    padding-top: 2.5em;
+
+    @media all and (max-width: $responsive-mobile-browser-width) {
+      padding-top: 0;
+    }
+  }
+
+  .v-slash {
+    position: relative;
+    padding: 1.6em 0;
+
+    @media all and (max-width: $responsive-mobile-browser-width) {
+      display: none;
+    }
+
+    > * {
+      color: $color-highlight;
+      background-color: $color-bg;
+      padding: 0 0.25em 0.15em;
+      position: relative;
+    }
+
+    &:before {
+      content: '';
+      display: block;
+      border-left: 1px solid $color-highlight;
+      width: 1px;
+      position: absolute;
+      height: 100%;
+      top: 0;
+      left: 50%;
+      transform: rotate(20deg);
+    }
+  }
+}

@@ -1,7 +1,8 @@
-@import "variables";
 /* fonts */
 @import "fonts/clearsans-font";
+@import "fonts/roboto-condensed-light";
 @import "fonts/font-awesome/font-awesome";
+@import "components/scrollbars";
 /* layouts */
 @import "layout/base";
 @import "layout/context-colors";
@@ -15,6 +16,5 @@
 @import "components/link";
 @import "components/button";
 @import "components/active-icon";
-@import "components/lightbox";
 @import "components/stacked-icons";
 @import "components/loader";

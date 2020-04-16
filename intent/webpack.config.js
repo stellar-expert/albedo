@@ -1,6 +1,7 @@
 const path = require('path'),
     webpack = require('webpack'),
-    TerserPlugin = require('terser-webpack-plugin')
+    TerserPlugin = require('terser-webpack-plugin'),
+    EsmWebpackPlugin = require('@purtuga/esm-webpack-plugin')
 
 module.exports = function () {
     const settings = {
@@ -13,11 +14,7 @@ module.exports = function () {
             path: path.join(__dirname, './lib'),
             filename: '[name].js',
             library: 'albedo',
-            libraryTarget: 'umd',
-            libraryExport: 'default'
-            /*chunkFilename: '[name].js',
-            library: 'intentAlbedoLink',
-            umdNamedDefine: true*/
+            libraryTarget: 'var'
         },
         module: {
             rules: [
@@ -32,10 +29,11 @@ module.exports = function () {
             new webpack.IgnorePlugin(/ed25519/),
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': JSON.stringify('production')
-            })
+            }),
+            new EsmWebpackPlugin()
         ],
         node: {
-            fs: 'empty',
+            fs: 'empty'
         },
         optimization: {
             minimizer: [new TerserPlugin({

@@ -1,7 +1,7 @@
 {
   "name": "albedo-intent",
   "private": true,
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "Albedo client library",
   "author": "StellarExpertTeam<info@stellar.expert>",
   "license": "MIT",
@@ -17,7 +17,7 @@
   "scripts": {
     "build": "webpack --mode=production --config ./webpack.config.js"
   },
-  "main": "./lib/intent.albedo.link.js",
+  "main": "./lib/albedo.intent.js",
   "keywords": [
     "stellar",
     "SSO",
@@ -26,20 +26,21 @@
     "multi-sig"
   ],
   "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "@babel/plugin-proposal-decorators": "^7.4.4",
-    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
-    "@babel/plugin-proposal-private-methods": "^7.4.4",
-    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "@babel/preset-env": "^7.4.4",
-    "@babel/register": "^7.4.4",
-    "babel-loader": "^8.0.5",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
+    "@babel/plugin-proposal-private-methods": "^7.8.3",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/register": "^7.9.0",
+    "@purtuga/esm-webpack-plugin": "^1.2.1",
+    "babel-loader": "^8.1.0",
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "sinon": "^6.3.5",
-    "terser-webpack-plugin": "^1.2.3",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.1"
+    "mocha": "^7.1.1",
+    "sinon": "^9.0.2",
+    "terser-webpack-plugin": "^2.3.5",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
   }
 }

@@ -3,6 +3,7 @@ import {Transaction, xdr as xdrTypes, Server} from 'stellar-sdk'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
 import {hintMatchesKey, zeroAccount} from '../util/signature-hint-utils'
 import {resolveNetworkParams} from '../util/network-resolver'
+import standardErrors from '../util/errors'
 
 class TxContext {
     /**
@@ -123,10 +124,11 @@ class TxContext {
             this.tx.sequence = newSequence
             this.tx.tx._attributes.seqNum = xdrTypes.SequenceNumber.fromString(newSequence)
         } catch (err) {
+            console.error(err)
             if (err.response) { //treat as Horizon error
                 if (err.response.status === 404)
-                    throw new Error(`Account does not exist on the network.`)
-                throw Object.assign(new Error('Transaction failed.'), {details: err.response.data})
+                    throw standardErrors.externalError(new Error('Source account doesn\'t exist on the network.'))
+                throw standardErrors.externalError('Horizon error.')
             }
         }
     }

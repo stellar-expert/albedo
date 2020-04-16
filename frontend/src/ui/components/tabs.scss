@@ -9,10 +9,10 @@
     .tabs-item {
       color: $color-text;
       font-family: $font-face-header;
-      font-weight: normal;
-      line-height: 2.6;
+      font-weight: 300;
+      line-height: 2;
       display: inline-block;
-      font-size: 1.8rem;
+      font-size: 2rem;
       border-bottom: 2px solid transparent;
       text-decoration: none;
       padding: 0 1em;
@@ -24,7 +24,6 @@
 
       &.selected {
         color: $color-highlight;
-        font-weight: bold;
         border-bottom-color: $color-highlight;
         cursor: default;
       }

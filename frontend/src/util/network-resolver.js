@@ -1,4 +1,4 @@
-import appSettings from '../app-settings'
+import appSettings from '../state/app-settings'
 import {Networks} from 'stellar-base'
 
 /**

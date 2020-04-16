@@ -1,5 +1,5 @@
 import {signMessage} from '../util/crypto-utils'
-import appSettings from '../app-settings'
+import appSettings from '../state/app-settings'
 
 class ApiCallBuilder {
     constructor(endpoint) {
@@ -74,7 +74,6 @@ class ApiCallBuilder {
         return this.execute()
     }
 
-    //TODO: add totp-key based authorization
     execute() {
         this.#checkNotFrozen()
         if (this.#signature) {

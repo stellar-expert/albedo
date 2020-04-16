@@ -1,6 +1,6 @@
 import {setupFakeArgon2} from '../util/fake-argon2'
 import {Transaction, Asset} from 'stellar-sdk'
-import {registerMessageListeners} from '../../src/message-listeners'
+import {registerMessageListeners} from '../../src/util/message-listeners'
 import {fakeWindow, setupFakeWindow} from '../util/fake-window'
 import actionContext from '../../src/state/action-context'
 import {setupAccountManager, publicKey} from '../util/fake-account-manager'

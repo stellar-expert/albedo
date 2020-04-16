@@ -1,3 +1,5 @@
+import {intentErrors} from 'albedo-intent'
+
 class AlbedoError extends Error {
     constructor(message) {
         super(message)
@@ -18,7 +20,6 @@ class AlbedoError extends Error {
 }
 
 function buildError(params) {
-    if (!params) return standardErrors.unhandledError
     const {message, code = 0, ext} = params
     const error = new Error(message)
     error.code = code
@@ -31,18 +32,19 @@ function buildError(params) {
     return error
 }
 
-//TODO: use getters instead of functions, move descriptions to the intent interface, use negative error codes
 class StandardErrors {
-    get unhandledError() {
+    unhandledError(error) {
+        console.error(error)
         return buildError({
             message: 'Error occurred. If this error persists, please contact our support team.',
             code: -1
         })
     }
 
-    get actionRejectedByUser() {
+    externalError(error) {
         return buildError({
-            message: 'Action request was rejected by the user.',
+            message: 'External error occurred.',
+            ext: error.message,
             code: -2
         })
     }
@@ -55,10 +57,17 @@ class StandardErrors {
         })
     }
 
+    get actionRejectedByUser() {
+        return buildError({
+            message: 'Action request was rejected by the user.',
+            code: -4
+        })
+    }
+
     get messageSigningFailed() {
         return buildError({
             message: 'Failed to sign a message.',
-            code: -4
+            code: -5
         })
     }
 
@@ -136,6 +145,29 @@ class StandardErrors {
             message: 'Ledger Wallet requires hash signing permission to be enabled in the app settings.',
             code: -2001
         })
+    }
+
+    /**
+     * Prepare an error for the serialization before sending via postMessage
+     * @param {Error|Object} error
+     * @param {Object} intentParams
+     */
+    prepareErrorDescription(error, intentParams) {
+        if (!(error instanceof Error)) {
+            error = standardErrors.unhandledError(error)
+        }
+        if (error.code === undefined) {
+            error = standardErrors.unhandledError(error)
+        }
+        //find a relevant standard intent error by code
+        const stdError = Object.values(intentErrors).find(stdError => stdError.code === error.code)
+        if (stdError) {
+            error = Object.assign({}, stdError, {ext: error.ext})
+        } else {
+            error = intentErrors.unhandledError
+        }
+
+        return {error: error || intentErrors.unhandledError, __reqid: intentParams.__reqid}
     }
 }
 

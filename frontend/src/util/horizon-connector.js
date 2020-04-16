@@ -8,8 +8,8 @@ import {resolveNetworkParams} from './network-resolver'
  * @return {Server}
  */
 function createHorizon({network, horizon}) {
-    const {horizon: resolved} = resolveNetworkParams({network, horizon})
-    return new Server(resolved)
+    const {horizon: selectedHorizon} = resolveNetworkParams({network, horizon})
+    return new Server(selectedHorizon)
 }
 
 export {createHorizon}

@@ -5,7 +5,7 @@ import {intentInterface} from 'albedo-intent'
 import demoNav from './demo-nav-model'
 import DemoIntroView from './demo-intro-view'
 import ExamplesView from './examples-view'
-import {Route} from 'react-router'
+import PaymentRequest from './demo-payment-request-button-view'
 
 const allSections = [
     'intro',
@@ -16,8 +16,9 @@ const allSections = [
     'tx',
     'pay',
     'trust',
-    'buy_tokens',
-    'implicit_flow'
+    'exchange',
+    'implicit_flow',
+    'payment-request'
     //'create_keypair'
 ]
 
@@ -41,13 +42,16 @@ class DemoView extends React.Component {
                 let title = section
                 const intentContract = intentInterface[section]
                 if (intentContract) {
-                    title = `${intentContract.title} (${title})`
+                    title = intentContract.title
                 }
                 if (section === 'intro') {
                     title = 'Introduction'
                 }
                 if (section === 'showcase') {
                     title = 'Usage examples'
+                }
+                if (section === 'payment-request') {
+                    title = 'Payment button generator'
                 }
                 return <li key={section} style={{padding: '0.3em 0'}}>
                     {section === demoNav.section ?
@@ -63,11 +67,13 @@ class DemoView extends React.Component {
         const {section} = demoNav
         if (section === 'intro') return <DemoIntroView/>
         if (section === 'showcase') return <ExamplesView/>
+        if (section === 'payment-request') return <PaymentRequest/>
         return <IntentBlock key={section} intent={section}/>
     }
 
     render() {
-        return <div className="container wide">
+        return <div>
+            <h2>Demos & How-To</h2>
             <div className="row">
                 <div className="column column-40">
                     <div className="segment" style={{margin: '0 -0.5em', padding: '0.5em 1em'}}>

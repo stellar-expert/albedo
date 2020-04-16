@@ -3,6 +3,7 @@ import registerTxActions from './tx-actions'
 import registerManagementActions from './management-actions'
 import accountManager from '../state/account-manager'
 import {ACCOUNT_TYPES} from '../state/account'
+import authorizationService from '../state/authorization'
 import {restoreImplicitSession} from '../storage/session-storage'
 import ActionExecutionContext from './action-execution-context'
 
@@ -74,7 +75,7 @@ class Responder {
                 throw new Error(`Account was not selected.`)
             executionContext = ActionExecutionContext.forAccount(activeAccount, selectedKeypair.publicKey)
             if (activeAccount.isStoredAccount) {
-                executionContext.credentials = await requestAuthorization(activeAccount)
+                executionContext.credentials = await authorizationService.requestAuthorization(activeAccount)
             }
         }
 

@@ -2,6 +2,7 @@ import {Account as StellarAccount, Asset, Memo, Operation, TransactionBuilder, N
 import {zeroAccount} from '../util/signature-hint-utils'
 import {createHorizon} from '../util/horizon-connector'
 import {resolveNetworkParams} from '../util/network-resolver'
+import standardErrors from '../util/errors'
 
 /**
  * Normalize memo type to the values accepted by Memo.
@@ -15,8 +16,8 @@ function normalizeMemoType(memoType) {
     return type
 }
 
-function predictOptimalFee({last_ledger_base_fee, p80_accepted_fee}) {
-    return Math.min(last_ledger_base_fee * 4, parseInt(p80_accepted_fee))
+function predictOptimalFee({last_ledger_base_fee, max_fee}) {
+    return Math.min(last_ledger_base_fee * 2, parseInt(max_fee.p80))
 }
 
 /**
@@ -75,7 +76,7 @@ async function prepareTxOperations(actionContext, source) {
             const {asset_code, asset_issuer, limit = '922337203685.4775807'} = intentParams
             return [Operation.changeTrust({asset: new Asset(asset_code, asset_issuer), limit})]
         }
-        case 'buy_tokens': {
+        case 'exchange': {
             const {sell_asset_code, sell_asset_issuer, max_price, buy_asset_code, buy_asset_issuer, amount} = intentParams,
                 destAsset = buy_asset_issuer ? new Asset(buy_asset_code, buy_asset_issuer) : Asset.native(),
                 operations = []
@@ -92,7 +93,7 @@ async function prepareTxOperations(actionContext, source) {
                 operations.push(Operation.changeTrust({asset: destAsset, limit: '922337203685.4775807'}))
             }
             //execute market order using path payment op
-            operations.push(Operation.pathPayment({
+            operations.push(Operation.pathPaymentStrictReceive({
                 sendAsset: sell_asset_issuer ? new Asset(sell_asset_code, sell_asset_issuer) : Asset.native(),
                 sendMax,
                 destination: source.account_id, //self-payment
@@ -164,11 +165,11 @@ async function processTxIntent({actionContext, executionContext}) {
         console.error(err)
         //something wrong with the network connection
         if (err.message === 'Network Error')
-            throw new Error('Network error.')
+            throw standardErrors.externalError('Network error.')
         if (err.response) { //treat as Horizon error
             if (err.response.status === 404)
-                throw new Error(`Account does not exist on the network.`)
-            throw Object.assign(new Error('Transaction failed.'), {details: err.response.data})
+                throw standardErrors.externalError(new Error('Source account doesn\'t exist on the network.'))
+            throw standardErrors.externalError('Horizon error.')
         }
         //unhandled error
         //TODO: add detailed error description
@@ -183,5 +184,5 @@ export default function (responder) {
 
     responder.registerReaction('tx', processTxIntent)
 
-    responder.registerReaction('buy_tokens', processTxIntent)
+    responder.registerReaction('exchange', processTxIntent)
 }

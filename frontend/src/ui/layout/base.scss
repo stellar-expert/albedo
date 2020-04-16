@@ -26,12 +26,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+@include scrollbars(8px, $color-dimmed);
+
 ::selection {
   background-color: $color-alt-bg;
   color: $color-text;
 }
 
 .page-container {
-  margin-top: 2rem;
-  min-height: 85vh;
+  min-height: calc(100vh - 4em);
 }

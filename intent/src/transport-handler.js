@@ -5,11 +5,11 @@ class TransportHandler {
     /**
      * Create transport handler for a given window|iframe and establish communication channel.
      * @param {Window} targetWindow - Transport window|iframe reference.
-     * @param {Boolean} isIframeTransport - Keeps transport window open after receiving the response.
+     * @param {Boolean} ephemeral - If set to true, automatically closes the window opened after receiving the response.
      */
-    constructor(targetWindow, isIframeTransport = false) {
+    constructor(targetWindow, ephemeral = false) {
         this.windowHandler = targetWindow
-        this.isIframeTransport = !!isIframeTransport
+        this.ephemeral = !!ephemeral
         this.isLoaded = false
         this.pendingRequests = {}
         this.onLoaded = new Promise((resolve, reject) => this.onLoadedCallback = resolve)
@@ -19,6 +19,15 @@ class TransportHandler {
 
     isLoaded = false
 
+    markLoaded() {
+        this.isLoaded = true
+        if (this.onLoadedCallback) {
+            const onTransportWindowLoaded = this.onLoadedCallback
+            this.onLoadedCallback = null
+            onTransportWindowLoaded()
+        }
+    }
+
     /**
      * Handler for incoming communication messages processing.
      * @param {Object} data - Received data.
@@ -27,13 +36,7 @@ class TransportHandler {
         if (data.albedo) {
             const {version} = data.albedo
             //TODO: check version compatibility
-            this.isLoaded = true
-            if (this.onLoadedCallback) {
-                const onTransportWindowLoaded = this.onLoadedCallback
-                this.onLoadedCallback = null
-                onTransportWindowLoaded()
-            }
-            return
+            return this.markLoaded()
         }
         if (data.albedoIntentResult) {
             const {__reqid, ...result} = data.albedoIntentResult,
@@ -41,7 +44,7 @@ class TransportHandler {
             if (pending) {
                 delete this.pendingRequests[__reqid]
                 pending(result.error, result)
-                if (!this.isIframeTransport) {
+                if (this.ephemeral) {
                     window.removeEventListener('message', this.messageHandler, false)
                     this.windowHandler.close()
                 }
@@ -61,6 +64,10 @@ class TransportHandler {
             }
     }
 
+    prepareRequestParams(params) {
+        return params
+    }
+
     /**
      * Request intent confirmation using current transport.
      * @param {Object} params - Intent request params.
@@ -71,7 +78,8 @@ class TransportHandler {
         return new Promise((resolve, reject) => {
             this.onLoaded.then(() => {
                 this.pendingRequests[nonce] = (err, data) => err ? reject(err) : resolve(data)
-                this.windowHandler.postMessage(Object.assign({__reqid: nonce}, params), '*')
+                params = this.prepareRequestParams(Object.assign({__reqid: nonce}, params))
+                this.windowHandler.postMessage(params, '*')
             })
         })
     }

@@ -12,14 +12,12 @@ import errors from '../../util/errors'
 
 @observer
 class SignupView extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            id: '',
-            error: null,
-            inProgress: false,
-            done: false
-        }
+    state = {
+        id: '',
+        onBoardingInfoShown: false,
+        error: null,
+        inProgress: false,
+        done: false
     }
 
     async saveAccount(data) {
@@ -54,7 +52,7 @@ class SignupView extends React.Component {
         } catch (e) {
             console.error(e)
             if (!e.status) {
-                e = errors.unhandledError
+                e = errors.unhandledError()
             }
             this.setState({inProgress: false})
             alert(e.message)
@@ -86,15 +84,14 @@ class SignupView extends React.Component {
     }
 
     render() {
-        if (this.state.done) return <DialogContainer>
+        const {done, onBoardingInfoShown} = this.state
+        if (done) return <DialogContainer>
             <h2>Sign Up</h2>
             <div className="space text-center">Congratulations!<br/>You are all set.</div>
 
         </DialogContainer>
-        return <>
-            <Onboarding/>
-            {this.renderSignupStep()}
-        </>
+        if (!onBoardingInfoShown) return <Onboarding onFinish={() => this.setState({onBoardingInfoShown: true})}/>
+        return this.renderSignupStep()
     }
 }
 

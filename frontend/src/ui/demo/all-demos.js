@@ -109,7 +109,7 @@ const demos = {
             }
         }
     },
-    buy_tokens: {
+    exchange: {
         description: 'Buy token market price',
         params: {
             sell_asset_code: {
@@ -149,7 +149,7 @@ const demos = {
         }
     },
     implicit_flow: {
-        description: 'Requests temporary access token for one or more intents that can be used to execute actions without explicit confirmation from the user.',
+        description: 'Requests temporary access token for one or more intents that can be used to execute actions without explicit confirmation from the user. In order to be executed implicitly, an implicit flow permissions for a given intent should be granted and "pubkey" parameter set.',
         params: {
             intents: {
                 description: 'Requested intents for the implicit flow.',
