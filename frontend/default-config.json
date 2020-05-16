@@ -1,5 +1,5 @@
 {
-  "apiEndpoint": "http://localhost:1237",
+  "apiEndpoint": "https://keystore.albedo.link",
   "networks": {
     "public": {
       "explorer": "https://stellar.expert/explorer/public/",
