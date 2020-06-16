@@ -1,42 +1,48 @@
-import {isInsideExtension} from '../util/extension-utils'
+import {extensionMessageDispatcher} from '../extension/messaging/extension-message-dispatcher'
 
-const storageName = 'extensionAuthStorage'
+const authStorage = {}
 
-function getStorage() {
-    if (!isInsideExtension()) return Promise.reject()
-    const browser = require('webextension-polyfill')
-    return browser.runtime.getBackgroundPage()
-        .then(w => {
-            let storage = w[storageName]
-            if (!storage) {
-                storage = w[storageName] = {}
-            }
-            return storage
-        })
+function saveCredentials({accountId, data, ts, ttl}) {
+    if (!accountId) return
+    authStorage[accountId] = {data, ts, ttl}
 }
 
-/**
- * Temporary store credentials in the browser if this is allowed.
- * @param {Credentials} credentials
- * @return {Promise}
- */
-function saveCredentialsInExtensionStorage(credentials) {
-    return getStorage()
-        .then(storage => {
-            //here we assume that encryption key is correct (allows to decipher account data), otherwise it will block the subsequent login attempts
-            storage[credentials.account.id] = Buffer.from(credentials.encryptionKey).toString('base64')
-        })
-        .catch(() => {/*storage is not available - ignore error*/
-        })
+function isExpired({ts, ttl}) {
+    return ts + ttl < new Date().getTime()
 }
 
-function getCredentialsFromExtensionStorage(accountId) {
-    return getStorage()
-        .then(storage => {
-            const val = storage[accountId]
-            if (!val) return undefined
-            return Buffer.from(val, 'base64')
-        })
+function getCredentials(accountId) {
+    const val = authStorage[accountId]
+    if (!val) return undefined
+    if (isExpired(val)) {
+        //cleanup if expired
+        delete authStorage[accountId]
+        return undefined
+    }
+    //reset timestamp to prolongate the expiration period
+    val.ts = new Date().getTime()
+    return val.data
 }
 
-export {saveCredentialsInExtensionStorage, getCredentialsFromExtensionStorage}
+//schedule a periodic auth data cleanup
+setInterval(function () {
+    for (const accountId of Object.keys(authStorage)) {
+        const val = authStorage[accountId]
+        //cleanup if expired
+        if (val && isExpired(val)) {
+            delete authStorage[accountId]
+        }
+    }
+}, 60 * 1000) //cleanup every minute
+
+export function initAuthStorage() {
+    extensionMessageDispatcher.listen('save-stored-credentials', function (request) {
+        saveCredentials(request)
+        return Promise.resolve({saved: true})
+    })
+    extensionMessageDispatcher.listen('get-stored-credentials', function (request) {
+        const credentials = getCredentials(request.accountId) || null
+        return Promise.resolve({credentials, __reqid: request.__reqid})
+    })
+
+}

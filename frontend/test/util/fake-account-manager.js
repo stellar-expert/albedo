@@ -20,9 +20,9 @@ async function setupAccountManager() {
     keypair.friendlyName = 'Test keypair'
     keypair.publicKey = publicKey
     fakeAccount.keypairs.push(keypair)
-    const sensitiveData = fakeAccount.requestSensitiveData(fakeCredetials)
+    const sensitiveData = fakeAccount.requestAccountSecret(fakeCredetials)
     sensitiveData.addOrUpdateKeypair({secret: privateKey, friendlyName: 'Test keypair'})
-    await fakeAccount.updateSensitiveData(fakeCredetials, sensitiveData)
+    await fakeAccount.updateAccountSecret(fakeCredetials, sensitiveData)
     accountManager.addAccount(fakeAccount)
     accountManager.setSelectedKeypair(keypair)
     accountManager.setActiveAccount(fakeAccount)

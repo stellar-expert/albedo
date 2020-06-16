@@ -12,27 +12,25 @@ function FormattedAmount({amount, params, prefix = ''}) {
         code: params[prefix + 'asset_code'],
         issuer: params[prefix + 'asset_issuer']
     } : 'XLM'
-    return <b><Amount amount={amount} asset={asset} displayIssuer/></b>
+    return <b><Amount amount={amount} asset={asset}/></b>
 }
 
 function IntentTextDescriptionView() {
     const {intent, intentParams, intentErrors} = actionContext
     if (intentErrors) {
-        return <div className="error">
-            Error: {intentErrors}
-            <br/>
-            It's likely an external application error. Please contact support team of {intentParams.app_origin}.
-        </div>
+        return <>
+            <div className="error">
+                Error: {intentErrors}
+                <br/>
+                It's likely an external application error. Please contact support team of {intentParams.app_origin}.
+            </div>
+            <div className="space"/>
+        </>
     }
     switch (intent) {
         case 'public_key':
             return <>
                 The application requested read-only access to your Stellar account public key.
-            </>
-        case 'basic_info':
-            //TODO: request only specific fields
-            return <>
-                The application requested read-only access to your personal information (email and avatar).
             </>
         case 'authenticate':
             return <>

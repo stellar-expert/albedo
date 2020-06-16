@@ -188,7 +188,7 @@ ${args.join(',\n')}
     generateWebStellarLink() {
         const paymentParams = this.getPaymentIntentParams(),
             formatted = Object.keys(paymentParams).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(paymentParams[k])}`),
-            script = `<a href="web+stellar:pay?${formatted.join('&')}">${this.formatCaption()}</a>`
+            script = `<a href="web+stellar:pay?${formatted.join('&')}" target="_blank">${this.formatCaption()}</a>`
         return {
             script,
             description: <>

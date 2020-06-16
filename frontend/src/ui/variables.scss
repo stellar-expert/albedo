@@ -6,7 +6,7 @@ $color-dimmed: #999;
 $color-primary: #0691B7;
 $color-highlight: #08B5E5;
 $color-contrast-border: #d3d5d6;
-$color-modal-bg: rgba(0, 0, 0, .5);
+$color-modal-bg: rgba(0, 0, 0, .2);
 $color-selection: $color-alt-bg !default;
 $color-alert: #dc3545;
 $color-success: #28a745;
@@ -17,13 +17,17 @@ $font-face-primary: ClearSans, sans-serif;
 $font-face-header: RobotoCondensedLight, Arial, Helvetica, sans-serif;
 $font-face-mono: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 
-$font-size-base: 1.8rem;
+$font-size-base: 1.6rem;
 $font-weight-base: 300;
 $font-line-height-base: 1.4285;
 $header-letter-spacing: -0.04em;
 
 //borders
 $border-radius-input: 0.3rem;
+
+//spacing
+$space-block: 1.6rem;
+$space-block-micro: 0.8rem;
 
 //responsive breakpoints
 $responsive-mobile-browser-width: 992px;

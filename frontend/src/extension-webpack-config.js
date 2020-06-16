@@ -1,10 +1,7 @@
 const path = require('path'),
     pkgInfo = require('../package.json'),
     webpack = require('webpack'),
-    autoprefixer = require('autoprefixer'),
-    CopyPlugin = require('copy-webpack-plugin'),
-    MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-    cssnano = require('cssnano')
+    CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = function (env, argv) {
     const mode = argv.mode || 'development'
@@ -19,8 +16,7 @@ module.exports = function (env, argv) {
         entry: {
             'albedo-contentscript': [path.join(__dirname, './extension/contentscript.js')],
             'albedo-background': [path.join(__dirname, './extension/background.js')],
-            'albedo-ext-ui': [path.join(__dirname, './extension.js')],
-            'injected-albedo-intent': [path.join(__dirname, './extension/injected-client-script.js')]
+            'albedo-ext-ui': [path.join(__dirname, './extension.js')]
         },
         output: {
             path: path.join(__dirname, '../distr/extension'),
@@ -33,82 +29,31 @@ module.exports = function (env, argv) {
                     test: /\.js?$/,
                     loader: 'babel-loader'
                     //exclude: /node_modules/
-                },
-                {
-                    test: /\.scss$/,
-                    use: [
-                        {
-                            loader: MiniCssExtractPlugin.loader
-                        },
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                importLoaders: 1,
-                                url: false,
-                                sourceMap: !isProduction
-                            }
-                        },
-                        {
-                            loader: 'postcss-loader',
-                            options: {
-                                ident: 'postcss',
-                                plugins: [
-                                    autoprefixer(),
-                                    cssnano({
-                                        autoprefixer: true,
-                                        discardComments: {removeAll: true}
-                                    })
-                                ],
-                                sourceMap: !isProduction
-                            }
-                        },
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                sourceMap: !isProduction,
-                                prependData: '@import "./src/ui/variables.scss";'
-                            }
-                        }
-                    ]
-                },
-                {
-                    test: /\.svg$/,
-                    loader: 'svg-inline-loader'
-                },
-                {
-                    test: /\.(html)$/,
-                    use: {
-                        loader: 'html-loader',
-                        options: {
-                            attrs: [':data-src'],
-                            interpolate: true
-                        }
-                    }
-                },
-                {
-                    test: /\.wasm$/,
-                    // Tells WebPack that this module should be included as base64-encoded binary file and not as code
-                    loaders: ['base64-loader'],
-                    // Disables WebPack's opinion where WebAssembly should be, makes it think that it's not WebAssembly - Error: WebAssembly module is included in initial chunk.
-                    type: 'javascript/auto'
                 }
-            ],
-            noParse: /\.wasm$/ // Makes WebPack think that we don't need to parse this module, otherwise it tries to recompile it, but fails - Error: Module not found: Error: Can't resolve 'env'
+            ]
         },
         plugins: [
             new webpack.IgnorePlugin(/ed25519/),
-            new CopyPlugin([
-                path.join(__dirname, './static/shared/'),
-                path.join(__dirname, './static/extension/') //TODO: remove localhost origin from the extension's manifest.json
-            ]),
-            new MiniCssExtractPlugin({
-                filename: '[name].css'
+            new CopyPlugin({
+                patterns: [
+                    path.join(__dirname, './static/shared/'),
+                    {
+                        from: path.join(__dirname, './static/extension/'),
+                        transform(content, absoluteFrom) {
+                            if (mode !== 'development' && absoluteFrom.includes('manifest.json')) {
+                                content = content.toString('utf8').replace(/https:\/\/localhost:5001/g, 'https://albedo.link')
+                                return Buffer.from(content, 'utf8')
+                            }
+                            return content
+                        }
+                    }
+                ]
             }),
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': JSON.stringify(mode),
+                albedoOrigin: JSON.stringify(mode === 'development' ? 'https://localhost:5001' : 'https://albedo.link'),
                 appVersion: JSON.stringify(pkgInfo.version)
-            }),
-            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)
+            })
         ],
         node: {
             fs: 'empty'

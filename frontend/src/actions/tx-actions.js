@@ -1,4 +1,4 @@
-import {Account as StellarAccount, Asset, Memo, Operation, TransactionBuilder, Networks} from 'stellar-sdk'
+import {Asset, Memo, Operation, TransactionBuilder} from 'stellar-sdk'
 import {zeroAccount} from '../util/signature-hint-utils'
 import {createHorizon} from '../util/horizon-connector'
 import {resolveNetworkParams} from '../util/network-resolver'
@@ -143,13 +143,22 @@ async function processTxIntent({actionContext, executionContext}) {
             hash = tx.hash().toString('hex'),
             envelopeXdr = tx.toEnvelope().toXDR().toString('base64')
 
-        if (intentParams.submit) {
+        if (actionContext.autoSubmitToHorizon) {
+            let result
             //submit a transaction to Horizon
-            const txResult = await createHorizon(intentParams).submitTransaction(tx)
+            try {
+                await new Promise(resolve => {
+                })
+                result = await createHorizon(intentParams)
+                    .submitTransaction(tx)
+            } catch (e) {
+
+            }
             //TODO: think about returning raw tx result, maybe it's not needed as the transaction can be always fetched by its hash, but still...
             Object.assign(res, {
                 tx_hash: hash,
                 signed_envelope_xdr: envelopeXdr,
+                result,
                 horizon
             })
         } else {

@@ -1,25 +1,28 @@
-import React from 'react'
+import React, {useState} from 'react'
 import CredentialsRequest from './credentials-request-view'
 import accountManager from '../../state/account-manager'
 import Account, {ACCOUNT_TYPES} from '../../state/account'
 import Credentials from '../../state/credentials'
 import actionContext from '../../state/action-context'
 import errors from '../../util/errors'
+import Dropdown from '../components/dropdown'
+import HardwareWalletSelectorView from './hardware-wallet-selector-view'
 
-export default class LoginPageView extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {inProgress: false}
-    }
+export default function LoginPageView() {
+    const allAccounts = accountManager.accounts.filter(a => a.accountType === ACCOUNT_TYPES.STORED_ACCOUNT),
+        current = accountManager.activeAccount || allAccounts[0]
+    const [inProgress, setInProgress] = useState(false),
+        [selectedAccount, setSelectedAccount] = useState(current && current.id)
 
-    async login(data) {
-        this.setState({inProgress: true})
+    async function login(data) {
+        setInProgress(true)
         try {
             let account
             if (data.type === ACCOUNT_TYPES.STORED_ACCOUNT) {
-                const {id, password, totp} = data
-                account = accountManager.get(id) || new Account({id})
-                const credentials = await Credentials.create({account, password, totp})
+                const {password} = data
+                account = allAccounts.find(a => a.id === selectedAccount)
+                const credentials = await Credentials.create({account, password})
+
                 await account.load(credentials)
             } else {
                 account = await accountManager.loginHWAccount(data)
@@ -27,7 +30,7 @@ export default class LoginPageView extends React.Component {
             accountManager.addAccount(account)
             accountManager.setActiveAccount(account)
             //restore default state
-            this.setState({inProgress: false})
+            setInProgress(false)
             //route
             __history.push(actionContext.intent ? '/confirm' : '/account')
         } catch (e) {
@@ -35,13 +38,42 @@ export default class LoginPageView extends React.Component {
             if (!e.status) {
                 e = errors.unhandledError()
             }
-            this.setState({inProgress: false})
+            setInProgress(false)
             alert(e.message)
         }
     }
 
-    render() {
-        return <CredentialsRequest title="Sign In" confirmText="Sign in" requestEmail requestPassword
-                                   onConfirm={data => this.login(data)} onCancel={() => this.cancel()}/>
-    }
+    const accountSelectorOptions = allAccounts.map(a => ({value: a.id, title: a.displayName}))
+
+    if (!accountSelectorOptions.length) return <>
+        <div className="space">
+            <h2>Log In</h2>
+            No stored accounts available. Looks like you are using Albedo for the first time on this device.
+            <div className="row">
+                <div className="column column-50 space">
+                    <a href="/signup" className="button button-block">Create new account</a>
+                    <div className="dimmed text-micro text-center">
+                        Create new empty account and start using Albedo right away.
+                    </div>
+                </div>
+                <div className="column column-50 space">
+                    <a href="/import" className="button button-block">Import existing</a>
+                    <div className="dimmed text-micro text-center">
+                        Use Albedo paper key or secret key from another Stellar wallet.
+                    </div>
+                </div>
+            </div>
+            <hr style={{margin: '3rem 0'}} title="or use hardware wallet"/>
+            <HardwareWalletSelectorView requirePublicKey onConfirm={login}/>
+        </div>
+    </>
+    return <>
+        <h2>Log In</h2>
+        <div className="space">
+            <Dropdown value={selectedAccount} onChange={value => setSelectedAccount(value)}
+                      options={accountSelectorOptions}/>
+        </div>
+        <CredentialsRequest confirmText="Log in" inProgress={inProgress || accountSelectorOptions.length}
+                            onConfirm={login} onCancel={() => __history.push('/')}/>
+    </>
 }

@@ -25,21 +25,17 @@ Configuration parameters can be found in [default-config.json](./default-config.
 
 ```
 {
-  "apiEndpoint": "http://localhost:1237",
   "networks": {
     "public": {
-      "explorer": "https://stellar.expert/explorer/public/",
       "horizon": "https://horizon.stellar.org"
     },
     "testnet": {
-      "explorer": "https://stellar.expert/explorer/testnet/",
       "horizon": "https://horizon-testnet.stellar.org"
     }
   }
 }
 ```
 
-- `apiEndpoint` specifies the address of backend server vault for encrypted accounts.
 - `networks` section contains known Stellar networks and horizon endpoints.
 
 Configuration parameters may be overridden in `default-config.json` before the

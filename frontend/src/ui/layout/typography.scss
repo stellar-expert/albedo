@@ -43,10 +43,6 @@ code {
   font-family: $font-face-mono;
 }
 
-pre > code {
-
-}
-
 p {
   text-align: justify;
 }
@@ -57,11 +53,12 @@ img {
 
 hr {
   border: none;
-  margin: 1em auto;
+  font-size: $font-size-base;
+  margin: 15px auto;
   width: 100%;
   max-width: 90vw;
-  height: 1px;
-  background-image: linear-gradient(to right, transparentize($color-highlight, 1) 5%, $color-highlight 25%, $color-highlight 75%, transparentize($color-highlight, 1) 95%);
+  height: 0.5px;
+  background-image: radial-gradient(circle at center, $color-highlight 50%, transparentize($color-highlight, 1) 85%);
 
   &.double-space {
     margin-bottom: 4rem;
@@ -71,6 +68,7 @@ hr {
     display: flex;
     justify-content: center;
     overflow: visible;
+    margin: 3rem 0;
 
     &:after {
       content: attr(title);
@@ -105,8 +103,16 @@ ol > li > * {
   text-align: right !important;
 }
 
+.text-justify {
+  text-align: justify !important;
+}
+
 .text-small {
-  font-size: 0.85*$font-size-base;
+  font-size: 0.88*$font-size-base;
+}
+
+.text-micro {
+  font-size: 0.75*$font-size-base;
 }
 
 .nowrap {

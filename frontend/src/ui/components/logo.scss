@@ -1,12 +1,13 @@
 .logo, .logo:hover {
   display: block;
-  float: right;
+  padding-top: 1em;
+  margin-bottom: -6rem;
+  text-align: right;
 
   img {
     height: 2.2rem;
-    margin: 0.2em 0;
     position: relative;
-    max-width: 100%;
+    z-index: 1;
     background-color: transparent;
   }
 }

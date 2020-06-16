@@ -1,20 +1,20 @@
-import {Keypair} from 'stellar-base'
+import {Keypair} from 'stellar-sdk'
 import shajs from 'sha.js'
 import Account, {ACCOUNT_TYPES} from '../state/account'
-import HwSigner from '../util/hw-signer/hw-signer'
+import HwSigner from '../hw-signer/hw-signer'
 import appSettings from '../state/app-settings'
+import isEqual from 'react-fast-compare'
 
 class ActionExecutionContext {
     /**
      * Create new instance of AccountActionsWrapper for a given account.
      * @param {Account} account - Account to use.
-     * @param {String} publicKey - Public key of the selected key pair.
      * @return {ActionExecutionContext}
      */
-    static forAccount(account, publicKey) {
+    static forAccount(account) {
         const res = new ActionExecutionContext()
         res.account = account
-        res.publicKey = publicKey
+        res.publicKey = account.publicKey
         if (account.isHWAccount) {
             res.hwSigner = new HwSigner(account.accountType)
         }
@@ -73,9 +73,9 @@ class ActionExecutionContext {
         } else if (this.account.isStoredAccount) { //stored account
             signature = (await this.getStoredKeypair()).sign(rawMessage)
         } else if (this.account.isHWAccount) { //hardware wallet
-            const kp = await this.getHWSignerKeypair()
+            const keyPath = await this.getHWSignerPath()
             signature = await this.hwSigner.signMessage({
-                path: kp.path,
+                path: keyPath,
                 publicKey: this.publicKey,
                 message: rawMessage
             })
@@ -94,47 +94,55 @@ class ActionExecutionContext {
         } else if (this.account.isStoredAccount) { //stored account
             transaction.sign(await this.getStoredKeypair())
         } else if (this.account.isHWAccount) { //hardware wallet
-            const kp = await this.getHWSignerKeypair()
+            const keyPath = await this.getHWSignerPath()
             await this.hwSigner.signTransaction({
-                path: kp.path,
+                path: keyPath,
                 publicKey: this.publicKey,
                 transaction
             })
         }
+        let newSignature = null
         //find new signature and return it
-        for (let sig of transaction.signatures) {
-            if (!existingSignatures.includes(sig)) return sig
+        for (let sig of transaction.signatures.slice()) {
+            //remove duplicates
+            while (transaction.signatures.filter(s => isEqual(s.signature(), sig.signature())).length > 1) {
+                console.log('duplicate signature found')
+                const idx = transaction.signatures.findIndex(s => isEqual(s.signature(), sig.signature()))
+                transaction.signatures.splice(idx, 1)
+            }
+            //check whether it's a new signature
+            if (!existingSignatures.includes(sig)) {
+                newSignature = sig
+            }
         }
-        return null
+        return newSignature
     }
 
     async getStoredKeypair() {
         //use stored account for signing
-        const sensitiveData = this.account.requestSensitiveData(this.credentials),
-            secret = sensitiveData.getSecret(this.publicKey)
+        const secret = this.account.requestAccountSecret(this.credentials)
         if (!secret) throw new Error(`Failed to retrieve a secret key for stored account.`)
         return Keypair.fromSecret(secret)
     }
 
-    async getHWSignerKeypair() {
-        //sign with HW wallet
-        const kp = this.account.keypairs.find(kp => kp.publicKey === this.publicKey)
-        if (!kp) throw new Error(`Failed to retrieve a corresponding key pair from the hardware wallet account.`)
+    async getHWSignerPath() {
+        if (!this.account.isHWAccount) throw new Error(`Failed to retrieve BIP-44 path from the non-hardware account.`)
+        const {path} = this.account
+        if (!path) throw new Error(`Failed to retrieve BIP-44 key path from the hardware wallet account.`)
         await this.hwSigner.init({
             appManifest: {
                 email: appSettings.appManifest.email,
                 appUrl: appSettings.appManifest.appUrl
             }
         })
-        return kp
+        return path
     }
 
     async retrieveSessionData() {
         if (this.account.accountType !== ACCOUNT_TYPES.STORED_ACCOUNT)
             return {accountType: this.account.accountType}
 
-        const sensitiveData = this.account.requestSensitiveData(this.credentials),
-            secret = sensitiveData.getSecret(this.publicKey)
+        const secret = this.account.requestAccountSecret(this.credentials)
         return {
             accountType: ACCOUNT_TYPES.STORED_ACCOUNT,
             publicKey: this.publicKey,

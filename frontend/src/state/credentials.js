@@ -1,4 +1,5 @@
 import {computeArgon2Hash, derivePublicKeyFromSecret} from '../util/crypto-utils'
+import {saveCredentialsInExtensionStorage} from '../storage/extension-auth-storage-interface'
 
 /**
  * Contains authorization credentials for a given account.
@@ -17,25 +18,13 @@ class Credentials {
     password
 
     /**
-     * One-time TOTP password.
-     * @type {String}
-     */
-    totp
-
-    /**
-     * TOTP secret.
-     * @type {String}
-     */
-    totpKey
-
-    /**
      * Credentials created timestamp.
      * @type {Date}
      */
     timestamp
 
     /**
-     * Sensitive data encryption key derived from an account email + password and hashed using Argon2.
+     * Sensitive data encryption key derived from the password and unique browser id. Hashed using Argon2di.
      * @type {Buffer}
      */
     encryptionKey
@@ -50,32 +39,37 @@ class Credentials {
      * Whether credentials are valid or not.
      * @returns {boolean}
      */
-    checkValidity(requireTotpCode = false) {
+    checkValidity() {
         //account should be present
         if (!this.account || !this.account.id) return false
         //check password
-        if (!this.encryptionKey||!this.authKey) return false
-        if (requireTotpCode) {
-            //check TOTP code
-            if (!this.totp) return false
-            //check that TOTP code is not expired (30 seconds)
-            if (this.timestamp.getTime() + 30000 < new Date()) return false
-        }
+        if (!this.encryptionKey || !this.authKey) return false
         //otherwise everything seems legit
         return true
     }
 
-    static async create({account, password, totp, totpKey, encryptionKey}) {
+    checkPasswordCorrect(){
+        if (!this.account.requestAccountSecret(this)) return false
+        saveCredentialsInExtensionStorage(this)
+        return  true
+    }
+
+    /**
+     * Create credentials objects.
+     * @param account
+     * @param password
+     * @param encryptionKey
+     * @returns {Promise<Credentials>}
+     */
+    static async create({account, password, encryptionKey}) {
         if (!encryptionKey) {
-            encryptionKey = await computeArgon2Hash(account.id + password)
+            encryptionKey = await computeArgon2Hash(password)
         }
         const authKey = derivePublicKeyFromSecret(encryptionKey)
 
         return Object.assign(new Credentials(), {
             account,
             password,
-            totp,
-            totpKey,
             timestamp: new Date(),
             encryptionKey,
             authKey

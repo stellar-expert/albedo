@@ -1,7 +1,7 @@
 jest.mock('trezor-connect')
 import TrezorConnect, {DEVICE_EVENT, DEVICE} from 'trezor-connect'
 import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
-import trezorAdapter from '../../../src/util/hw-signer/adapters/trezor-adapter'
+import trezorAdapter from '../../../src/hw-signer/adapters/trezor-adapter'
 
 const path = 'm/44\'/148\'/0\''
 const publicKey = 'GARITBNKCUYWOYIUQWPARYLHYDYYKCYLLQZMX64LYEAMH3HKICGMKIVF'

@@ -36,7 +36,7 @@ class StandardErrors {
     unhandledError(error) {
         console.error(error)
         return buildError({
-            message: 'Error occurred. If this error persists, please contact our support team.',
+            message: 'Unhandled error occurred. If this error persists, please contact our support team.',
             code: -1
         })
     }
@@ -68,13 +68,6 @@ class StandardErrors {
         return buildError({
             message: 'Failed to sign a message.',
             code: -5
-        })
-    }
-
-    get invalidEmail() {
-        return buildError({
-            message: 'Invalid email format.',
-            code: -1100
         })
     }
 

@@ -2,22 +2,14 @@
   position: relative;
 }
 
-// .container is main centered wrapper
 .container {
   margin: 0 auto;
-  max-width: 80rem;
+  max-width: 50rem;
   padding: 0 2rem;
   position: relative;
   width: 100%;
-
-  &.wide {
-    max-width: 120rem;
-  }
 }
 
-// By default each .column within a .row will evenly take up
-// available width, and the height of each .column with take
-// up the height of the tallest .column in the same .row
 .row {
   display: flex;
   flex-direction: row;
@@ -37,8 +29,6 @@
     flex-wrap: wrap;
   }
 
-  // Vertically Align Columns
-  // .row-* vertically aligns every .col in the .row
   &.row-top {
     align-items: flex-start;
   }
@@ -59,9 +49,17 @@
     align-items: baseline;
   }
 
+  @media (min-width: $responsive-mobile-browser-width) {
+    &.wide {
+      margin-left: -20rem;
+      margin-right: -20rem;
+      width: auto;
+      max-width: 100vw;
+    }
+  }
+
   .column {
     display: block;
-    // IE 11 required specifying the flex-basis otherwise it breaks mobile
     flex: 1 1 auto;
     margin-left: 0;
     max-width: 100%;
@@ -81,7 +79,6 @@
       align-self: center;
     }
 
-    // Column Offsets
     &.column-offset-10 {
       margin-left: 10%;
     }
@@ -120,10 +117,6 @@
       margin-left: 90%;
     }
 
-    // Explicit Column Percent Sizes
-    // By default each grid column will evenly distribute
-    // across the grid. However, you can specify individual
-    // columns to take up a certain size of the available area
     &.column-10 {
       flex: 0 0 10%;
       max-width: 10%;
@@ -181,7 +174,6 @@
       max-width: 90%;
     }
 
-    // .column-* vertically aligns an individual .column
     .column-top {
       align-self: flex-start;
     }
@@ -193,21 +185,8 @@
     .column-center {
       align-self: center;
     }
-  }
-}
 
-@media (max-width: $responsive-mobile-browser-width) {
-  /*.container {
-    margin-left: 0.6em !important;
-    margin-right: 0.6em !important;
-  }*/
-  .row {
-    flex-direction: column;
-    padding: 0;
-    width: 100%;
-    margin-left: 0;
-
-    .column {
+    @media (max-width: $responsive-mobile-browser-width) {
       margin-bottom: 0;
       padding: 0;
       flex: 0 0 100% !important;
@@ -215,9 +194,30 @@
       margin-left: 0 !important;
     }
   }
+
+  @media (max-width: $responsive-mobile-browser-width) {
+    flex-direction: column;
+    padding: 0;
+    width: 100%;
+    margin-left: 0;
+  }
 }
 
 .segment {
   background: $color-alt-bg;
   border: saturate($color-alt-bg, 0.2);
+}
+
+.dual-layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  &.vertical {
+    flex-direction: column;
+  }
+
+  > * {
+    display: block;
+  }
 }

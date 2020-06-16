@@ -4,8 +4,9 @@ import registerManagementActions from './management-actions'
 import accountManager from '../state/account-manager'
 import {ACCOUNT_TYPES} from '../state/account'
 import authorizationService from '../state/authorization'
-import {restoreImplicitSession} from '../storage/session-storage'
+import {restoreImplicitSession} from '../storage/implicit-session-storage'
 import ActionExecutionContext from './action-execution-context'
+import {resolveNetworkParams} from '../util/network-resolver'
 
 /**
  * The responder responsible for a confirmed action execution and finalization.
@@ -50,13 +51,21 @@ class Responder {
             actionContext.secret = null
         } else if (actionContext.isImplicitIntent) { //process implicit requests
             const session = restoreImplicitSession(intentParams.session)
+            let {network: requestedNetwork} = resolveNetworkParams(intentParams)
             //TODO: request interactive session if the request can't be confirmed in implicit mode
             if (!session)
                 throw new Error(`Session doesn't exist or expired`)
-            const {accountType, publicKey, secret, intents} = session
+            const {accountType, publicKey, secret, intents, network} = session,
+                {network: enforcedNetwork} = resolveNetworkParams({network})
             //session should allow the intent
             if (!intents.includes(intent))
                 throw new Error(`Intent ${intent} is not allowed for this implicit session.`)
+            //session should allow the intent
+            if (requestedNetwork !== enforcedNetwork) {
+                //ignore network check for unrelated intents
+                if (!['sign_message', 'public_key'].includes(actionContext.intent))
+                    throw new Error(`Network "${network}" is not allowed for this implicit session.`)
+            }
             //initiate wrapper if the session contains a secret key
             if (secret) {
                 executionContext = ActionExecutionContext.forSecret(secret)
@@ -64,16 +73,13 @@ class Responder {
             } else if (accountType === ACCOUNT_TYPES.TREZOR_ACCOUNT || accountType === ACCOUNT_TYPES.LEDGER_ACCOUNT) {
                 //TODO: retrieve an account by id and find a keypair by publicKey
                 throw new Error(`Implicit sessions for HW accounts is not implemented.`)
-                //accountManager.accounts.find(acc=>)
-                //actionsWrapper = AccountActionsWrapper.forAccount(activeAccount, selectedKeypair.publicKey)
             } else
                 throw new Error(`Implicit sessions are not supported for account type ${accountType}.`)
         } else {
-            const {selectedKeypair, activeAccount} = accountManager
-            if (!selectedKeypair) return
+            const {activeAccount} = accountManager
             if (!activeAccount)
                 throw new Error(`Account was not selected.`)
-            executionContext = ActionExecutionContext.forAccount(activeAccount, selectedKeypair.publicKey)
+            executionContext = ActionExecutionContext.forAccount(activeAccount)
             if (activeAccount.isStoredAccount) {
                 executionContext.credentials = await authorizationService.requestAuthorization(activeAccount)
             }

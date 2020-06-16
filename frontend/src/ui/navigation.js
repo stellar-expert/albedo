@@ -31,7 +31,10 @@ class Navigation {
                 // When history works, internal links sometimes should not trigger page refresh
                 if ((currentLocation.pathname + currentLocation.search) === href) return
                 this.history.push(href)
-                window.scrollTo(0, 0)
+                setTimeout(() => {
+                    document.body.scrollIntoView({behavior: 'smooth'})
+                }, 200)
+
             }
         })
     }
