@@ -1,0 +1,33 @@
+.dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+
+  > .dialog-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: $color-modal-bg;
+    backdrop-filter: blur(2px);
+  }
+
+  > .dialog-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+
+    > .container {
+      background: $color-bg;
+      border: 1px solid $color-contrast-border;
+      border-radius: $border-radius-input;
+      box-shadow: 0 2px 4px -1px $color-modal-bg;
+      padding-bottom: $space-block;
+    }
+  }
+}

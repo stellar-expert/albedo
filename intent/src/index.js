@@ -3,6 +3,7 @@ import intentInterface from './intent-interface'
 import intentErrors from './intent-errors'
 import intentDispatcher from './intent-dispatcher'
 import implicitSessionStorage from './implicit-session-storage'
+import {bindWebStellarLinkHandler} from './web+stellar-handler'
 
 if (typeof window === 'object' && typeof window.fetch !== 'function') {
     throw new Error('Browser FetchAPI is not available. For legacy browsers support use polyfills such as whatwg-fetch.')
@@ -21,7 +22,6 @@ if (typeof window === 'object' && typeof window.fetch !== 'function') {
  * External SSO/signing calling interface implementation.
  */
 class Intent {
-
     frontendUrl = 'https://albedo.link'
 
     /**
@@ -179,7 +179,6 @@ class Intent {
     }
 }
 
-
 /**
  * Normalize a message before sending it to the signing endpoint.
  * @param {String} message - Message to normalize.
@@ -198,5 +197,9 @@ function normalizeMessageToSign(message) {
 Intent.intentInterface = intentInterface
 Intent.intentErrors = intentErrors
 
+const albedoIntentInstance = new Intent()
+
+bindWebStellarLinkHandler(albedoIntentInstance)
+
 export {intentInterface, intentErrors}
-export default new Intent()
+export default albedoIntentInstance

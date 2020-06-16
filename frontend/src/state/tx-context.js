@@ -198,8 +198,10 @@ class TxContext {
         }
         const newSignature = await executionContext.signTransaction(this.tx)
         //add full pubkey to the decorated signature for the fast lookup
-        newSignature.pubKey = executionContext.publicKey
-        newSignature.new = true
+        Object.assign(newSignature, {
+            pubKey: executionContext.publicKey,
+            new: true
+        })
         //TODO: append to the signatures list if it's not there yet
         this.signatures = this.tx.signatures.slice()
     }

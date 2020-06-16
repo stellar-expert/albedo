@@ -1,10 +1,12 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import cn from 'classnames'
-import AlbedoSigner from '../../util/hw-signer/hw-signer'
+import AlbedoSigner from '../../hw-signer/hw-signer'
 import Actions from '../components/actions-block'
 import {ACCOUNT_TYPES} from '../../state/account'
 import appSettings from '../../state/app-settings'
+import './hw-selector.scss'
+import {extractDeviceId} from '../../util/device-id-generator'
 
 class HardwareWalletSelectorView extends Component {
     state = {
@@ -29,11 +31,13 @@ class HardwareWalletSelectorView extends Component {
             }
         })
 
+        const pubkey = await signer.getPublicKey({path})
+
         const result = {
-            id: await signer.getDeviceId(),
+            id: extractDeviceId(pubkey),
             path,
             type: accountType,
-            publicKey: this.props.requirePublicKey ? await signer.getPublicKey({path}) : undefined
+            publicKey: this.props.requirePublicKey ? pubkey : undefined
         }
 
         //TODO: handle errors
@@ -53,7 +57,7 @@ class HardwareWalletSelectorView extends Component {
         return <div className="space">
             <label style={{display: 'inline'}}>
                 <input type="checkbox" checked={isDefaultPath}
-                       onChange={() => this.setState({isDefaultPath: !isDefaultPath})}/> Use default BIP32 path
+                       onChange={() => this.setState({isDefaultPath: !isDefaultPath})}/> Use default BIP 44 path
             </label>&emsp;
             {!isDefaultPath && <input type="text" value={path} style={{width: '10em'}}
                                       onChange={e => this.setState({path: e.target.value})}/>}

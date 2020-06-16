@@ -1,20 +1,20 @@
 import {version} from '../../package'
 import actionContext from '../state/action-context'
-import {isInsideExtension} from './extension-utils'
+import {isInsideFrame} from './frame-utils'
 
 function registerMessageListeners(window) {
     (window.opener || window.parent).postMessage({albedo: {version}}, '*')
 
     window.addEventListener('message', function ({data, origin, source}) {
         //TODO: we can store source in the actionContext to avoid possible source window disambiguation
-        if (!data.intent) return
-        //trust app_origin only inside extension, otherwise it's unsafe and have to be updated with origin received form the event itself
+        if (!data.__albedo_intent_version || !data.intent) return
+        /*//trust app_origin only inside extension, otherwise it's unsafe and have to be updated with origin received form the event itself
         if (!isInsideExtension()) {
             data.app_origin = origin
-        }
+        }*/
         actionContext.setContext(data)
             .then(() => {
-                if (!actionContext.isInsideFrame) {
+                if (!isInsideFrame()) {
                     //interactive flow
                     window.__history.push('/confirm')
                     return

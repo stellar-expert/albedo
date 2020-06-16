@@ -2,15 +2,24 @@ import nacl from 'tweetnacl'
 import AES from 'aes-js'
 import argon2 from 'argon2-browser'
 
+const ds = localStorage.getItem('uid')
+
+let deviceSalt = ds && decodeBase64(ds)
+if (!deviceSalt) {
+    deviceSalt = generateRandomEncryptionKey()
+    localStorage.setItem('uid', encodeBase64(deviceSalt))
+}
+
 function validateNonEmpty(data, key) {
     if (!data) throw new Error(`Invalid argument: ${key}.`)
     if (typeof data !== 'string') throw new TypeError(`Invalid argument type: ${key}.`)
 }
 
+
 async function computeArgon2Hash(encryptionKey) {
     const {hash} = await argon2.hash({
         pass: encryptionKey,
-        salt: 'albedo_auth',
+        salt: deviceSalt,
         type: argon2.ArgonType.Argon2id, //the most secure option
         time: 3, // the number of iterations
         mem: 20 * 1024, // used memory, in KiB
@@ -40,10 +49,10 @@ function derivePublicKeyFromSecret(hash) {
 
 /**
  * Generates random key for encryption.
- * @returns {String}
+ * @returns {Uint8Array}
  */
 function generateRandomEncryptionKey(seedSize = 32) {
-    return encodeBase64(nacl.randomBytes(seedSize))
+    return nacl.randomBytes(seedSize)
 }
 
 /**

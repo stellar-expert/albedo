@@ -19,7 +19,8 @@ class Dropdown extends React.Component {
         }), PropTypes.string])).isRequired,
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
-        showToggle: PropTypes.bool,
+        hideToggle: PropTypes.bool,
+        hideSelected: PropTypes.bool,
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     }
 
@@ -48,13 +49,19 @@ class Dropdown extends React.Component {
         onChange && onChange(option.value || option, this)
     }
 
+    isSelected(item) {
+        const {value} = this.props
+        return (typeof item === 'string') ? item === value : item.value === value
+    }
+
     getSelectedItem() {
-        const {options, value} = this.props
-        return options.find(item => (item instanceof String) ? item === value : item.value === value) || options[0]
+        const {options} = this.props
+        return options.find(item => this.isSelected(item)) || options[0]
     }
 
     renderOption(option, selected) {
         if (option.hidden) return
+        if (this.props.hideSelected && this.isSelected(option)) return null
         const {id, value, title} = option
         if (value === '') return <li key="space">
             <hr/>
@@ -65,13 +72,13 @@ class Dropdown extends React.Component {
     }
 
     render() {
-        const {options, disabled, showToggle} = this.props,
+        const {options, disabled, hideToggle} = this.props,
             {listOpen} = this.state,
             selectedItem = this.getSelectedItem()
         return <div className={cn('dd-wrapper', {disabled})}>
             <a href="#" className="dd-header" onClick={e => this.toggleList(e)}>
                 {selectedItem.title || selectedItem.value || selectedItem}
-                {showToggle !== false && <span className={cn('dd-toggle', {visible: listOpen})}/>}
+                {!hideToggle && <span className={cn('dd-toggle', {visible: listOpen})}/>}
             </a>
             {!disabled && <ul className={cn('dd-list', {visible: listOpen})}>
                 {options.map(option => this.renderOption(option, option === selectedItem))}

@@ -1,11 +1,8 @@
 import intent from 'albedo-intent'
 
-intent.frontendUrl = location.origin;
-
 (function () {
-    const scope = document.currentScript
-
-    const options = {}
+    const scope = document.currentScript,
+        options = {}
 
     for (const attr of scope.attributes) {
         if (attr.name.indexOf('x-') === 0) {
@@ -13,37 +10,28 @@ intent.frontendUrl = location.origin;
         }
     }
 
-    function mussingMandatoryOption(name) {
-        console.error(`Failed to initialize Albedo payment button. Mandatory option ${name} is missing.`)
+    function missingMandatoryOption(name) {
+        console.error(`Failed to initialize Albedo payment button. Mandatory option "${name}" is missing.`)
     }
 
-    if (!options.amount) return mussingMandatoryOption('amount')
-    if (!options.destination) return mussingMandatoryOption('destination')
-    if (!options.network) return mussingMandatoryOption('network')
-    if (options['asset-code'] && options['asset-code'] !== 'XLM' && !options['asset-issuer']) return mussingMandatoryOption('asset-issuer')
+    const {network, text, amount, destination, 'asset-code': assetCode, 'asset-issuer': assetIssuer, memo, 'class-name': className, width, height} = options
+
+    if (!amount) return missingMandatoryOption('amount')
+    if (!destination) return missingMandatoryOption('destination')
+    if (!network) return missingMandatoryOption('network')
+    if (assetCode && assetCode !== 'XLM' && !assetIssuer) return missingMandatoryOption('asset-issuer')
 
     const buttonElement = document.createElement('button')
 
-    if (options['class-name']) {
-        buttonElement.className = options['class-name']
+    buttonElement.className = className
+    if (width) {
+        buttonElement.style.width = width + 'px'
+    }
+    if (height) {
+        buttonElement.style.height = height + 'px'
     }
 
-    if (options.width) {
-        buttonElement.style.width = options.width + 'px'
-    }
-
-    if (options.height) {
-        buttonElement.style.height = options.height + 'px'
-    }
-
-    const {network, text, amount, destination, 'asset-code': assetCode, 'asset-issuer': assetIssuer, memo} = options
-
-    let innerText = text || ''
-    if (amount) {
-        innerText += ` ${amount} ${assetCode || 'XLM'}`
-    }
-    buttonElement.innerText = innerText
-    buttonElement.value = innerText
+    buttonElement.innerText = buttonElement.value = `${text ? text + ' ' : ''}${amount} ${assetCode || 'XLM'}`
 
     const paymentParams = {
         network,

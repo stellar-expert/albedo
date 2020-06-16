@@ -5,32 +5,21 @@ import accountManager from './account-manager'
 import responder from '../actions/responder'
 import {dispatchIntentResponse, handleIntentResponseError} from '../actions/callback-dispatcher'
 import errors from '../util/errors'
-import {parseQuery, parseStellarLink} from '../util/url-utils'
 import TxContext from './tx-context'
 import {whitelist} from '../../implicit-flow-whitelist'
 import {resolveNetworkParams} from '../util/network-resolver'
-import {restoreImplicitSession} from '../storage/session-storage'
+import {restoreImplicitSession} from '../storage/implicit-session-storage'
+import {isImplicitIntentRequested} from '../ui/intent/implicit-intent-detector'
 
 /**
  * Provides context for initiated action.
  */
 class ActionContext {
-    get isInsideFrame() {
-        return window !== window.top
-    }
-
     @computed
     get isImplicitIntent() {
-        //the intent should be available
-        if (!this.intent) return false
-        const {pubkey, session} = this.intentParams
-        //we allow implicit action only if pubkey and session key are provided
-        if (!pubkey || !session) return false
-        //check that implicit flow is available for current intent
-        const intentDescriptor = intentInterface[this.intent]
-        if (!intentDescriptor.implicitFlow) return false
+        if (!isImplicitIntentRequested({intent: this.intent, ...this.intentParams})) return false
         //try to find corresponding session
-        if (!restoreImplicitSession(session)) return false
+        if (!restoreImplicitSession(this.intentParams.session)) return false
         //looks ok
         return true
     }
@@ -85,25 +74,18 @@ class ActionContext {
      */
     secret = null
 
+    @computed
+    get autoSubmitToHorizon() {
+        return this?.intentParams?.submit || false
+    }
 
     /**
-     * Set current context based on the
+     * Set current context based on the request params.
      * @param {object} params - Intent request parameters.
      */
     @action
     async setContext(params) {
         this.reset()
-        if (params.sep0007link) {
-            params = parseStellarLink(params.sep0007link)
-        }
-        if (params.encoded) { //treat as SEP-0007 encoded data
-            params = parseQuery(params.encoded)
-        }
-
-        if (params.demo_mode) {
-            accountManager.createDemoAccount()
-                .catch(err => console.error(err))
-        }
         const {intent, ...intentParams} = params
 
         Object.assign(this, {
@@ -192,6 +174,11 @@ class ActionContext {
         })
     }
 
+    @computed
+    get isFinalized() {
+        return this.confirmed && !!this.response
+    }
+
     /**
      * Confirm the intent request.
      */
@@ -253,7 +240,6 @@ class ActionContext {
                 this.reset()
                 return e
             })
-
     }
 
     /**
@@ -277,7 +263,7 @@ class ActionContext {
         //discover available signers using current account
         //TODO: update available signers when the activeAccount is changed
         const {activeAccount} = accountManager,
-            availableSigners = !activeAccount ? [] : activeAccount.keypairs.map(kp => kp.publicKey)
+            availableSigners = !activeAccount ? [] : [activeAccount.publicKey]
         txContext.setAvailableSigners(availableSigners)
         try {
             await txContext.updateSignatureSchema()

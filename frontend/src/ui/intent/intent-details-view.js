@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {observer} from 'mobx-react'
 import actionContext from '../../state/action-context'
-import Signatures from './tx-singatures-list-view'
-import TxSigningStatus from './tx-signing-status-view'
+import Signatures from './tx-signatures-list-view'
+import TxSigningStatus from './tx-partial-signed-status-view'
 import IntentTextDescription from './intent-text-description-view'
 import AccountAddress from '../components/account-address'
 
@@ -36,7 +36,7 @@ function RiskLevelIconView({risk}) {
 
 function IntentDetailsView({expanded}) {
     const {intentProps, intentErrors, txContext} = actionContext,
-        {title, risk, personalData, unsafe} = intentProps,
+        {title, risk, unsafe} = intentProps,
         {app_origin, network, pubkey} = actionContext.intentParams
 
     return <div>
@@ -61,19 +61,12 @@ function IntentDetailsView({expanded}) {
             <div>
                 <IntentContextIconView color="primary" main="shield"/> Your funds are safe.
             </div>}
-        {personalData ?
-            <div>
-                <IntentContextIconView color="warning" main="id-card-o" sub="key"/> The application requested access to
-                your personal data (email and avatar).
-            </div> :
-            <div>
-                <IntentContextIconView color="primary" main="id-card-o" sub="lock"/> Personal data won't be shared.
-            </div>}
-        {txContext && txContext.signatures.length > 0 &&
-        <div>
-            <IntentContextIconView color="info" main="pen"/> Signatures: <Signatures/>
-        </div>}
         {(intentErrors || expanded) && <div className="space text-small"><IntentTextDescription/></div>}
+        {txContext && txContext.signatures.length > 0 && <div>
+            <hr/>
+            <b>Signatures:</b>
+            <Signatures/>
+        </div>}
         <TxSigningStatus/>
     </div>
 }

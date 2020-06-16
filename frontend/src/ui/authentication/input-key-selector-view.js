@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {StrKey} from 'stellar-base'
+import {StrKey} from 'stellar-sdk'
 import actionContext from '../../state/action-context'
 import accountManager from '../../state/account-manager'
 
@@ -28,10 +28,8 @@ class InputKeySelectorView extends React.Component {
     render() {
         return <div>
             <div className="dimmed">Provide a secret key you'd like to use:</div>
-            <div className="space">
-                <input type="text" onChange={e => this.setKey(e.target.value)}
-                       placeholder="Secret key starting with 'S', like 'SAK4...2PLT'"/>
-            </div>
+            <input type="text" onChange={e => this.setKey(e.target.value)}
+                   placeholder="Secret key starting with 'S', like 'SAK4...2PLT'"/>
             <div>
                 <button className="button" onClick={() => this.sign()}>Sign directly</button>
             </div>

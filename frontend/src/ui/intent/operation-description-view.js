@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Address from '../components/account-address'
 import Amount from '../components/amount'
-import AssetLink from '../components/asset-link'
+import AssetName from '../components/asset-name'
 
 function SourceAccount({op, source}) {
     if (!op.source) return null
@@ -27,10 +27,21 @@ function OperationDescriptionView({op, source}) {
                 <b>Path Payment</b> max <Amount amount={op.sendMax} asset={op.sendAsset}/>
                 <span className="fa fa-space fa-random"/>
                 {op.path.map((asset, i) => <span key={i}>
-                    <AssetLink asset={asset} compact/>
+                    <AssetName asset={asset} compact/>
                     <span className="fa fa-space fa-random"/>
                 </span>)}
                 <Amount amount={op.destAmount} asset={op.destAsset}/> to <Address account={op.destination} compact/>
+                <SourceAccount op={op} source={source}/>.
+            </span>
+        case 'pathPaymentStrictSend':
+            return <span>
+                <b>Path Payment</b> <Amount amount={op.amount} asset={op.sendAsset}/>
+                <span className="fa fa-space fa-random"/>
+                {op.path.map((asset, i) => <span key={i}>
+                    <AssetName asset={asset} compact/>
+                    <span className="fa fa-space fa-random"/>
+                </span>)}
+                min <Amount amount={op.destAmount} asset={op.destAsset}/> to <Address account={op.destination} compact/>
                 <SourceAccount op={op} source={source}/>.
             </span>
         case 'manageSellOffer':
@@ -48,7 +59,7 @@ function OperationDescriptionView({op, source}) {
             } else {
                 return <span>
                     <b>{action} {op.offerId > 0 && ('#' + op.offerId)} {direction}</b>{' '}
-                    <Amount amount={op.amount} asset={op.selling}/> for <AssetLink asset={op.buying} compact/>{' '}
+                    <Amount amount={op.amount} asset={op.selling}/> for <AssetName asset={op.buying} compact/>{' '}
                     at <b>{op.price}</b> {op.buying.code}/{op.selling.code} <SourceAccount op={op} source={source}/>.
                 </span>
             }
@@ -58,7 +69,7 @@ function OperationDescriptionView({op, source}) {
             const direction = op.type === 'manageSellOffer' ? 'sell' : 'buy'
             return <span>
                     <b>Create passive {direction} offer</b> <Amount amount={op.amount} asset={op.selling}/> for{' '}
-                <AssetLink asset={op.buying} compact/> at <b>{op.price}</b> {op.buying.code}/{op.selling.code}
+                <AssetName asset={op.buying} compact/> at <b>{op.price}</b> {op.buying.code}/{op.selling.code}
                 <SourceAccount op={op} source={source}/>.
                 </span>
         }
@@ -92,23 +103,23 @@ function OperationDescriptionView({op, source}) {
         case 'changeTrust':
             if (parseFloat(op.limit) > 0)
                 return <span>
-                    <b>Create trustline</b> to <AssetLink
+                    <b>Create trustline</b> to <AssetName
                     asset={op.line} compact/> with limit <Amount amount={op.limit} asset={op.line} compact/>
                     <SourceAccount op={op} source={source}/>.
             </span>
             return <span>
-                    <b>Remove trustline</b> to <AssetLink asset={op.line} compact/>
+                    <b>Remove trustline</b> to <AssetName asset={op.line} compact/>
                     <SourceAccount op={op} source={source}/>.
                 </span>
         case 'allowTrust':
             asset = {code: op.assetCode, issuer: op.source || source}
             if (op.authorize) return <span>
-                <b>Allow trustline</b> <AssetLink asset={asset} compact/> for account <Address account={op.trustor}
+                <b>Allow trustline</b> <AssetName asset={asset} compact/> for account <Address account={op.trustor}
                                                                                                compact/>
                 <SourceAccount op={op} source={source}/>.
             </span>
             return <span>
-                <b>Disallow trustline</b> <AssetLink asset={asset} compact/> for account <Address account={op.trustor}
+                <b>Disallow trustline</b> <AssetName asset={asset} compact/> for account <Address account={op.trustor}
                                                                                                   compact/>
                 <SourceAccount op={op} source={source}/>.
             </span>

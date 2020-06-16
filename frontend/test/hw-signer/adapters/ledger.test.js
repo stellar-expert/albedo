@@ -5,7 +5,7 @@ jest.mock('@ledgerhq/hw-app-str')
 import StellarApp from '@ledgerhq/hw-app-str'
 import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
 
-import ledgerAdapter from '../../../src/util/hw-signer/adapters/ledger-adapter'
+import ledgerAdapter from '../../../src/hw-signer/adapters/ledger-adapter'
 
 const path = `44'/148'/0'`
 const publicKey = 'GARITBNKCUYWOYIUQWPARYLHYDYYKCYLLQZMX64LYEAMH3HKICGMKIVF'

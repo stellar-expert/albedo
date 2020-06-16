@@ -1,14 +1,12 @@
-import ApiCall from '../api/api-call-builder'
 import {decryptDataAes, encryptDataAes, derivePublicKeyFromSecret} from '../util/crypto-utils'
 import Account from '../state/account'
-import AccountKeypair from '../state/account-keypair'
-import AccountSensitiveData from '../state/account-sensitive-data'
+import {currentStorageVersion} from './storage-version'
 
 const accountKeyPrefix = 'account_'
 
 /**
  * Load all stored accounts.
- * @returns {String[]} all accounts (emails) stored in the browser.
+ * @returns {String[]} all accounts stored in the browser.
  */
 function enumerateStoredAccounts() {
     return Object.keys(localStorage)
@@ -23,97 +21,35 @@ function enumerateStoredAccounts() {
  */
 function loadAccountDataFromBrowserStorage(id) {
     if (!id || typeof id !== 'string' || id.length < 5) return Promise.reject(`Invalid account key: ${id}.`)
-    const storedAccount = localStorage[accountKeyPrefix + id]
+    const storedAccount = localStorage.getItem(accountKeyPrefix + id)
     if (!storedAccount) throw new Error(`Account ${id} is not stored in the browser.`)
-    return JSON.parse(storedAccount)
+    const res = JSON.parse(storedAccount)
+    if (res.version !== currentStorageVersion) {
+        //TODO: implement storage protocol upgrades here
+        return null
+    }
+    return res
 }
 
 /**
  * Encrypt account keypairs.
  * @param {Credentials} credentials - User credentials.
- * @param {AccountSensitiveData} sensitiveData - Sensitive account data to encrypt.
+ * @param {String} secret - Account secret key.
  * @returns {String}
  */
-function encryptSensitiveAccountData(credentials, sensitiveData) {
-    if (!(sensitiveData instanceof AccountSensitiveData)) throw new Error('Invalid sensitive data provided')
-    return encryptDataAes(JSON.stringify(sensitiveData), credentials.encryptionKey)
+function encryptAccountSecret(credentials, secret) {
+    return encryptDataAes(secret, credentials.encryptionKey)
 }
 
 /**
  * Decrypt account keypairs.
  * @param {Credentials} credentials - User credentials.
- * @returns {AccountSensitiveData}
+ * @returns {String}
  */
-function decryptSensitiveAccountData(credentials) {
+function decryptAccountSecret(credentials) {
     const {account} = credentials
-    if (!account.encryptedData) return new AccountSensitiveData()
-    const decrypted = JSON.parse(decryptDataAes(account.encryptedData, credentials.encryptionKey))
-    return new AccountSensitiveData(decrypted)
-}
-
-/**
- * Register new user account.
- * @param {Credentials} credentials - User credentials.
- * @returns {Promise<Account>}
- */
-function registerAccount(credentials) {
-    const {account} = credentials
-    if (account.version !== 1)
-        throw new Error(`Invalid sensitive data version: ${account.version}. Expected 1.`)
-
-    return new ApiCall('keystore')
-        .data({
-            id: credentials.authKey,
-            version: account.version,
-            data: account.encryptedData
-        })
-        .authorize(credentials)
-        .post()
-        .then(res => {
-            //TODO: check the result from server
-            return account
-        })
-}
-
-/**
- * Save an account on the server if multiLogin feature is enabled.
- * @param {Credentials} credentials - User credentials.
- * @param {{authPublicKey: String, totpKey: String}} updatedAuthorizationCredentials - Updated account authorization settings.
- * @returns {Promise<Account>}
- */
-function persistAccountServerSide(credentials, updatedAuthorizationCredentials = null) {
-    const {account} = credentials,
-        id = credentials.authKey,
-        payload = {
-            id,
-            version: account.version,
-            data: account.encryptedData
-        }
-
-    //include updated authorization settings if provided
-    if (updatedAuthorizationCredentials) {
-        const {totpKey} = updatedAuthorizationCredentials
-        //update TOTP secret
-        if (totpKey) {
-            payload.totpKey = totpKey
-        }
-    }
-
-    return new ApiCall(`keystore/${encodeURIComponent(id)}`)
-        .data(payload)
-        .authorize(credentials)
-        .put()
-}
-
-/**
- * Load account data from the server.
- * @param {Credentials} credentials - User credentials.
- * @returns {Promise<Object>}
- */
-function loadAccountFromServer(credentials) {
-    return new ApiCall(`keystore/${encodeURIComponent(credentials.authKey)}`)
-        //.authorize(credentials)
-        .get()
+    if (!account.encryptedSecret) return null
+    return decryptDataAes(account.encryptedSecret, credentials.encryptionKey)
 }
 
 /**
@@ -127,7 +63,7 @@ function persistAccountInBrowser(account) {
     return account
 }
 
-function eraseAccountInBrowser(account) {
+function forgetAccount(account) {
     if (!account.id) throw new Error('Invalid account.')
     localStorage.removeItem(accountKeyPrefix + account.id)
     return account
@@ -147,14 +83,11 @@ function retrieveRecentAccount() {
 
 export {
     enumerateStoredAccounts,
-    encryptSensitiveAccountData,
-    decryptSensitiveAccountData,
+    encryptAccountSecret,
+    decryptAccountSecret,
     persistAccountInBrowser,
     loadAccountDataFromBrowserStorage,
-    persistAccountServerSide,
-    loadAccountFromServer,
-    registerAccount,
-    eraseAccountInBrowser,
+    forgetAccount,
     updateRecentAccount,
     retrieveRecentAccount
 }

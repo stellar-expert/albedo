@@ -1,11 +1,23 @@
 .active-icon {
   display: inline-block;
-  margin: 0 0.3em;
-  padding: 0.3em;
+  padding: 0 .3em;
+  position: relative;
 
   &:active {
-    color: #FFF;
-    background: #999;
-    border-radius: 50%;
+    color: $color-bg;
+    outline: none;
+
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -.25em;
+      left: 0.05em;
+      width: 1.5em;
+      height: 1.5em;
+      border-radius: 50%;
+      background: $color-highlight;
+      z-index: -1;
+    }
   }
 }

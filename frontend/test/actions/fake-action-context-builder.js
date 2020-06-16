@@ -1,5 +1,5 @@
 import clone from 'clone'
-import {Account, Keypair} from 'stellar-base'
+import {Account, Keypair} from 'stellar-sdk'
 
 const defaultContext = {
     selectedAccount: {

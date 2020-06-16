@@ -2,30 +2,30 @@ fieldset,
 input:not([type=checkbox]),
 select,
 textarea {
-  margin-bottom: 1.5rem;
+  margin-bottom: $space-block;
 }
 
 ol,
 p,
 pre,
 table {
-  margin-bottom: 1.5rem;
+  margin-bottom: $space-block;
 }
 
 .space {
-  margin-top: 1.5rem;
+  margin-top: $space-block;
 }
 
 .micro-space {
-  margin-top: 0.7rem;
+  margin-top: $space-block-micro;
 }
 
 .double-space {
-  margin-top: 4rem;
+  margin-top: 2*$space-block;
 }
 
 .block-indent {
-  padding-left: 3rem;
+  padding-left: 2*$space-block;
 }
 
 @media (max-width: $responsive-mobile-browser-width) {

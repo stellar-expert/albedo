@@ -1,6 +1,6 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import IntentBlock from './demo-intent-block-view'
+import IntentBlock from './demo-intent-block/demo-intent-block-view'
 import {intentInterface} from 'albedo-intent'
 import demoNav from './demo-nav-model'
 import DemoIntroView from './demo-intro-view'
@@ -72,16 +72,18 @@ class DemoView extends React.Component {
     }
 
     render() {
-        return <div>
-            <h2>Demos & How-To</h2>
-            <div className="row">
-                <div className="column column-40">
-                    <div className="segment" style={{margin: '0 -0.5em', padding: '0.5em 1em'}}>
-                        {this.renderNav()}
+        return <div className="row wide no-center">
+            <div className="column">
+                <h2>Demos & How-To</h2>
+                <div className="row">
+                    <div className="column column-40">
+                        <div className="segment" style={{margin: '0 -0.5em', padding: '0.5em 1em'}}>
+                            {this.renderNav()}
+                        </div>
                     </div>
-                </div>
-                <div className="column column-60">
-                    {this.renderSection()}
+                    <div className="column column-60">
+                        {this.renderSection()}
+                    </div>
                 </div>
             </div>
         </div>

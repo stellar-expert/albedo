@@ -1,5 +1,6 @@
 import {generateRandomToken} from './random-token-generator'
 import intentErrors from './intent-errors'
+import pkgInfo from '../package.json'
 
 class TransportHandler {
     /**
@@ -12,6 +13,7 @@ class TransportHandler {
         this.ephemeral = !!ephemeral
         this.isLoaded = false
         this.pendingRequests = {}
+        this.preprocessRequestParams = null
         this.onLoaded = new Promise((resolve, reject) => this.onLoadedCallback = resolve)
         this.messageHandler = this.messageHandler.bind(this)
         window.addEventListener('message', this.messageHandler, false)
@@ -64,10 +66,6 @@ class TransportHandler {
             }
     }
 
-    prepareRequestParams(params) {
-        return params
-    }
-
     /**
      * Request intent confirmation using current transport.
      * @param {Object} params - Intent request params.
@@ -78,7 +76,10 @@ class TransportHandler {
         return new Promise((resolve, reject) => {
             this.onLoaded.then(() => {
                 this.pendingRequests[nonce] = (err, data) => err ? reject(err) : resolve(data)
-                params = this.prepareRequestParams(Object.assign({__reqid: nonce}, params))
+                params = Object.assign({__reqid: nonce, __albedo_intent_version: pkgInfo.version}, params)
+                if (this.preprocessRequestParams) {
+                    params = this.preprocessRequestParams(params)
+                }
                 this.windowHandler.postMessage(params, '*')
             })
         })

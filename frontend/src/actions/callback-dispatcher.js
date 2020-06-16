@@ -1,6 +1,5 @@
 import errors from '../util/errors'
-import {isInsideExtensionBackgroundScript} from '../util/extension-utils'
-import actionContext from '../state/action-context'
+import {isInsideFrame} from '../util/frame-utils'
 
 const urlSchema = 'url:'
 
@@ -40,17 +39,13 @@ function postMessage(res, actionContext) {
     return Promise.resolve()
 }
 
-function locateCallerWindow(actionContext) {
-    return actionContext.isInsideFrame ? window.top : window.opener
+function locateCallerWindow() {
+    return isInsideFrame() ? window.top : window.opener
 }
 
 function dispatchIntentResponse(res, actionContext) {
     const {callback, __reqid} = actionContext.intentParams
     res.__reqid = __reqid
-    //handle the implicit flow in the background script case
-    if (isInsideExtensionBackgroundScript())
-        return Promise.resolve(res)
-
     return callback ? execCallback(callback, res) : postMessage(res, actionContext)
 }
 
@@ -64,9 +59,6 @@ function handleIntentResponseError(error, actionContext) {
         error = errors.actionRejectedByUser
     }
     error = errors.prepareErrorDescription(error, actionContext.intentParams)
-    //invocation from background script - extension messaging system will handle the response
-    if (isInsideExtensionBackgroundScript())
-        return Promise.reject(error)
 
     const {callback} = actionContext.intentParams
     if (callback) {

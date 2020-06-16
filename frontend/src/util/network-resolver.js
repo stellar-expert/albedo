@@ -1,5 +1,5 @@
 import appSettings from '../state/app-settings'
-import {Networks} from 'stellar-base'
+import {Networks} from 'stellar-sdk'
 
 /**
  * Resolve Stellar network identifier based on the intent settings.

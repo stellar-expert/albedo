@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Transaction} from 'stellar-base'
+import {Transaction} from 'stellar-sdk'
 import OperationDescription from './operation-description-view'
 import AccountAddress from '../components/account-address'
 import {zeroAccount} from '../../util/signature-hint-utils'

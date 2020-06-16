@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {observer} from 'mobx-react'
 import errors from '../../util/errors'
 import accountManager from '../../state/account-manager'
 import Account from '../../state/account'
@@ -7,6 +8,7 @@ import Credentials from '../../state/credentials'
 import CredentialsRequest from './credentials-request-view'
 import authorizationService from '../../state/authorization'
 
+@observer
 class AuthorizationRequestView extends React.Component {
     constructor(props) {
         super(props)
@@ -15,13 +17,10 @@ class AuthorizationRequestView extends React.Component {
 
     get defaultState() {
         return {
-            email: '',
             account: null,
             inProgress: false,
-            requestEmail: false,
-            requestPassword: false,
-            requestTotp: false,
-            noHW: false
+            noHW: false,
+            error: null
         }
     }
 
@@ -29,28 +28,12 @@ class AuthorizationRequestView extends React.Component {
         this.requestAuthorization()
     }
 
-    requestAuthorization(requireTotpCode = false) {
+    requestAuthorization() {
         const {account} = authorizationService,
             newState = {
-                requestEmail: true,
-                requestPassword: true,
-                requestTotp: true,
-                noHW: !account.isHWAccount
+                noHW: !account.isHWAccount,
+                account
             }
-
-        if (typeof account === 'string') {
-            newState.email = account
-        }
-
-        if (account instanceof Account) {
-            Object.assign(newState, {
-                email: account.id,
-                requestEmail: false,
-                account,
-                requestTotp: !!requireTotpCode
-            })
-        }
-
         this.setState(newState)
     }
 
@@ -59,26 +42,22 @@ class AuthorizationRequestView extends React.Component {
     }
 
     async submit(data) {
-        const {id, password, totp} = data,
+        this.setState({inProgress: true, error: null})
+        const {id, password} = data,
             account = this.state.account || accountManager.get(id) || new Account({id}),
-            credentials = await Credentials.create({account, password, totp})
+            credentials = await Credentials.create({account, password})
 
-        this.setState({inProgress: true})
-
+        if (!credentials.checkPasswordCorrect()) {
+            this.setState({inProgress: false, error: 'Invalid password'})
+            return
+        }
         try {
-            //if (totp) { //fetch account from the server if TOTP is provided
-            await account.load(credentials) //always fetch from the server to sync everything
-
             authorizationService.credentialsRequestCallback.resolve(credentials)
             //restore default state
             this.setState(this.defaultState)
         } catch (e) {
             this.setState({inProgress: false})
             console.error(e)
-            if (e.status === 404) {
-                this.setState({error: 'Invalid email or password. Please try again.'})
-                return
-            }
             //unhandled
             if (!e.status) {
                 e = errors.unhandledError()
@@ -101,13 +80,16 @@ class AuthorizationRequestView extends React.Component {
 
     render() {
         if (!authorizationService.dialogOpen) return null
-        return <CredentialsRequest title={`Authorization for ${this.state.email}`}
-                                   confirmText="Confirm"
-                                   modal
-                                   onConfirm={data => this.submit(data)}
-                                   onCancel={() => this.cancel()}
-                                   {...this.state}>
-        </CredentialsRequest>
+        const {account} = this.state
+        if (!account) return null
+        return <div>
+            <h2>Authorization for {account.friendlyName}</h2>
+            <div className="space text-small dimmed">
+                Please provide your password
+            </div>
+            <CredentialsRequest confirmText="Confirm" noRegistrationLink {...this.state}
+                                onConfirm={data => this.submit(data)} onCancel={() => this.cancel()}/>
+        </div>
     }
 }
 
