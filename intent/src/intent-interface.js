@@ -1,13 +1,4 @@
 const intentInterface = {
-    basic_info: {
-        risk: 'low',
-        title: 'View personal info',
-        personalData: true,
-        unsafe: false,
-        implicitFlow: false,
-        params: {},
-        returns: ['info']
-    },
     public_key: {
         risk: 'low',
         title: 'View public key',
@@ -91,20 +82,10 @@ const intentInterface = {
         unsafe: true,
         implicitFlow: false,
         params: {
-            intents: {required: true}
+            intents: {required: true},
+            network: {required: true}
         },
-        returns: ['granted', 'intents', 'session', 'pubkey', 'valid_until']
-    },
-    create_keypair: {
-        risk: 'low',
-        title: 'Create new key pair',
-        personalData: false,
-        unsafe: false,
-        implicitFlow: true,
-        params: {
-            name: {required: false}
-        },
-        returns: ['pubkey']
+        returns: ['granted', 'intents', 'session', 'pubkey', 'network', 'valid_until']
     },
     exchange: {
         risk: 'high',
@@ -124,6 +105,17 @@ const intentInterface = {
             submit: {required: false, type: Boolean}
         },
         returns: ['amount', 'max_price', 'sell_asset_code', 'sell_asset_issuer', 'buy_asset_code', 'buy_asset_issuer', 'tx_signature', 'network', 'horizon']
+    },
+    create_keypair: {
+        risk: 'low',
+        title: 'Create new key pair',
+        personalData: false,
+        unsafe: false,
+        implicitFlow: true,
+        params: {
+            name: {required: false}
+        },
+        returns: ['pubkey']
     }
 }
 

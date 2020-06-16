@@ -21,7 +21,7 @@ function createDialogTransport(frontendUrl) {
     return new TransportHandler(dialogWindow, true)
 }
 
-let sharedTransport = null
+let sharedIframeTransport = null
 
 /**
  * Create implicit transport based on hidden iframe.
@@ -30,34 +30,20 @@ let sharedTransport = null
  */
 function createIframeTransport(frontendUrl) {
     //check if already initialized
-    if (!sharedTransport) {
+    if (!sharedIframeTransport) {
         const iframe = document.createElement('iframe')
+        iframe.style.border = 'none'
         Object.assign(iframe, {
-            width: 0,
-            height: 0,
-            border: 0,
-            referrerpolicy: 'origin',
-            position: 'absolute',//???
-            style: '',
+            width: '0',
+            height: '0',
+            frameBorder: '0',
+            referrerPolicy: 'origin',
             src: `${frontendUrl}/implicit`
         })
         document.body.appendChild(iframe)
-        sharedTransport = new TransportHandler(iframe.contentWindow)
+        sharedIframeTransport = new TransportHandler(iframe.contentWindow)
     }
-    return sharedTransport
+    return sharedIframeTransport
 }
 
-/**
- * Create a transport on top of the extension API.
- * @return {TransportHandler}
- */
-function createExtensionTransport() {
-    if (!sharedTransport) {
-        sharedTransport = new TransportHandler(window)
-        sharedTransport.prepareRequestParams = params => ({albedoExtensionRequest: params})
-        sharedTransport.markLoaded()
-    }
-    return sharedTransport
-}
-
-export {createDialogTransport, createIframeTransport, createExtensionTransport}
+export {createDialogTransport, createIframeTransport}

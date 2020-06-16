@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import {ACCOUNT_TYPES} from '../../src/state/account'
-import StellarSigner from '../../src/util/hw-signer/hw-signer'
-import {DEVICE_CONNECT, DEVICE_DISCONNECT} from '../../src/util/hw-signer/adapters/adapter-events'
+import StellarSigner from '../../src/hw-signer/hw-signer'
+import {DEVICE_CONNECTED, DEVICE_DISCONNECTED} from '../../src/hw-signer/adapters/adapter-events'
 
 describe('Hardware Signer', () => {
     it('should be able to set adapter', () => {
@@ -17,8 +17,8 @@ describe('Hardware Signer', () => {
         mockedAdapter.off = jest.fn().mockImplementation(() => mockedAdapter)
         signer.setAdapter(mockedAdapter)
 
-        expect(mockedAdapter.on).toHaveBeenNthCalledWith(1, DEVICE_CONNECT, expect.any(Function))
-        expect(mockedAdapter.on).toHaveBeenNthCalledWith(2, DEVICE_DISCONNECT, expect.any(Function))
+        expect(mockedAdapter.on).toHaveBeenNthCalledWith(1, DEVICE_CONNECTED, expect.any(Function))
+        expect(mockedAdapter.on).toHaveBeenNthCalledWith(2, DEVICE_DISCONNECTED, expect.any(Function))
     })
 
     /*it('should deregister listeners on adapter re-set', () => {

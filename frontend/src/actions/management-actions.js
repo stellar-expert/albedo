@@ -1,6 +1,6 @@
-import {Keypair} from 'stellar-base'
+import {Keypair} from 'stellar-sdk'
 import accountManager from '../state/account-manager'
-import {saveImplicitSession} from '../storage/session-storage'
+import {saveImplicitSession} from '../storage/implicit-session-storage'
 
 function findFriendlyName(account, desiredName) {
     if (!desiredName) desiredName = 'New key pair'
@@ -27,7 +27,7 @@ export default function (responder) {
                 //add/modify a keypair
                 sensitiveData.addOrUpdateKeypair({secret: kp.secret(), friendlyName})
                 //update the data
-                return activeAccount.updateSensitiveData(credentials, sensitiveData)
+                return activeAccount.updateAccountSecret(credentials, sensitiveData)
                 //save account on the server and in browser
                     .then(() => activeAccount.save(credentials))
                     .then(() => ({
@@ -40,13 +40,14 @@ export default function (responder) {
     responder.registerReaction('implicit_flow', function ({actionContext, executionContext}) {
         const {intentParams} = actionContext,
             {activeAccount} = accountManager,
-            {intents} = intentParams
+            {intents, network} = intentParams
         return executionContext.retrieveSessionData()
             .then(data => {
-                data.intents = intents
+                Object.assign(data, {intents, network})
                 const {sessionKey, validUntil} = saveImplicitSession(activeAccount, 3600, data)
                 return {
                     granted: true,
+                    network: network,
                     session: sessionKey,
                     pubkey: data.publicKey,
                     grants: intents,

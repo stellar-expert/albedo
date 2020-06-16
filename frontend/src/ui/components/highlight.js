@@ -1,12 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import hljs from 'highlight.js/lib/highlight'
+import cn from 'classnames'
+import hljs from 'highlight.js/lib/core'
 import jsLang from 'highlight.js/lib/languages/javascript'
 import jsonLang from 'highlight.js/lib/languages/json'
 import htmlLang from 'highlight.js/lib/languages/xml'
 import plaintextLang from 'highlight.js/lib/languages/plaintext'
 import './highlight.scss'
-import cn from 'classnames'
 
 hljs.registerLanguage('js', jsLang)
 hljs.registerLanguage('json', jsonLang)

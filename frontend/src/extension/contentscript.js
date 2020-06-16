@@ -1,9 +1,10 @@
 import browser from 'webextension-polyfill'
+import {contentscriptMessageDispatcher} from './messaging/contenscript-message-dispatcher'
 
-function executeInPageContext({src, file}) {
+function executeInPageContext({source, file}) {
     const script = document.createElement('script')
-    if (src) {
-        script.text = text
+    if (source) {
+        script.text = source
     }
     if (file) {
         script.src = browser.runtime.getURL(file)
@@ -13,23 +14,8 @@ function executeInPageContext({src, file}) {
     };
     (document.head || document.documentElement).appendChild(script)
 }
-//
-/*browser.runtime.onMessage.addListener(function (request, sender) {
-    //proxy messages from extension to the original caller window
-    window.postMessage(request)
-})*/
 
-//capture it in the contentscript.js and pass to the rest of the extension
-window.addEventListener('message', function (event) {
-    //only accept messages from this window to itself [i.e. not from any iframes]
-    if (event.source !== window) return
-    if (!event.data.albedoExtensionRequest) return
-    const {origin} = event.source
-    // broadcasts it to rest of extension
-    browser.runtime.sendMessage(event.data)
-        .then(response => {
-            window.postMessage(response, origin)
-        })
-}, false)
+contentscriptMessageDispatcher.proxyToBackgroundPage('get-stored-credentials')
+contentscriptMessageDispatcher.proxyToBackgroundPage('save-stored-credentials')
 
-executeInPageContext({file: 'injected-albedo-intent.js'})
+executeInPageContext({source: 'window.albedoExtensionInstalled = true'})

@@ -1,6 +1,5 @@
-import merge from 'deepmerge'
 import defaultConfig from '../../default-config'
 
-const appSettings = merge(defaultConfig, typeof window !== 'undefined' && window.clientConfig || {})
+const appSettings = defaultConfig
 
 export default appSettings

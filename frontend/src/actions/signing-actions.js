@@ -20,26 +20,6 @@ export default function (responder) {
         }
     })
 
-    responder.registerReaction('basic_info', async function ({executionContext}) {
-        try {
-            const {email, avatar = null} = accountManager.activeAccount,
-                info = {avatar, email},
-                messageToSign = JSON.stringify(info),
-                {signature, signedMessage} = await executionContext.signMessage(messageToSign)
-
-            return {
-                info,
-                pubkey: executionContext.publicKey,
-                signed_message: signedMessage.toString('hex'),
-                signature: signature.toString('hex')
-            }
-        } catch (e) {
-            console.error(e)
-            if (e.code) throw e
-            throw standardErrors.messageSigningFailed
-        }
-    })
-
     responder.registerReaction('public_key', async function ({executionContext}) {
         try {
             const {publicKey} = executionContext,

@@ -88,18 +88,30 @@ module.exports = function (env, argv) {
         },
         plugins: [
             new webpack.IgnorePlugin(/ed25519/),
-            new CopyPlugin([
-                path.join(__dirname, './static/shared/'),
-                path.join(__dirname, './static/app/')
-            ]),
+            new webpack.IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
+            new CopyPlugin({
+                patterns: [
+                    path.join(__dirname, './static/shared/'),
+                    {
+                        from: path.join(__dirname, './static/app/'),
+                        transform(content, absoluteFrom) {
+                            if (absoluteFrom.includes('index.html')) {
+                                content = content.toString('utf8').replace(/v=0\.0\.0/g, 'v=' + pkgInfo.version)
+                                return Buffer.from(content, 'utf8')
+                            }
+                            return content
+                        }
+                    }
+                ]
+            }),
             new MiniCssExtractPlugin({
                 filename: '[name].css'
             }),
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': JSON.stringify(mode),
+                albedoOrigin: JSON.stringify(mode === 'development' ? 'https://localhost:5001' : 'https://albedo.link'),
                 appVersion: JSON.stringify(pkgInfo.version)
-            }),
-            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)
+            })
         ],
         node: {
             fs: 'empty'

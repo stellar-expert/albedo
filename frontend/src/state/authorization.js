@@ -1,9 +1,9 @@
-import {getCredentialsFromExtensionStorage, saveCredentialsInExtensionStorage} from '../storage/extension-auth-storage'
+import {getCredentialsFromExtensionStorage, saveCredentialsInExtensionStorage} from '../storage/extension-auth-storage-interface'
 import Credentials from './credentials'
 import standardErrors from '../util/errors'
 import {observable, action, runInAction} from 'mobx'
 
-class AuthroizationService {
+class AuthorizationService {
     constructor() {
         setTimeout(() => { //TODO: address the loading sequence problem and rewrite this dirty hack
             __history.listen((location, action) => {
@@ -35,7 +35,7 @@ class AuthroizationService {
     requestAuthorization(account) {
         return getCredentialsFromExtensionStorage(account.id)
             .catch(e => {
-                console.error(e)
+                e && console.error(e)
             })
             .then(encryptionKey => {
                 if (encryptionKey) return Credentials.create({account, encryptionKey})
@@ -49,7 +49,8 @@ class AuthroizationService {
                 })
                     .then(credentials => {
                         try {
-                            credentials.account.requestSensitiveData(credentials)
+                            credentials.account.requestAccountSecret(credentials)
+                            saveCredentialsInExtensionStorage(credentials)
                         } catch (e) {
                             return Promise.reject(standardErrors.invalidPassword)
                         }
@@ -65,5 +66,5 @@ class AuthroizationService {
     }
 }
 
-const authorizationService = new AuthroizationService()
+const authorizationService = new AuthorizationService()
 export default authorizationService

@@ -1,43 +1,31 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import {observer} from 'mobx-react'
-import cn from 'classnames'
-import Amount from '../components/amount'
-import AccountLedgerData from '../../state/account-ledger-data'
-import {formatAssetUnifiedLink} from '../../util/formatter'
+import {formatAssetUnifiedLink, formatCurrency} from '../../util/formatter'
+import {parseAssetInfo} from '../../util/asset-info-parser'
+import AssetName from '../components/asset-name'
+import './account-balance-view.scss'
 
-@observer
-class AccountBalanceView extends React.Component {
-    state = {
-        accountData: null
-    }
-
-    static propTypes = {
-        address: PropTypes.string.isRequired
-    }
-
-    componentDidMount() {
-        const data = new AccountLedgerData(this.props.address)
-        data.sync()
-            .catch(e => console.error(e))
-        this.setState({accountData: data})
-    }
-
-    render() {
-        const {accountData} = this.state
-        if (!accountData || !accountData.loaded) return null
-        if (accountData.nonExisting) return <div className="dimmed text-small">
-            (Balances unavailable - account doesn't exist on the ledger)
+function AccountBalanceView({balance, asset}) {
+    return <div className="account-balance dual-layout">
+        <AssetName asset={asset}/>
+        <div className="balance">
+            {formatCurrency(balance.balance)}<span className="dimmed text-small">{asset.split('-')[0]}</span>
         </div>
-        return <div>
-            {accountData.balances.map(balance => {
-                const asset = formatAssetUnifiedLink({code: balance.asset_code, issuer: balance.asset_issuer})
-                return <span key={asset}>
-                <Amount amount={balance.balance} asset={asset}/>
-            </span>
-            })}
-        </div>
-    }
+    </div>
 }
 
-export default AccountBalanceView
+function AllAccountBalancesView({balances, nonExisting}) {
+    if (nonExisting) {
+        balances = [{asset_type: 'native', balance: 0}]
+    }
+    return <div>
+        {balances.map(balance => {
+            const asset = formatAssetUnifiedLink(parseAssetInfo(balance))
+            return <AccountBalanceView key={asset} balance={balance} asset={asset}/>
+        })}
+        {nonExisting && <div className="dimmed text-micro space text-center">
+            (Balances unavailable - account doesn't exist on the ledger)
+        </div>}
+    </div>
+}
+
+export default AllAccountBalancesView

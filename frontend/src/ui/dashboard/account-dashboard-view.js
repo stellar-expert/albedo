@@ -1,23 +1,47 @@
 import React from 'react'
-import cn from 'classnames'
-import AccountBalance from './account-balance-view'
-import dashboardSettings from '../../state/dashboard-settings'
+import {observer} from 'mobx-react'
+import accountManager from '../../state/account-manager'
+import AccountSelectorView from './account-selector-view'
+import {CopyToClipboard} from 'react-copy-to-clipboard'
+import AccountAddress from '../components/account-address'
+import AccountLedgerDataView from './account-ledger-info-view'
+import NetworkSelectorView from './network-selector-view'
+import AccountActivityView from '../account/account-activity-view'
 
-function AccountDashboardView({account}) {
-    return <div>
-        <h2>Account <a href="/account" title="Account settings">{account.displayName} <i style={{fontSize: '0.7em'}}
-                                                                                         className="fa fa-cog"/></a>
-        </h2>
-        <div>
-            {account.keypairs.map(kp => <div className="space" key={kp.publicKey}>
-                <div><span className="dimmed">Keypair</span> {kp.displayName}</div>
-                <div className="micro-space">
-                    <AccountBalance address={kp.publicKey}/>
-                </div>
-            </div>)}
+function AccountDashboardView() {
+    const account = accountManager.activeAccount
+    if (!account) {
+        __history.push('/')
+        return null
+        return <div>
+            <h2>Welcome</h2>
+            <div className="space">
+
+            </div>
         </div>
+    }
+    return <div>
+        <h2><AccountSelectorView/></h2>
+        <div className="dual-layout">
+            <div>
+                <span className="dimmed">Address: </span>
+                <span className="nowrap">
+                    <AccountAddress account={account.publicKey} chars={8}/>
+                    <CopyToClipboard text={account.publicKey}>
+                        <a href="#" className="fa fa-copy active-icon" title="Copy public key to clipboard"/>
+                    </CopyToClipboard>
+                        </span>
+            </div>
+            <div className="text-right"><NetworkSelectorView/></div>
+        </div>
+        <div className="space">
+            <h3>Balances</h3>
+            <AccountLedgerDataView address={account.publicKey}/>
+        </div>
+        <div className="space"/>
+        <hr className="space"/>
+        <AccountActivityView address={account.publicKey}/>
     </div>
 }
 
-export default AccountDashboardView
-
+export default observer(AccountDashboardView)

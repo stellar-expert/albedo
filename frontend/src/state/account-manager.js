@@ -1,11 +1,10 @@
-import {observable, action, transaction} from 'mobx'
-import Account from './account'
-import AccountKeypair from './account-keypair'
+import {observable, action} from 'mobx'
+import Account, {ACCOUNT_TYPES} from './account'
 import {
     enumerateStoredAccounts,
     loadAccountDataFromBrowserStorage,
     persistAccountInBrowser,
-    eraseAccountInBrowser,
+    forgetAccount,
     updateRecentAccount,
     retrieveRecentAccount
 } from '../storage/account-storage'
@@ -13,10 +12,7 @@ import {
 class AccountManager {
     constructor() {
         this.loadAvailableAccounts()
-        const recent = this.get(retrieveRecentAccount())
-        if (recent) {
-            this.activeAccount = recent
-        }
+        this.activeAccount = this.get(retrieveRecentAccount()) || null
     }
 
     /**
@@ -44,13 +40,6 @@ class AccountManager {
     activeAccount = null
 
     /**
-     * Currently selected keypair.
-     * @type {AccountKeypair}
-     */
-    @observable
-    selectedKeypair = null
-
-    /**
      * All accounts saved to browser localStorage.
      * @type {Account[]}
      */
@@ -67,46 +56,31 @@ class AccountManager {
     }
 
     /**
-     * Update selected keypair.
-     * @param {AccountKeypair} keypair - Selected keypair.
-     */
-    @action
-    setSelectedKeypair(keypair) {
-        if (!(keypair instanceof AccountKeypair)) throw new TypeError('Invalid keypair.')
-        this.setActiveAccount(keypair.account)
-        this.selectedKeypair = keypair
-    }
-
-    /**
      * Load all accounts saved in browser localStorage.
      */
     @action
     loadAvailableAccounts() {
+        //console.log('Enumerating accounts', Object.keys(storageAbstraction.storage))
         this.accounts = enumerateStoredAccounts()
-            .map(id => new Account(loadAccountDataFromBrowserStorage(id)))
-        //this.createDemoAccount()
-        //.catch(e => console.error(e))
+            .map(id => loadAccountDataFromBrowserStorage(id))
+            .filter(a => !!a)
+            .map(a => new Account(a))
     }
 
     @action
     addAccount(account) {
         if (!(account instanceof Account)) throw new Error('Invalid account provided.')
-        const i = this.accounts.findIndex(a => a.id === account.id)
-        if (i >= 0) {
-            //replace existing account
-            this.accounts.splice(i, 1, account)
-            //TODO: check existing account properties and merge them
-        } else {
+        if (!this.accounts.some(a => a.id === account.id)) {
             this.accounts.push(account)
         }
     }
 
-    signOut(account) {
+    forget(account) {
         const pos = this.accounts.indexOf(account)
         if (pos >= 0) {
             this.accounts.splice(pos, 1)
         }
-        eraseAccountInBrowser(account)
+        forgetAccount(account)
         if (this.activeAccount === account) {
             this.setActiveAccount(this.accounts[0])
         }
@@ -117,12 +91,12 @@ class AccountManager {
         let account = this.get(accountId)
         let shouldUpdate = false
         if (!account) {
-            account = new Account({id: accountId, accountType: type})
-            shouldUpdate = true
-        }
-
-        const keypair = new AccountKeypair({path, publicKey}, account)
-        if (account.addKeypair(keypair)) {
+            account = new Account({
+                id: accountId,
+                accountType: type,
+                path,
+                publicKey
+            })
             shouldUpdate = true
         }
         if (shouldUpdate) {
@@ -131,35 +105,18 @@ class AccountManager {
         return account
     }
 
-    /**
-     * Create demo account if it does not exist and unlock it permanently.
-     * @returns {Promise<Account>}
-     */
-
-    /*@action
-    createDemoAccount() {
-        const demoEmail = 'demo@demo.com'
-        let existingDemoAccount = this.get(demoEmail)
-        if (existingDemoAccount) {
-            if (existingDemoAccount.isDecrypted) return Promise.resolve(existingDemoAccount) //everything ok
-            //something went wrong, have to recreate it
-            deleteAccount(existingDemoAccount)
-            this.accounts = this.accounts.filter(a => a !== existingDemoAccount)
+    findSuitableFriendlyName() {
+        const n = this.accounts
+            .map(a => (/account\s?(\d+)/i.exec(a.friendlyName) || [])[1])
+            .filter(name => !!name)
+            .map(name => parseInt(name))
+        if (!n.length) {
+            if (this.accounts.some(a => a.accountType === ACCOUNT_TYPES.STORED_ACCOUNT)) return 'Account 1'
+            return 'Default Account'
         }
-
-        let pwd = Math.random().toString(36).slice(2)
-        return Account.create(demoEmail, pwd)
-            .then(demoAccount => {
-                return demoAccount.addKeypair(new AccountKeypair({
-                    secret: 'SCDQNBXV6WSAUCVNYQCD6NAXL7S2ROG2DSHHEBLKIGKQPYWUIUAYIO7T',
-                    friendlyName: 'Demo account'
-                }))
-                    .then(() => demoAccount.save())
-                    .then(() => demoAccount.unlock(pwd, 100000000000))
-                    .then(() => this.accounts.push(demoAccount))
-                    .then(() => demoAccount)
-            })
-    }*/
+        n.sort()
+        return 'Account ' + (1 + n.pop())
+    }
 }
 
 const manager = new AccountManager()
