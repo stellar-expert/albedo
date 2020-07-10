@@ -19,7 +19,6 @@ const allSections = [
     'exchange',
     'implicit_flow',
     'payment-request'
-    //'create_keypair'
 ]
 
 @observer

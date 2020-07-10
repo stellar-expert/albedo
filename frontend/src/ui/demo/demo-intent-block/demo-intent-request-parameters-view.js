@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function DemoIntentRequestParametersView({allParams, intentParams, demoParams, inProgress, onChange}) {
+export default function DemoIntentRequestParametersView({allParams, intentParams, inProgress, onChange}) {
     const keys = Object.keys(allParams)
     if (!keys.length) return <div className="dimmed">No parameters</div>
     return <>{keys.map(param => {
@@ -8,8 +8,8 @@ export default function DemoIntentRequestParametersView({allParams, intentParams
         if (!intentParams[param].required) {
             descr += ' (optional)'
         }
-        if (demoParams[param]) {
-            const paramDescription = demoParams[param].description
+        if (intentParams[param]) {
+            const paramDescription = intentParams[param].description
             if (paramDescription) {
                 descr += ' - ' + paramDescription
             }

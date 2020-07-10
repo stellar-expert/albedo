@@ -113,17 +113,19 @@ class Intent {
     }
 
     /**
-     * Request inflation pool voting.
+     * Request token exchange on Stellar DEX.
      * @param {Object} params - Intent parameters.
-     * @param {String} params.destination - Inflation destination address.
-     * @param {String} [params.pubkey] - Specific public key requested by the application.
-     * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
-     * @param {String} [params.horizon] - The URL of the Horizon server.
-     * @param {Boolean} [params.submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
-     * @returns {Promise<Object>}
+     * @param {String} params.destination - Payment destination address.
+     * @param {String} params.amount - Amount to pay.
+     * @param {String} params.max_price - Maximum price to pay.
+     * @param {String} [params.sell_asset_code] - [Optional] Selling asset code (if not set XLM is implied).
+     * @param {String} [params.sell_asset_issuer] - [Optional] Selling asset issuer (if not set XLM is implied).
+     * @param {String} [params.buy_asset_code] - [Optional] Selling asset code (if not set XLM is implied).
+     * @param {String} [params.buy_asset_issuer] - [Optional] Selling asset issuer (if not set XLM is implied).
+     * @return {Promise<Object>}
      */
-    inflationVote(params) {
-        return this.request('inflation_vote', params)
+    exchange(params) {
+        return this.request('exchange', params)
     }
 
     /**
@@ -150,22 +152,6 @@ class Intent {
 
     generateRandomToken() {
         return generateRandomToken()
-    }
-
-    /**
-     * Request token exchange on Stellar DEX.
-     * @param {Object} params - Intent parameters.
-     * @param {String} params.destination - Payment destination address.
-     * @param {String} params.amount - Amount to pay.
-     * @param {String} params.max_price - Maximum price to pay.
-     * @param {String} [params.sell_asset_code] - [Optional] Selling asset code (if not set XLM is implied).
-     * @param {String} [params.sell_asset_issuer] - [Optional] Selling asset issuer (if not set XLM is implied).
-     * @param {String} [params.buy_asset_code] - [Optional] Selling asset code (if not set XLM is implied).
-     * @param {String} [params.buy_asset_issuer] - [Optional] Selling asset issuer (if not set XLM is implied).
-     * @return {Promise<Object>}
-     */
-    exchange(params) {
-        return this.request('exchange', params)
     }
 
     /**

@@ -70,10 +70,10 @@ function IntentTextDescriptionView() {
                 <FormattedAmount params={intentParams} prefix="buy_" amount={intentParams.amount}/>{' '}
                 at price <b>{intentParams.max_price}</b> or lower.
             </>
-        case 'create_keypair':
+        /*case 'create_keypair':
             return <>
                 The application requested creation of new key pair and access read-only access to its public key.
-            </>
+            </>*/
         case 'implicit_flow':
             return <>
                 The application requested a temporary permission to execute the following actions without showing a

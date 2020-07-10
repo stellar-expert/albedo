@@ -81,7 +81,7 @@ async function prepareTxOperations(actionContext, source) {
                 destAsset = buy_asset_issuer ? new Asset(buy_asset_code, buy_asset_issuer) : Asset.native(),
                 operations = []
 
-            //calculate sen max amount from max price the user willing to pay
+            //calculate send max amount from max price the user willing to pay
             const sendMax = (Math.floor(amount * 10000000 / max_price) / 10000000).toFixed(7)
 
             //check whether the trustline exists

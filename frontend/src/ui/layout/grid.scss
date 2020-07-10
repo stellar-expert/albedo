@@ -221,3 +221,9 @@
     display: block;
   }
 }
+
+.v-center-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
