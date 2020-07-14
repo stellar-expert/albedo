@@ -1,4 +1,4 @@
-import {intentErrors} from 'albedo-intent'
+import {intentErrors} from '@albedo-link/intent'
 
 class AlbedoError extends Error {
     constructor(message) {

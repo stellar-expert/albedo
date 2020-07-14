@@ -1,4 +1,4 @@
-import intent from 'albedo-intent'
+import intent from '@albedo-link/intent'
 
 (function () {
     const scope = document.currentScript,
