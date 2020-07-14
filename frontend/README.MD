@@ -92,8 +92,7 @@ happens to update extension files in the browser.
    ```
    npm run build-extension
    ```
-2. Navigate to `distr/extension` and zip the contents of the directory.
-3. Upload the file `extension.zip` to
+2. Upload the extension package file `distr/extension.zip` to
 [Google Webstore dev console](https://chrome.google.com/u/2/webstore/devconsole/)
 or [Mozilla Add-on Developer Hub](https://addons.mozilla.org/en-US/developers/).
 

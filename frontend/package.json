@@ -17,6 +17,7 @@
   "scripts": {
     "build-app": "webpack --mode=production --config src/app-webpack-config.js",
     "build-extension": "webpack --mode=production --config src/extension-webpack-config.js",
+    "postbuild-extension": "node ./deploy/prepare-extension-package.js",
     "watch-app": "webpack-dev-server --mode=development --config src/app-webpack-config.js",
     "watch-extension": "webpack --mode=development --config src/extension-webpack-config.js --watch",
     "test": "jest"
@@ -52,6 +53,7 @@
     "@stellar-expert/tx-signers-inspector": "^1.0.1",
     "aes-js": "^3.1.2",
     "albedo-intent": "file:../intent",
+    "archiver": "^4.0.2",
     "argon2-browser": "^1.13.0",
     "autoprefixer": "^9.8.0",
     "babel-jest": "^26.0.1",
