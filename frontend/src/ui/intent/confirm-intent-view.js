@@ -19,7 +19,8 @@ function ConfirmIntentView() {
         </div>}
         {!intentErrors && <button className="button button-block" disabled={confirmed}
                                   onClick={() => actionContext.confirmRequest()}>
-            Confirm using {accountManager.activeAccount.shortDisplayName}
+            Confirm using{' '}
+            {accountManager.activeAccount ? accountManager.activeAccount.shortDisplayName : 'Albedo account'}
         </button>}
         {sendPartiallySigned && <button className="button button-outline button-block" disabled={confirmed}
                                         onClick={() => actionContext.finalize()}>
