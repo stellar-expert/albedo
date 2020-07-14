@@ -28,3 +28,9 @@ node_modules/
 
 #CI
 .circleci
+
+# tests and unneeded project files
+/test
+/build
+webpack.config.js
+babel.config.js
