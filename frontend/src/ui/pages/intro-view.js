@@ -36,8 +36,8 @@ function IntroView() {
         </div>
         <div>
             <h3 className="text-center">
-                Highlights for
-                <br/>
+                Highlights
+                <div className="text-small dimmed">for</div>
                 <ToggleLink link="user">Users</ToggleLink>
                 &nbsp;/&nbsp;
                 <ToggleLink link="dev">Developers</ToggleLink>
@@ -47,16 +47,17 @@ function IntroView() {
         </div>
         <div className="double-space"/>
         <div>
-            <a href="/playground" target="_blank" className="button button-outline button-block">
-                Developer playground
-            </a>
             {!isInsideFrame() && <>
                 <a href="/install-extension" className="button button-outline button-block">Get browser
                     extension</a>
                 <a href="#" onClick={() => registerProtocolHandler()}
                    className="button button-outline button-block">Install as web+stellar handler</a>
             </>}
+            <a href="/playground" target="_blank" className="button button-outline button-block">
+                Developer playground
+            </a>
         </div>
+        <div className="double-space"/>
     </div>
 }
 

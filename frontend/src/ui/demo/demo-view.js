@@ -9,7 +9,7 @@ import PaymentRequest from './demo-payment-request-button-view'
 
 const allSections = [
     'intro',
-    'showcase',
+    //'showcase',
     'public_key',
     //'basic_info',
     'sign_message',
