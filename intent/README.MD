@@ -1,6 +1,6 @@
 # Intent interface module for Albedo
 
-This library is a lightweight browser wrapper for [Albedo](../README.MD) API 
+This library is a lightweight browser wrapper for [Albedo](https://github.com/stellar-expert/albedo) API 
 that provides a promise-based interface for all supported intents.    
 
 ## Installation
@@ -18,7 +18,6 @@ import albedo from '@albedo-link/intent'
 ```
 
 ### Intents
-
 
 #### Intent `public_key`
 

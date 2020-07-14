@@ -1,6 +1,6 @@
 import {observable, action, runInAction, computed} from 'mobx'
 import {Transaction} from 'stellar-sdk'
-import {intentInterface} from 'albedo-intent'
+import {intentInterface} from '@albedo-link/intent'
 import accountManager from './account-manager'
 import responder from '../actions/responder'
 import {dispatchIntentResponse, handleIntentResponseError} from '../actions/callback-dispatcher'

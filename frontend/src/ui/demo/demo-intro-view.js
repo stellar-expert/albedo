@@ -41,8 +41,7 @@ function DemoIntroView() {
         <div>
             <h2>Setup</h2>
             <div>
-                <Highlight>{`import AlbedoIntent from 'albedo-intent'
-const albedo = new AlbedoIntent()`}</Highlight>
+                <Highlight>{`import albedo from '@albedo-link/intent'`}</Highlight>
             </div>
         </div>
     </>

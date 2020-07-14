@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import cn from 'classnames'
 import Highlight from '../components/highlight'
-import intent, {intentInterface} from 'albedo-intent'
+import intent, {intentInterface} from '@albedo-link/intent'
 import Dropdown from '../components/dropdown'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 

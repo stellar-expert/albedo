@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import intent, {intentInterface} from 'albedo-intent'
+import intent, {intentInterface} from '@albedo-link/intent'
 import allDemos from '../demo-intent-default-params'
 import demoNav from '../demo-nav-model'
 import DemoIntentRequestParametersView from './demo-intent-request-parameters-view'

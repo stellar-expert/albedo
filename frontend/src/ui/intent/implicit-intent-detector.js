@@ -1,4 +1,4 @@
-import {intentInterface} from 'albedo-intent'
+import {intentInterface} from '@albedo-link/intent'
 
 /**
  * Check whether an implicit mode requested for a given intent request.

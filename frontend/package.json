@@ -38,6 +38,7 @@
     ]
   },
   "devDependencies": {
+    "@albedo-link/intent": "file:../intent",
     "@babel/core": "^7.10.1",
     "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/plugin-proposal-decorators": "^7.10.1",
@@ -52,7 +53,6 @@
     "@ledgerhq/hw-transport-u2f": "^5.15.0",
     "@stellar-expert/tx-signers-inspector": "^1.0.1",
     "aes-js": "^3.1.2",
-    "albedo-intent": "file:../intent",
     "archiver": "^4.0.2",
     "argon2-browser": "^1.13.0",
     "autoprefixer": "^9.8.0",
