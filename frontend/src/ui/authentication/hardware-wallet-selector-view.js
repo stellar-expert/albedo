@@ -25,10 +25,7 @@ class HardwareWalletSelectorView extends Component {
         this.setState({inProgress: true})
         const signer = new AlbedoSigner(accountType)
         await signer.init({
-            appManifest: {
-                email: appSettings.appManifest.email,
-                appUrl: appSettings.appManifest.appUrl
-            }
+            appManifest: appSettings.appManifest
         })
 
         const pubkey = await signer.getPublicKey({path})

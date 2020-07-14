@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import intent, {intentInterface} from 'albedo-intent'
-import allDemos from '../all-demos'
+import allDemos from '../demo-intent-default-params'
 import demoNav from '../demo-nav-model'
 import DemoIntentRequestParametersView from './demo-intent-request-parameters-view'
 import DemoIntentResultsView from './demo-intent-results-view'
@@ -30,8 +30,8 @@ class IntentBlock extends Component {
 
     getDefaultParams(props) {
         const {intent} = props,
-            {example, params: demoParams, description} = allDemos[intent],
-            {title, params: intentParams, returns, implicitFlow} = intentInterface[intent]
+            defaultParams = allDemos[intent],
+            {title, description, params: intentParams, returns, implicitFlow} = intentInterface[intent]
 
         const allParams = {}
         for (let key in intentParams) {
@@ -42,19 +42,17 @@ class IntentBlock extends Component {
                 }
             }
         }
-        for (let key in demoParams)
-            if (demoParams.hasOwnProperty(key) && demoParams[key].default) {
-                allParams[key] = demoParams[key].default
+        for (let key in (defaultParams||{}))
+            if (defaultParams.hasOwnProperty(key)) {
+                allParams[key] = defaultParams[key]
             }
 
         return {
             allParams,
             intentParams,
-            demoParams,
             returns,
             title,
             description,
-            example,
             implicitFlow,
             inProgress: false,
             result: null,

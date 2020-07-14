@@ -17,7 +17,7 @@ function findFriendlyName(account, desiredName) {
 }
 
 export default function (responder) {
-    responder.registerReaction('create_keypair', function ({actionContext, sensitiveData}) {
+    /*responder.registerReaction('create_keypair', function ({actionContext, sensitiveData}) {
         const {intentParams} = actionContext,
             {activeAccount} = accountManager,
             {name: desiredName} = intentParams
@@ -35,7 +35,7 @@ export default function (responder) {
                         friendlyName
                     }))
             })
-    })
+    })*/
 
     responder.registerReaction('implicit_flow', function ({actionContext, executionContext}) {
         const {intentParams} = actionContext,

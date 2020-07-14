@@ -2,7 +2,9 @@ jest.mock('trezor-connect')
 import TrezorConnect, {DEVICE_EVENT, DEVICE} from 'trezor-connect'
 import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
 import trezorAdapter from '../../../src/hw-signer/adapters/trezor-adapter'
+import appSettings from '../../../src/state/app-settings'
 
+const {appManifest} = appSettings
 const path = 'm/44\'/148\'/0\''
 const publicKey = 'GARITBNKCUYWOYIUQWPARYLHYDYYKCYLLQZMX64LYEAMH3HKICGMKIVF'
 const privateKey = 'SD3J53SQNMRVYLWGSKGZRJNLJAMKQKG3Y5NXI3O226QF3QUEUAXB3FDJ'
@@ -10,46 +12,23 @@ const privateKey = 'SD3J53SQNMRVYLWGSKGZRJNLJAMKQKG3Y5NXI3O226QF3QUEUAXB3FDJ'
 describe('TrezorAdapter', () => {
 
     it('should call manifest on init', async () => {
-        await trezorAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
-        expect(TrezorConnect.manifest).toHaveBeenCalledWith({
-            email: 'dev@stellar.expert',
-            appUrl: 'https://stellar.expert'
-        })
+        await trezorAdapter.init({appManifest})
+        expect(TrezorConnect.manifest).toHaveBeenCalledWith({appManifest})
     })
 
     it('should call init on init', async () => {
-        await trezorAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
+        await trezorAdapter.init({appManifest})
         expect(TrezorConnect.init).toHaveBeenCalled()
     })
 
     it('should listen on connect/disconnect events', async () => {
-        await trezorAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
+        await trezorAdapter.init({appManifest})
         expect(TrezorConnect.on).toHaveBeenCalledWith(DEVICE_EVENT, expect.any(Function))
     })
 
 
     it('should call adapter method on signTransaction', async () => {
-        await trezorAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
+        await trezorAdapter.init({appManifest})
         TrezorConnect.signMessage.mockImplementation(() => {
             return {
                 success: true,
@@ -77,12 +56,7 @@ describe('TrezorAdapter', () => {
     })
 
     it('should call stellarGetAddress method on getPublicKey', async () => {
-        await trezorAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
+        await trezorAdapter.init({appManifest})
         TrezorConnect.stellarGetAddress.mockImplementation(() => {
             return {
                 payload: {

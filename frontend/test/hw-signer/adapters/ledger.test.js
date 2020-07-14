@@ -1,12 +1,13 @@
 jest.mock('@ledgerhq/hw-transport-u2f')
-import Transport from '@ledgerhq/hw-transport-u2f'
-
 jest.mock('@ledgerhq/hw-app-str')
+import Transport from '@ledgerhq/hw-transport-u2f'
 import StellarApp from '@ledgerhq/hw-app-str'
+import appSettings from '../../../src/state/app-settings'
 import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
 
 import ledgerAdapter from '../../../src/hw-signer/adapters/ledger-adapter'
 
+const {appManifest} = appSettings
 const path = `44'/148'/0'`
 const publicKey = 'GARITBNKCUYWOYIUQWPARYLHYDYYKCYLLQZMX64LYEAMH3HKICGMKIVF'
 const privateKey = 'SD3J53SQNMRVYLWGSKGZRJNLJAMKQKG3Y5NXI3O226QF3QUEUAXB3FDJ'
@@ -37,12 +38,7 @@ StellarApp.mockImplementation(() => {
 
 describe('LedgerAdapter', () => {
     it('should create transport on init', async () => {
-        await ledgerAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
+        await ledgerAdapter.init({appManifest})
         expect(ledgerAdapter.transport).not.toBeNull()
         expect(ledgerAdapter.stellarApp).not.toBeNull()
         expect(ledgerAdapter.transport.setExchangeTimeout).toHaveBeenCalledWith(20000)
@@ -50,12 +46,7 @@ describe('LedgerAdapter', () => {
     })
 
     it('should call getPublicKey method on getPublicKey', async () => {
-        await ledgerAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
+        await ledgerAdapter.init({appManifest})
         await ledgerAdapter.getPublicKey({
             path
         })
@@ -63,12 +54,7 @@ describe('LedgerAdapter', () => {
     })
 
     it('should call signHash method on signTransaction', async () => {
-        await ledgerAdapter.init({
-            appManifest: {
-                email: 'dev@stellar.expert',
-                appUrl: 'https://stellar.expert'
-            }
-        })
+        await ledgerAdapter.init({appManifest})
 
         const destination = Keypair.random()
         const sourceAccount = new Account(publicKey, '0')

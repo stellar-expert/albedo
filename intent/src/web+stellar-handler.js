@@ -11,7 +11,8 @@ function parseQuery(query = null) {
     return dest
 }
 
-export function bindWebStellarLinkHandler(albedoIntent){
+export function bindWebStellarLinkHandler(albedoIntent) {
+    if (typeof (document) === 'undefined' || !document.addEventListener) return
     document.addEventListener('click', function sep0007Handler(e) {
         //we are only interested in links with "web+stellar" protocol
         if (e.target.tagName !== 'A' || (e.target.href || '').indexOf('web+stellar:') !== 0) return

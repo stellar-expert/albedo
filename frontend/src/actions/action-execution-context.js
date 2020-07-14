@@ -130,10 +130,7 @@ class ActionExecutionContext {
         const {path} = this.account
         if (!path) throw new Error(`Failed to retrieve BIP-44 key path from the hardware wallet account.`)
         await this.hwSigner.init({
-            appManifest: {
-                email: appSettings.appManifest.email,
-                appUrl: appSettings.appManifest.appUrl
-            }
+            appManifest: appSettings.appManifest
         })
         return path
     }

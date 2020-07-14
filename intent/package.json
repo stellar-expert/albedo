@@ -1,8 +1,7 @@
 {
   "name": "albedo-intent",
-  "private": true,
-  "version": "0.8.0",
-  "description": "Albedo client library",
+  "version": "0.8.1",
+  "description": "A lightweight browser wrapper for Albedo API that provides a promise-based interface for all supported intents.",
   "author": "StellarExpertTeam<info@stellar.expert>",
   "license": "MIT",
   "homepage": "https://github.com/stellar-expert/albedo",
@@ -15,9 +14,11 @@
     "url": "https://github.com/stellar-expert/albedo.git"
   },
   "scripts": {
+    "postbuild": "node ./build/update-readme.js",
     "build": "webpack --mode=production --config ./webpack.config.js"
   },
   "main": "./lib/albedo.intent.js",
+  "module": "./src/index.js",
   "keywords": [
     "stellar",
     "SSO",
@@ -37,6 +38,7 @@
     "@purtuga/esm-webpack-plugin": "^1.2.1",
     "babel-loader": "^8.1.0",
     "chai": "^4.2.0",
+    "esm": "^3.2.25",
     "mocha": "^7.2.0",
     "sinon": "^9.0.2",
     "terser-webpack-plugin": "^2.3.6",

@@ -4,7 +4,7 @@ import React from 'react'
 export default function InstallExtensionView() {
     return <div>
         <h2>Install browser extension</h2>
-        <div className="space text-small">
+        <div className="space">
             <p>
                 Albedo extension is a thin wrapper on top of albedo.link website. If you often use Albedo or other
                 Stellar services that support web+stellar links, you might want to install this extension.

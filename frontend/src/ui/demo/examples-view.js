@@ -22,9 +22,7 @@ function ExamplesView() {
         <ExampleView title="Message signing with Albedo account" img="albedo-message-signing-account.gif">
             Arbitrary message signing can be useful for a wide range of tasks, like simple OAuth-like
             authentication for applications, delegated actions approval/confirmation, notary services, identity
-            verification, and many other applications based on public-key cryptography. A user doesn't need to create
-            an account to use a service, she can simply confirm the identity using Albedo, very similar to
-            Google/Facebook OAuth.
+            verification, and many other applications based on public-key cryptography.
         </ExampleView>
         <ExampleView title="Message signing with Ledger hardware wallet" img="albedo-message-signing-ledger.gif">
             Hardware wallet integration has always been a tricky part for most applications, as it requires a special

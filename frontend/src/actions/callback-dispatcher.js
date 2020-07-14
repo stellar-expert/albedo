@@ -16,14 +16,13 @@ function execCallback(callback, data) {
     document.body.appendChild(form)
     form.method = 'post'
     form.action = action
-    for (let name in data) {
-        if (data.hasOwnProperty(name)) {
-            const input = document.createElement('input')
-            input.type = 'hidden'
-            input.name = name
-            input.value = data[name]
-            form.appendChild(input)
-        }
+    form.target = '_blank'
+    for (let name of Object.keys(data)) {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = name
+        input.value = data[name]
+        form.appendChild(input)
     }
     form.submit()
     return Promise.resolve()
