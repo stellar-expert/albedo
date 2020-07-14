@@ -22,7 +22,7 @@ export default function InstallExtensionView() {
                 </li>
             </ul>
         </div>
-        {window.albedoExtensionInstalled && <div className="dimmed space text-small">
+        {document.head.getAttribute('albedoExtensionInstalled') && <div className="dimmed space text-small">
             <i className="fa fa-info-circle"/> Albedo extension has been already installed in this browser.
         </div>}
         <div className="double-space">

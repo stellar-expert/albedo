@@ -19,7 +19,7 @@ export function saveCredentialsInExtensionStorage(credentials) {
 }
 
 export function getCredentialsFromExtensionStorage(accountId) {
-    if (!window.albedoExtensionInstalled) return Promise.resolve(null)
+    if (!document.head.getAttribute('albedoExtensionInstalled')) return Promise.resolve(null)
     return new Promise((resolve, reject) => {
         const __reqid = encodeBase64(generateRandomEncryptionKey(16))
         let installed = true
