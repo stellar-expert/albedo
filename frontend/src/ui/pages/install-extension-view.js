@@ -30,9 +30,9 @@ export default function InstallExtensionView() {
                className="button button-block" target="_blank">
                 <i className="fa fa-chrome"/> Get Chrome extension
             </a>
-            <a href="https://addons.mozilla.org/en-US/firefox/search/?q=albedo"
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/albedo-signer-for-stellar/"
                className="button button-block" target="_blank">
-                <i className="fa fa-firefox"/> Get Firefox extension
+                <i className="fa fa-firefox"/> Get Firefox add-on
             </a>
         </div>
     </div>

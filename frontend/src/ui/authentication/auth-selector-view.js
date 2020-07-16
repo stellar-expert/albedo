@@ -44,7 +44,8 @@ function AuthSelectorView() {
         title: directKeyInput ?
             'Direct secret key input' :
             activeAccount ?
-                <><IdenticonView address={activeAccount.publicKey}/> {activeAccount.friendlyName || activeAccount.displayName}</> :
+                <><IdenticonView
+                    address={activeAccount.publicKey}/> {activeAccount.friendlyName || activeAccount.displayName}</> :
                 'Albedo account'
     }]
 
@@ -62,7 +63,7 @@ function AuthSelectorView() {
 
     dropdownOptions.push({
         value: 'signup',
-        title: 'Add another account'
+        title: allAccounts.length ? 'Add one more account' : 'Create Albedo account'
     })
 
     if (!directKeyInput) {
