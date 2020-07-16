@@ -1,7 +1,7 @@
 {
   "name": "albedo",
   "private": true,
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Delegated transactions and messages signer for Stellar Network",
   "author": "StellarExpertTeam<info@stellar.expert>",
   "license": "MIT",

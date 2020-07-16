@@ -69,7 +69,7 @@ export default function AccountSelectorView() {
 
     dropdownOptions.push({
         value: 'signup',
-        title: <>Add another account</>
+        title: <>Add one more account</>
     })
 
     return <Dropdown className="dimmed" value="title" onChange={handleAccountAction} options={dropdownOptions}

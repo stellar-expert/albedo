@@ -87,8 +87,21 @@ module.exports = function (env, argv) {
             noParse: /\.wasm$/ // Makes WebPack think that we don't need to parse this module, otherwise it tries to recompile it, but fails - Error: Module not found: Error: Can't resolve 'env'
         },
         plugins: [
-            new webpack.IgnorePlugin(/ed25519/),
-            new webpack.IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
+            //new webpack.IgnorePlugin(/ed25519/),
+            new webpack.IgnorePlugin({
+                checkResource(resource, context) {
+                    if (/bip39[/\\]src$/.test(context)){
+                        if (resource.includes('/wordlists/')){
+                            return !resource.includes('english.json')
+                        }
+                    }
+                    if (resource.includes('ed25519')){
+                        debugger
+                    }
+                    ///^\.\/(?!english)/, /bip39\/src\/wordlists$/),
+                    return false
+                }
+            }),
             new CopyPlugin({
                 patterns: [
                     path.join(__dirname, './static/shared/'),
@@ -131,13 +144,10 @@ module.exports = function (env, argv) {
                 disableDotRule: true
             },
             compress: true,
+            host: '0.0.0.0',
             port: 5001,
             contentBase: [path.join(__dirname, './distr/app')],
-            https: {
-                key: fs.readFileSync('./certs/private.key'),
-                cert: fs.readFileSync('./certs/private.crt'),
-                ca: fs.readFileSync('./certs/private.pem')
-            },
+            https: true,
             setup(app) {
                 const bodyParser = require('body-parser')
                 app.use(bodyParser.urlencoded())
@@ -165,12 +175,12 @@ module.exports = function (env, argv) {
             }
         })]
 
-        /*const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+        const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
         settings.plugins.push(new BundleAnalyzerPlugin({
             analyzerMode: 'static',
             reportFilename: 'bundle-stats.html',
             openAnalyzer: false
-        }))*/
+        }))
     }
     return settings
 }
