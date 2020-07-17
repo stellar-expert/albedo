@@ -4,8 +4,7 @@ const path = require('path'),
     autoprefixer = require('autoprefixer'),
     CopyPlugin = require('copy-webpack-plugin'),
     MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-    cssnano = require('cssnano'),
-    fs = require('fs')
+    cssnano = require('cssnano')
 
 module.exports = function (env, argv) {
     const mode = argv.mode || 'development'
@@ -87,7 +86,6 @@ module.exports = function (env, argv) {
             noParse: /\.wasm$/ // Makes WebPack think that we don't need to parse this module, otherwise it tries to recompile it, but fails - Error: Module not found: Error: Can't resolve 'env'
         },
         plugins: [
-            //new webpack.IgnorePlugin(/ed25519/),
             new webpack.IgnorePlugin({
                 checkResource(resource, context) {
                     if (/bip39[/\\]src$/.test(context)){
@@ -95,10 +93,6 @@ module.exports = function (env, argv) {
                             return !resource.includes('english.json')
                         }
                     }
-                    if (resource.includes('ed25519')){
-                        debugger
-                    }
-                    ///^\.\/(?!english)/, /bip39\/src\/wordlists$/),
                     return false
                 }
             }),
