@@ -20,10 +20,10 @@ export default function (responder) {
         }
     })
 
-    responder.registerReaction('public_key', async function ({executionContext}) {
+    responder.registerReaction('public_key', async function ({actionContext, executionContext}) {
         try {
             const {publicKey} = executionContext,
-                messageToSign = publicKey,
+                messageToSign = actionContext.intentParams.token,
                 {signature, signedMessage} = await executionContext.signMessage(messageToSign)
 
             return {
