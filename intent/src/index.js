@@ -58,7 +58,10 @@ class Intent {
      * @returns {Promise<Object>}
      */
     publicKey(params) {
-        params = Object.assign({}, params, {token: params.token || this.generateRandomToken()})
+        params = Object.assign({}, params)
+        if (!params.token) {
+            params.token = generateRandomToken()
+        }
         return this.request('public_key', params)
     }
 
