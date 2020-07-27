@@ -1,18 +1,10 @@
 .account-address {
   * {
     font-family: $font-face-mono;
-    white-space: nowrap;
   }
 
   &.plain * {
     font: inherit;
     white-space: normal;
-  }
-}
-
-h2,
-.table {
-  .account-address * {
-    letter-spacing: -.05em;
   }
 }

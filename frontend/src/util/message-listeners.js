@@ -8,10 +8,7 @@ function registerMessageListeners(window) {
     window.addEventListener('message', function ({data, origin, source}) {
         //TODO: we can store source in the actionContext to avoid possible source window disambiguation
         if (!data.__albedo_intent_version || !data.intent) return
-        /*//trust app_origin only inside extension, otherwise it's unsafe and have to be updated with origin received form the event itself
-        if (!isInsideExtension()) {
-            data.app_origin = origin
-        }*/
+        data.app_origin = origin || null
         actionContext.setContext(data)
             .then(() => {
                 if (!isInsideFrame()) {

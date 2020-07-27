@@ -6,8 +6,10 @@ import accountManager from '../../state/account-manager'
 import ActionsBlock from '../components/actions-block'
 
 function ConfirmIntentView() {
-    const {txContext, intentErrors, confirmed, isFinalized, autoSubmitToHorizon} = actionContext,
+    const {txContext, intentErrors, confirmed, isFinalized, autoSubmitToHorizon, requiresExistingAccount, selectedAccountInfo} = actionContext,
         sendPartiallySigned = txContext && txContext.signatures.length > 0 && !txContext.isFullySigned
+
+    const confirmationBlocked = confirmed || requiresExistingAccount && (!selectedAccountInfo || selectedAccountInfo.error)
 
     return <ActionsBlock>
         {confirmed && !intentErrors && (!txContext || txContext.isFullySigned) && <div className="text-center">
@@ -17,12 +19,12 @@ function ConfirmIntentView() {
             </div>
             <div className="space"/>
         </div>}
-        {!intentErrors && <button className="button button-block" disabled={confirmed}
+        {!intentErrors && <button className="button button-block" disabled={confirmationBlocked}
                                   onClick={() => actionContext.confirmRequest()}>
             Confirm using{' '}
             {accountManager.activeAccount ? accountManager.activeAccount.shortDisplayName : 'Albedo account'}
         </button>}
-        {sendPartiallySigned && <button className="button button-outline button-block" disabled={confirmed}
+        {sendPartiallySigned && <button className="button button-outline button-block" disabled={confirmationBlocked}
                                         onClick={() => actionContext.finalize()}>
             Proceed with partially signed transaction
         </button>}

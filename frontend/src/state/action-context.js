@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed} from 'mobx'
-import {Transaction} from 'stellar-sdk'
+import {Transaction, Keypair} from 'stellar-sdk'
 import {intentInterface} from '@albedo-link/intent'
 import accountManager from './account-manager'
 import responder from '../actions/responder'
@@ -10,6 +10,7 @@ import {whitelist} from '../../implicit-flow-whitelist'
 import {resolveNetworkParams} from '../util/network-resolver'
 import {restoreImplicitSession} from '../storage/implicit-session-storage'
 import {isImplicitIntentRequested} from '../ui/intent/implicit-intent-detector'
+import {loadSelectedAccountInfo} from '../actions/account-info-loader'
 
 /**
  * Provides context for initiated action.
@@ -68,11 +69,34 @@ class ActionContext {
 
     response = null
 
+    @observable
+    directKeyInput = false
+
     /**
      * Directly provided secret key (only for direct input case).
      * @type {String}
      */
     secret = null
+
+    @observable
+    selectedAccountInfo = null
+
+    @computed
+    get selectedPublicKey() {
+        try {
+            if (this.directKeyInput) {
+                if (!this.secret) return null
+                return Keypair.fromSecret(this.secret).publicKey()
+            }
+            return accountManager.activeAccount?.publicKey || null
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    get requiresExistingAccount() {
+        return !['public_key', 'sign_message', 'implicit_flow'].includes(this.intent)
+    }
 
     @computed
     get autoSubmitToHorizon() {
@@ -275,6 +299,14 @@ class ActionContext {
             actionContext.txContext = txContext
         })
         return txContext
+    }
+
+    @action
+    loadSelectedAccountInfo() {
+        loadSelectedAccountInfo(this)
+            .then(info => runInAction(() => {
+                this.selectedAccountInfo = info
+            }))
     }
 }
 

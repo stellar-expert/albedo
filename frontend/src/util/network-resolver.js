@@ -36,5 +36,9 @@ function resolveNetworkParams({network, horizon}) {
     }
 }
 
-export {resolveNetworkParams}
+function isTestnet({network = 'public'}) {
+    return network.toLowerCase() === 'testnet' || network === Networks.TESTNET
+}
+
+export {resolveNetworkParams, isTestnet}
 

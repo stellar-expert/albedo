@@ -6,6 +6,7 @@ import actionContext from '../../state/action-context'
 import IntentDescription from './intent-details-view'
 import ConfirmIntentView from './confirm-intent-view'
 import AuthSelectorView from '../authentication/auth-selector-view'
+import AccountFundingStatusView from '../account/account-funding-status-view'
 
 function IntentView({location}) {
     if (!actionContext.intentProps || location.pathname !== '/confirm') return null
@@ -22,6 +23,7 @@ function IntentView({location}) {
         return <div>
             <IntentDescription expanded={true}/>
             <AuthSelectorView/>
+            <AccountFundingStatusView/>
             <ConfirmIntentView/>
         </div>
     }

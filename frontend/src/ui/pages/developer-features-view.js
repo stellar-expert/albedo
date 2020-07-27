@@ -3,7 +3,7 @@ import Feature from '../components/product-feature'
 
 export default function DeveloperFeaturesView() {
     return <div className="double-space">
-        <Feature title="Universal account" img="/img/features/feature-icon-accounts.svg">
+        <Feature title="Universal account" img="/img/features/feature-icon-uniaccount.svg">
             Expand the reach of your app and forget about on-boarding. Every Stellar user is your user now.
             We'll take care about all account-related things.
         </Feature>
