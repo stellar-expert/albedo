@@ -208,6 +208,14 @@
   border: saturate($color-alt-bg, 0.2);
 }
 
+.warning-block {
+  background: transparentize($color-warning, 0.8);
+  border: 1px solid transparentize($color-warning, 0.3);
+  margin: $space-block 0;
+  padding: $space-block-micro;
+  text-align: justify;
+}
+
 .dual-layout {
   display: flex;
   flex-direction: row;

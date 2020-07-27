@@ -2,9 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {StrKey} from 'stellar-sdk'
 import actionContext from '../../state/action-context'
-import accountManager from '../../state/account-manager'
 
-class InputKeySelectorView extends React.Component {
+class DirectKeyInputView extends React.Component {
     constructor(props) {
         super(props)
         this.state = {secret: '', isValid: false}
@@ -21,7 +20,7 @@ class InputKeySelectorView extends React.Component {
             actionContext.secret = secret
             actionContext.confirmRequest()
                 .catch(err => console.error(err))
-            accountManager.directKeyInput = false
+            actionContext.directKeyInput = false
         }
     }
 
@@ -37,4 +36,4 @@ class InputKeySelectorView extends React.Component {
     }
 }
 
-export default InputKeySelectorView
+export default DirectKeyInputView

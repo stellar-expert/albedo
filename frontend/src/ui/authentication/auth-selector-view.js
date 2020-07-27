@@ -2,7 +2,7 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import accountManager from '../../state/account-manager'
 import actionContext from '../../state/action-context'
-import InputKeySelectorView from './input-key-selector-view'
+import DirectKeyInputView from './direct-key-input-view'
 import Dropdown from '../components/dropdown'
 import AccountAddress from '../components/account-address'
 import IdenticonView from '../account/account-identicon-view'
@@ -10,20 +10,20 @@ import IdenticonView from '../account/account-identicon-view'
 function handleAccountAction(action) {
     switch (action) {
         case 'albedo-account':
-            accountManager.directKeyInput = false
+            actionContext.directKeyInput = false
             break
             break
         case 'signup':
             __history.push('/signup')
             break
         case 'direct-input':
-            accountManager.directKeyInput = true
+            actionContext.directKeyInput = true
             break
         default:
             const account = accountManager.accounts.find(a => a.id === action)
             if (account) {
                 accountManager.setActiveAccount(account)
-                accountManager.directKeyInput = false
+                actionContext.directKeyInput = false
             }
             break
     }
@@ -34,8 +34,8 @@ function AuthActionLink({action, children}) {
 }
 
 function AuthSelectorView() {
-    const {activeAccount, directKeyInput, accounts: allAccounts} = accountManager,
-        {intentParams} = actionContext,
+    const {activeAccount, accounts: allAccounts} = accountManager,
+        {intentParams, directKeyInput} = actionContext,
         {pubkey: requestedKey} = intentParams,
         noMatchingKey = requestedKey && activeAccount && !activeAccount.keypairs.some(keyPair => keyPair.publicKey === requestedKey)
 
@@ -78,7 +78,7 @@ function AuthSelectorView() {
         <span className="dimmed">Account: </span>
         <Dropdown className="dimmed" value="title" onChange={handleAccountAction} options={dropdownOptions}/>
         <div className="space"/>
-        {directKeyInput ? <InputKeySelectorView/> : <>
+        {directKeyInput ? <DirectKeyInputView/> : <>
             {noMatchingKey && <div className="space">
                 The application requested specific key (<AccountAddress account={requestedKey}/>).
                 Either <AuthActionLink action="signup">add another Albedo account</AuthActionLink>

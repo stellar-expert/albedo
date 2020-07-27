@@ -2,19 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import appSettings from '../../state/app-settings'
 import './account-address.scss'
+import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 const defaultStyle = {
     maxWidth: '100%'
 }
 
-function AccountAddress({account, chars = 12, name, link, style, className}) {
+function AccountAddress({account, chars = 12, name, link, style, className, copyToClipboard}) {
     if (!account) return null
 
     let innerStyle = style ? undefined : Object.assign({}, defaultStyle, style),
         address = account,
         children = []
 
-    if (chars) {
+    if (chars && chars < 56) {
         let limit = Math.floor(chars / 2)
         address = account.substr(0, limit) + '…' + account.substr(-limit)
     }
@@ -42,7 +43,16 @@ function AccountAddress({account, chars = 12, name, link, style, className}) {
         //containerProps.target = '_blank'
     }
 
-    return React.createElement(tag, containerProps, children)
+    const res = React.createElement(tag, containerProps, children)
+    if (copyToClipboard) {
+        return <>
+            {res}
+            <CopyToClipboard text={account}>
+                <a href="#" className="fa fa-copy active-icon" title="Copy address to clipboard"/>
+            </CopyToClipboard>
+        </>
+    }
+    return res
 }
 
 AccountAddress.propTypes = {
@@ -63,7 +73,8 @@ AccountAddress.propTypes = {
      */
     chars: PropTypes.number,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    copyToClipboard: PropTypes.bool
 }
 
 export default AccountAddress

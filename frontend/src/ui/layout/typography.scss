@@ -115,6 +115,10 @@ ol > li > * {
   font-size: 0.75*$font-size-base;
 }
 
+.text-condensed{
+  letter-spacing: -.05em;
+}
+
 .nowrap {
   white-space: nowrap;
 }
@@ -158,4 +162,3 @@ ol > li > * {
 .relative {
   position: relative;
 }
-

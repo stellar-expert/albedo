@@ -46,9 +46,6 @@ class AccountManager {
     @observable.shallow
     accounts = []
 
-    @observable
-    directKeyInput = false
-
     @action
     setActiveAccount(account) {
         this.activeAccount = account
