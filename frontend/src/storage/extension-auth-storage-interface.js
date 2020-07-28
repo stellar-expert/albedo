@@ -1,4 +1,5 @@
 import {encodeBase64, generateRandomEncryptionKey} from '../util/crypto-utils'
+import {isExtensionInstalled} from '../extension/extension-detection'
 
 const ttl = 60 * 60 * 1000
 
@@ -19,7 +20,7 @@ export function saveCredentialsInExtensionStorage(credentials) {
 }
 
 export function getCredentialsFromExtensionStorage(accountId) {
-    if (!document.head.getAttribute('albedoExtensionInstalled')) return Promise.resolve(null)
+    if (!isExtensionInstalled()) return Promise.resolve(null)
     return new Promise((resolve, reject) => {
         const __reqid = encodeBase64(generateRandomEncryptionKey(16))
         let installed = true
