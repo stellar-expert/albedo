@@ -6,10 +6,10 @@ import accountManager from '../../state/account-manager'
 import ActionsBlock from '../components/actions-block'
 
 function ConfirmIntentView() {
-    const {txContext, intentErrors, confirmed, isFinalized, autoSubmitToHorizon, requiresExistingAccount, selectedAccountInfo} = actionContext,
+    const {txContext, intentErrors, confirmed, isFinalized, autoSubmitToHorizon, requiresExistingAccount, selectedAccountInfo, selectedPublicKey} = actionContext,
+        alreadySigned = txContext && txContext.findSignatureByKey(selectedPublicKey),
+        accountUnavailable = requiresExistingAccount && (!selectedAccountInfo || selectedAccountInfo.error),
         sendPartiallySigned = txContext && txContext.signatures.length > 0 && !txContext.isFullySigned
-
-    const confirmationBlocked = confirmed || requiresExistingAccount && (!selectedAccountInfo || selectedAccountInfo.error)
 
     return <ActionsBlock>
         {confirmed && !intentErrors && (!txContext || txContext.isFullySigned) && <div className="text-center">
@@ -19,14 +19,14 @@ function ConfirmIntentView() {
             </div>
             <div className="space"/>
         </div>}
-        {!intentErrors && <button className="button button-block" disabled={confirmationBlocked}
+        {!intentErrors && <button className="button button-block" disabled={alreadySigned || accountUnavailable}
                                   onClick={() => actionContext.confirmRequest()}>
             Confirm using{' '}
             {accountManager.activeAccount ? accountManager.activeAccount.shortDisplayName : 'Albedo account'}
         </button>}
-        {sendPartiallySigned && <button className="button button-outline button-block" disabled={confirmationBlocked}
+        {sendPartiallySigned && <button className="button button-outline button-block"
                                         onClick={() => actionContext.finalize()}>
-            Proceed with partially signed transaction
+            Proceed with partially signed tx
         </button>}
         {' '}
         <button className="button button-outline button-block" disabled={isFinalized}
