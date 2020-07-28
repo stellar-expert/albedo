@@ -1,4 +1,5 @@
 import React from 'react'
+import {isExtensionInstalled} from '../../extension/extension-detection'
 
 //TODO: automatically detect browser runtime
 export default function InstallExtensionView() {
@@ -22,7 +23,7 @@ export default function InstallExtensionView() {
                 </li>
             </ul>
         </div>
-        {document.head.getAttribute('albedoExtensionInstalled') && <div className="dimmed space text-small">
+        {isExtensionInstalled() && <div className="dimmed space text-small">
             <i className="fa fa-info-circle"/> Albedo extension has been already installed in this browser.
         </div>}
         <div className="double-space">

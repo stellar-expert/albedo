@@ -18,8 +18,4 @@ function executeInPageContext({source, file}) {
 contentscriptMessageDispatcher.proxyToBackgroundPage('get-stored-credentials')
 contentscriptMessageDispatcher.proxyToBackgroundPage('save-stored-credentials')
 
-document.head.setAttribute('albedoExtensionInstalled', '1')
-/*browser.tabs.executeScript({
-    code: 'window.albedoExtensionInstalled = true'
-});*/
-//executeInPageContext({source: 'window.albedoExtensionInstalled = true'})
+window.sessionStorage.setItem('albedoExtensionInstalled', '1')
