@@ -218,7 +218,7 @@ class ActionContext {
             }
         } catch (e) {
             console.error(e)
-            this.intentErrors = e.message
+            this.intentErrors = e
 
             if (this.isImplicitIntent) {
                 return this.rejectRequest(e)
@@ -251,11 +251,16 @@ class ActionContext {
      * @param {Error} [error] - Rejection reason or validation error.
      */
     rejectRequest(error) {
-        if (!this.intent) return
-        if (!error && this.intentErrors) {
-            error = errors.invalidIntentRequest(this.intentErrors)
+        const {intent, intentErrors} = this
+        if (!intent) return
+        if (!error && intentErrors) {
+            if (intentErrors.code === undefined) {
+                error = errors.invalidIntentRequest(intentErrors)
+            } else {
+                error = intentErrors
+            }
         }
-        return handleIntentResponseError(error || errors.actionRejectedByUser, this)
+        return handleIntentResponseError(error, this)
             .then(res => {
                 this.reset()
                 return res

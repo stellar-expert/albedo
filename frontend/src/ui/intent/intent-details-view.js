@@ -64,8 +64,9 @@ function IntentDetailsView({expanded}) {
         {(intentErrors || expanded) && <div className="space text-small"><IntentTextDescription/></div>}
         {txContext && txContext.signatures.length > 0 && <div>
             <hr/>
-            <b>Signatures:</b>
+            <h3>Signatures:</h3>
             <Signatures/>
+            <div className="space"/>
         </div>}
         <TxSigningStatus/>
     </div>

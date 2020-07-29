@@ -26,9 +26,6 @@ function buildError(params) {
     if (ext) {
         error.ext = ext
     }
-    if (params instanceof Error) {
-        error.originalError = params
-    }
     return error
 }
 
@@ -36,7 +33,7 @@ class StandardErrors {
     unhandledError(error) {
         console.error(error)
         return buildError({
-            message: 'Unhandled error occurred. If this error persists, please contact our support team.',
+            message: 'Unhandled error occurred. If this error persists, please contact Albedo support.',
             code: -1
         })
     }
@@ -64,10 +61,19 @@ class StandardErrors {
         })
     }
 
-    get messageSigningFailed() {
+    horizonError(data) {
         return buildError({
-            message: 'Failed to sign a message.',
+            message: 'Transaction failed when submitted to Stellar network.',
+            ext: data,
             code: -5
+        })
+    }
+
+    callbackError(data) {
+        return buildError({
+            message: 'Callback redirect failed.',
+            ext: data,
+            code: -6
         })
     }
 
@@ -92,11 +98,6 @@ class StandardErrors {
         })
     }
 
-    /*accountNonPersistent() {
-        return buildError({
-        message: 'Account was not saved server-side. Enable the multi-login feature first.',
-        code: -103
-    }) },*/
     get invalidPassword() {
         return buildError({
             message: 'Invalid account password. Please provide a valid password.',
@@ -104,39 +105,18 @@ class StandardErrors {
         })
     }
 
-    get encryptedSecretKeyNotFound() {
+
+    get messageSigningFailed() {
         return buildError({
-            message: 'Error decrypting account. Encrypted secret key not found.',
-            code: -1105
+            message: 'Failed to sign a message.',
+            code: -2001
         })
     }
-
-    get invalid2FATotpKeyFormat() {
-        return buildError({
-            message: 'Invalid 2FA TOTP key format.',
-            code: -1201
-        })
-    }
-
-    get invalid2FAVerificationCodeFormat() {
-        return buildError({
-            message: 'Invalid 2FA verification code format.',
-            code: -1202
-        })
-    }
-
-    get invalid2FAVerificationCode() {
-        return buildError({
-            message: 'Invalid 2FA verification code.',
-            code: -1202
-        })
-    }
-
     //Ledger-specific errors
     get hashSigningNotAllowed() {
         return buildError({
             message: 'Ledger Wallet requires hash signing permission to be enabled in the app settings.',
-            code: -2001
+            code: -2002
         })
     }
 
@@ -146,21 +126,18 @@ class StandardErrors {
      * @param {Object} intentParams
      */
     prepareErrorDescription(error, intentParams) {
-        if (!(error instanceof Error)) {
-            error = standardErrors.unhandledError(error)
-        }
         if (error.code === undefined) {
             error = standardErrors.unhandledError(error)
         }
         //find a relevant standard intent error by code
-        const stdError = Object.values(intentErrors).find(stdError => stdError.code === error.code)
-        if (stdError) {
-            error = Object.assign({}, stdError, {ext: error.ext})
-        } else {
+        let stdError = Object.values(intentErrors).find(stdError => stdError.code === error.code)
+        if (!stdError) {
             error = intentErrors.unhandledError
+        } else {
+            error = Object.assign({}, stdError, {ext: error.ext})
         }
 
-        return {error: error || intentErrors.unhandledError, __reqid: intentParams.__reqid}
+        return {error, __reqid: intentParams.__reqid}
     }
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import actionContext from '../../state/action-context'
 import TxDetailsView from './tx-details-view'
-import {formatAddress, formatCurrency} from '../../util/formatter'
+import {formatAddress} from '../../util/formatter'
 import {intentInterface} from '@albedo-link/intent'
 import {resolveNetworkParams} from '../../util/network-resolver'
 import Amount from '../components/amount'
@@ -15,15 +15,24 @@ function FormattedAmount({amount, params, prefix = ''}) {
     return <b><Amount amount={amount} asset={asset}/></b>
 }
 
+function IntentErrorView() {
+    const {intentParams, intentErrors} = actionContext
+    //TODO: use only unified error objects everywhere in intentErrors to prevent problems with type casting
+
+    let text = 'Error: ' + intentErrors.message || intentErrors
+
+    if (!intentErrors.code || intentErrors.code === -1) {
+        text += ` It's likely an external application error. Please contact support team of ${intentParams.app_origin}.`
+    }
+    if (intentErrors)
+    return <div className="error">{text}</div>
+}
+
 function IntentTextDescriptionView() {
     const {intent, intentParams, intentErrors} = actionContext
     if (intentErrors) {
         return <>
-            <div className="error">
-                Error: {intentErrors}
-                <br/>
-                It's likely an external application error. Please contact support team of {intentParams.app_origin}.
-            </div>
+            <IntentErrorView/>
             <div className="space"/>
         </>
     }

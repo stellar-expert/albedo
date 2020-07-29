@@ -13,7 +13,7 @@ function WebStellarLinkHandlerView() {
             referrer = document.referrer && new URL(document.referrer).origin || null
         if (protocol !== 'web+stellar') return setError('Invalid web+stellar link.')
         if (!allowedIntents.includes(intentName)) {
-            const origin = document.referrer ? new URL(document.referrer).origin : 'your application'
+            const origin = document.referrer ? new URL(document.referrer).origin : 'the caller application'
             setError(`Invalid operation requested: "${intentName}". It's likely an external application error. Please contact support team of ${origin}.`)
             return
         }
