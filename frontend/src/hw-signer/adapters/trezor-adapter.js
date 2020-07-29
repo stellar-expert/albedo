@@ -3,6 +3,7 @@ import TrezorConnect, {DEVICE_EVENT, DEVICE} from 'trezor-connect'
 import {Keypair, xdr} from 'stellar-sdk'
 import {DEVICE_CONNECTED, DEVICE_DISCONNECTED} from './adapter-events'
 import standardErrors from '../../util/errors'
+import {decodeBase64} from '../../util/crypto-utils'
 
 let initialized = false
 
@@ -40,13 +41,16 @@ class TrezorAdapter extends EventEmitter {
     async signTransaction({path, publicKey, transaction}) {
         const response = await TrezorConnect.signMessage({
             path,
-            message: transaction.hash().toString()
+            message: transaction.hash().toString('hex'),
+            hex: true
         })
 
         if (response.success) {
-            const keyPair = Keypair.fromPublicKey(publicKey)
-            const hint = keyPair.signatureHint()
-            const decorated = new xdr.DecoratedSignature({hint: hint, signature: response.payload.signature})
+            const keyPair = Keypair.fromPublicKey(publicKey),
+                decorated = new xdr.DecoratedSignature({
+                    hint: keyPair.signatureHint(),
+                    signature: decodeBase64(response.payload.signature)
+                })
             transaction.signatures.push(decorated)
             return transaction
         } else {

@@ -115,8 +115,8 @@ async function prepareTxOperations(actionContext, source) {
  * @returns {Promise}
  */
 async function processTxIntent({actionContext, executionContext}) {
+    let {txContext, intent, intentParams, intentProps} = actionContext
     try {
-        let {txContext, intent, intentParams, intentProps} = actionContext
         if (!txContext) {
             const tx = await buildTx(actionContext, executionContext.publicKey)
             txContext = await actionContext.setTxContext(tx)
@@ -146,20 +146,18 @@ async function processTxIntent({actionContext, executionContext}) {
         if (actionContext.autoSubmitToHorizon) {
             let result
             //submit a transaction to Horizon
+            const horizon = createHorizon(intentParams)
             try {
-                await new Promise(resolve => {
-                })
-                result = await createHorizon(intentParams)
-                    .submitTransaction(tx)
+                result = await horizon.submitTransaction(tx)
             } catch (e) {
-
+                throw standardErrors.horizonError(e?.response?.data || 'Network error. Failed to connect to Horizon server ' + resolveNetworkParams(intentParams).horizon)
             }
-            //TODO: think about returning raw tx result, maybe it's not needed as the transaction can be always fetched by its hash, but still...
+
             Object.assign(res, {
                 tx_hash: hash,
                 signed_envelope_xdr: envelopeXdr,
                 result,
-                horizon
+                horizon: horizon.serverURL.origin()
             })
         } else {
             //just prepare a signed envelope
@@ -171,18 +169,18 @@ async function processTxIntent({actionContext, executionContext}) {
         return res
     } catch (err) {
         //TODO: too general error handler - split into a few separate try-catch blocks to handle specific errors individually
-        console.error(err)
+        if (err.code && err.message) throw err
         //something wrong with the network connection
         if (err.message === 'Network Error')
-            throw standardErrors.externalError('Network error.')
+            throw standardErrors.externalError('Network error. Failed to connect to Horizon server ' + resolveNetworkParams(intentParams).horizon)
         if (err.response) { //treat as Horizon error
             if (err.response.status === 404)
                 throw standardErrors.externalError(new Error('Source account doesn\'t exist on the network.'))
-            throw standardErrors.externalError('Horizon error.')
+            throw standardErrors.horizonError(e?.response?.data)
         }
         //unhandled error
         //TODO: add detailed error description
-        throw new Error('Failed to process the transaction.')
+        throw standardErrors.unhandledError(err)
     }
 }
 

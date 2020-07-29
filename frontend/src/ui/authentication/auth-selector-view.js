@@ -6,6 +6,7 @@ import DirectKeyInputView from './direct-key-input-view'
 import Dropdown from '../components/dropdown'
 import AccountAddress from '../components/account-address'
 import IdenticonView from '../account/account-identicon-view'
+import {CopyToClipboard} from 'react-copy-to-clipboard/lib/Component'
 
 function handleAccountAction(action) {
     switch (action) {
@@ -44,8 +45,7 @@ function AuthSelectorView() {
         title: directKeyInput ?
             'Direct secret key input' :
             activeAccount ?
-                <><IdenticonView
-                    address={activeAccount.publicKey}/> {activeAccount.friendlyName || activeAccount.displayName}</> :
+                <><IdenticonView address={activeAccount.publicKey}/> {activeAccount.displayName}</> :
                 'Albedo account'
     }]
 

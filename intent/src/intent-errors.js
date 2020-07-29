@@ -1,6 +1,6 @@
 const intentErrors = {
     unhandledError: {
-        message: 'Unhandled error occurred. If this error persists, please contact our support team.',
+        message: 'Unhandled error occurred. If this error persists, please contact Albedo support.',
         code: -1
     },
     externalError: {
@@ -14,6 +14,14 @@ const intentErrors = {
     actionRejectedByUser: {
         message: 'Action request was rejected by the user.',
         code: -4
+    },
+    horizonError: {
+        message: 'Transaction failed when submitted to Stellar network.',
+        code: -5
+    },
+    callbackError: {
+        message: 'Callback redirect failed.',
+        code: -6
     }
 }
 
