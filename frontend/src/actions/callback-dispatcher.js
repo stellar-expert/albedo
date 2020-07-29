@@ -42,10 +42,14 @@ function locateCallerWindow() {
     return isInsideFrame() ? window.top : window.opener
 }
 
-function dispatchIntentResponse(res, actionContext) {
+async function dispatchIntentResponse(res, actionContext) {
     const {callback, __reqid} = actionContext.intentParams
     res.__reqid = __reqid
-    return callback ? execCallback(callback, res) : postMessage(res, actionContext)
+
+    if (callback) {
+        await execCallback(callback, res)
+    }
+    return postMessage(res, actionContext)
 }
 
 /**
