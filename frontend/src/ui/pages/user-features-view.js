@@ -22,7 +22,7 @@ export default function UserFeaturesView() {
             Seamless experience across different browsers and operating systems, desktops and smartphones.
         </Feature>
         <Feature title="SEP-0007 compatible" img="/img/features/feature-icon-link.svg">
-            Handles "web+stellar" links – wider support for different ecosystem Stellar services.
+            Handles "web+stellar" links – wider support for different Stellar ecosystem services.
         </Feature>
     </div>
 }
