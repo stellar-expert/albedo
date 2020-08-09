@@ -1,37 +1,37 @@
-class ImplicitSession {
-    constructor({session, pubkey, grants, valid_until}) {
-        this.key = session
-        this.pubkey = pubkey
-        this.grants = grants.slice()
-        this.validUntil = valid_until
-        //prevent accidental changes
-        Object.freeze(this)
-        Object.freeze(this.grants)
-    }
+function ImplicitSession({session, pubkey, grants, valid_until}) {
+    this.key = session
+    this.pubkey = pubkey
+    this.grants = grants.slice()
+    this.validUntil = valid_until
+    //prevent accidental changes
+    Object.freeze(this)
+    Object.freeze(this.grants)
+}
 
+ImplicitSession.prototype = {
     /**
      * Unique session key.
      * @type {String}
      */
-    key = ''
+    key: '',
 
     /**
      * Public key of the key pair used to authorize the session.
      * @type {String}
      */
-    pubkey = ''
+    pubkey: '',
 
     /**
      * Granted permissions.
      * @type {Array<String>}
      */
-    grants = []
+    grants: [],
 
     /**
      * Time-to-live.
      * @type {Number}
      */
-    validUntil = 0
+    validUntil: 0,
 
     /**
      * Check whether the session is expired or not.
@@ -40,7 +40,7 @@ class ImplicitSession {
     get isExpired() {
         //2 seconds reserve
         return this.validUntil - 2000 < new Date().getTime()
-    }
+    },
 
     toJSON() {
         return {
