@@ -1,8 +1,8 @@
 import {generateRandomToken} from './random-token-generator'
 import intentInterface from './intent-interface'
 import intentErrors from './intent-errors'
-import intentDispatcher from './intent-dispatcher'
-import implicitSessionStorage from './implicit-session-storage'
+import {requestIntentConfirmation} from './intent-dispatcher'
+import {getImplicitSession} from './implicit-session-storage'
 import {bindWebStellarLinkHandler} from './web+stellar-handler'
 
 if (typeof window === 'object' && typeof window.fetch !== 'function') {
@@ -21,8 +21,12 @@ if (typeof window === 'object' && typeof window.fetch !== 'function') {
 /**
  * External SSO/signing calling interface implementation.
  */
-class Intent {
-    frontendUrl = 'https://albedo.link'
+function AlbedoIntent() {
+    this.frontendUrl = 'https://albedo.link'
+}
+
+AlbedoIntent.prototype = {
+    frontendUrl: 'https://albedo.link',
 
     /**
      * Initiate external intent request.
@@ -31,8 +35,8 @@ class Intent {
      * @returns {Promise<Object>}
      */
     request(intent, params) {
-        return intentDispatcher.requestIntentConfirmation(Object.assign(params || {}, {intent}), this.frontendUrl)
-    }
+        return requestIntentConfirmation(Object.assign(params || {}, {intent}), this.frontendUrl)
+    },
 
     /**
      * Requests temporary permissions to execute the specific intents without calling confirmation dialog.
@@ -41,15 +45,7 @@ class Intent {
      */
     implicitFlow(params) {
         return this.request('implicit_flow', params)
-    }
-
-    /**
-     * Request user basic info (email, avatar etc).
-     * @returns {Promise<Object>}
-     */
-    basicInfo() {
-        return this.request('basic_info')
-    }
+    },
 
     /**
      * Request secure third-party application authentication.
@@ -63,7 +59,7 @@ class Intent {
             params.token = generateRandomToken()
         }
         return this.request('public_key', params)
-    }
+    },
 
     /**
      * Request transaction signing, returns signed transaction envelope.
@@ -78,7 +74,7 @@ class Intent {
     tx(params) {
         //TODO: check if txXdr is a Transaction instance and serialize it
         return this.request('tx', params)
-    }
+    },
 
     /**
      * Request an asset trustline creation.
@@ -97,7 +93,7 @@ class Intent {
      */
     pay(params) {
         return this.request('pay', params)
-    }
+    },
 
     /**
      * Request an asset trustline creation.
@@ -113,7 +109,7 @@ class Intent {
      */
     trust(params) {
         return this.request('trust', params)
-    }
+    },
 
     /**
      * Request token exchange on Stellar DEX.
@@ -129,7 +125,7 @@ class Intent {
      */
     exchange(params) {
         return this.request('exchange', params)
-    }
+    },
 
     /**
      * Request arbitrary data signing.
@@ -141,21 +137,11 @@ class Intent {
     signMessage(params) {
         params = Object.assign({}, params, {message: normalizeMessageToSign(params.message)})
         return this.request('sign_message', params)
-    }
-
-    /**
-     * Request user's permission to create and save new Stellar keypair.
-     * @param {Object} params - Intent parameters.
-     * @param {String} params.name - Keypair name.
-     * @returns {Promise<Object>}
-     */
-    createKeypair(params) {
-        return this.request('create_keypair', params)
-    }
+    },
 
     generateRandomToken() {
         return generateRandomToken()
-    }
+    },
 
     /**
      * Check whether an implicit session exists for a given intent and pubkey.
@@ -164,7 +150,7 @@ class Intent {
      * @return {boolean}
      */
     isImplicitSessionAllowed(intent, pubkey) {
-        return !!implicitSessionStorage.getImplicitSession(intent, pubkey)
+        return !!getImplicitSession(intent, pubkey)
     }
 }
 
@@ -183,12 +169,12 @@ function normalizeMessageToSign(message) {
     return JSON.stringify(message)
 }
 
-Intent.intentInterface = intentInterface
-Intent.intentErrors = intentErrors
+AlbedoIntent.intentInterface = intentInterface
+AlbedoIntent.intentErrors = intentErrors
 
-const albedoIntentInstance = new Intent()
+const albedo = new AlbedoIntent()
 
-bindWebStellarLinkHandler(albedoIntentInstance)
+bindWebStellarLinkHandler(albedo)
 
 export {intentInterface, intentErrors}
-export default albedoIntentInstance
+export default albedo

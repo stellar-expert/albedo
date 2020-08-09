@@ -2,24 +2,24 @@ import {generateRandomToken} from './random-token-generator'
 import intentErrors from './intent-errors'
 import pkgInfo from '../package.json'
 
-class TransportHandler {
-    /**
-     * Create transport handler for a given window|iframe and establish communication channel.
-     * @param {Window} targetWindow - Transport window|iframe reference.
-     * @param {Boolean} ephemeral - If set to true, automatically closes the window opened after receiving the response.
-     */
-    constructor(targetWindow, ephemeral = false) {
-        this.windowHandler = targetWindow
-        this.ephemeral = !!ephemeral
-        this.isLoaded = false
-        this.pendingRequests = {}
-        this.preprocessRequestParams = null
-        this.onLoaded = new Promise((resolve, reject) => this.onLoadedCallback = resolve)
-        this.messageHandler = this.messageHandler.bind(this)
-        window.addEventListener('message', this.messageHandler, false)
-    }
+/**
+ * Create transport handler for a given window|iframe and establish communication channel.
+ * @param {Window} targetWindow - Transport window|iframe reference.
+ * @param {Boolean} ephemeral - If set to true, automatically closes the window opened after receiving the response.
+ */
+function TransportHandler(targetWindow, ephemeral = false){
+    this.windowHandler = targetWindow
+    this.ephemeral = !!ephemeral
+    this.isLoaded = false
+    this.pendingRequests = {}
+    this.preprocessRequestParams = null
+    this.onLoaded = new Promise((resolve, reject) => this.onLoadedCallback = resolve)
+    this.messageHandler = this.messageHandler.bind(this)
+    window.addEventListener('message', this.messageHandler, false)
+}
 
-    isLoaded = false
+TransportHandler.prototype = {
+    isLoaded: false,
 
     markLoaded() {
         this.isLoaded = true
@@ -28,7 +28,7 @@ class TransportHandler {
             this.onLoadedCallback = null
             onTransportWindowLoaded()
         }
-    }
+    },
 
     /**
      * Handler for incoming communication messages processing.
@@ -52,7 +52,7 @@ class TransportHandler {
                 }
             }
         }
-    }
+    },
 
     /**
      * Handler for the transport window close event.
@@ -64,7 +64,7 @@ class TransportHandler {
                 delete this.pendingRequests[key]
                 pending(intentErrors.actionRejectedByUser)
             }
-    }
+    },
 
     /**
      * Request intent confirmation using current transport.
