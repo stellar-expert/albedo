@@ -4,12 +4,15 @@
   box-sizing: border-box;
 }
 
+* {
+  @include scrollbars(6px, $color-dimmed);
+}
+
 html {
   font-size: 62.5%;
   height: 100%;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  @include scrollbars(8px, $color-dimmed);
 }
 
 body {

@@ -21,6 +21,9 @@ function AssetName({asset}) {
         let [code, issuer] = asset.split('-')
         asset = {code, issuer}
     }
+    if (!asset.code) {
+        asset.code = 'XLM'
+    }
     const currentNetwork = useStellarNetwork()
     const [tomlData, setTomlData] = useDependantState(() => {
         resolveAssetMeta(asset, currentNetwork)

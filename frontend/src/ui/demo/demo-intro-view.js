@@ -3,11 +3,13 @@ import Highlight from '../components/highlight'
 
 function DemoIntroView() {
     return <>
-        <b>Albedo</b> provides a safe and reliable way to use Stellar accounts without trusting anyone
-        with secret keys. It is a useful tool for delegated transactions signing, third-party websites log-in,
-        arbitrary message signing, and much more. Albedo allows users to securely store their secret keys in
-        encrypted accounts, use hardware wallets for transaction/message signing, or convenient interface for
-        directly provided secret keys.
+        <p>
+            <b>Albedo</b> provides a safe and reliable way to use Stellar accounts without trusting anyone
+            with secret keys. It is a useful tool for delegated transactions signing, third-party websites log-in,
+            arbitrary message signing, and much more. Albedo allows users to securely store their secret keys in
+            encrypted accounts, use hardware wallets for transaction/message signing, or convenient interface for
+            directly provided secret keys.
+        </p>
         <h3>Key features</h3>
         <ul>
             <li>
@@ -28,10 +30,6 @@ function DemoIntroView() {
             </li>
             <li>
                 <b>Message signing tools</b> – sign and verify arbitrary data with your private keys.
-            </li>
-            <li>
-                <b>Two-factor authorization support</b> – provides another level of protection for your
-                accounts.
             </li>
             <li>
                 <b>Works everywhere</b> – seamless experience on desktops, smartphones, and tablets.

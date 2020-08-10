@@ -55,10 +55,10 @@ hr {
   border: none;
   font-size: $font-size-base;
   margin: 15px auto;
-  width: 100%;
+  width: 90%;
   max-width: 90vw;
-  height: 0.5px;
-  background-image: radial-gradient(circle at center, $color-highlight 50%, transparentize($color-highlight, 1) 85%);
+  height: 0.9px;
+  background: linear-gradient(to right, transparentize($color-highlight, 1) 0%, $color-highlight 15%, $color-highlight 85%, transparentize($color-highlight, 1) 100%);
 
   &.double-space {
     margin-bottom: 4rem;
@@ -115,7 +115,7 @@ ol > li > * {
   font-size: 0.75*$font-size-base;
 }
 
-.text-condensed{
+.text-condensed {
   letter-spacing: -.05em;
 }
 

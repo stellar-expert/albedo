@@ -235,7 +235,7 @@ const intentInterface = {
                 required: false
             }
         },
-        returns: ['granted', 'intents', 'session', 'pubkey', 'network', 'valid_until']
+        returns: ['granted', 'intents', 'grants', 'session', 'pubkey', 'network', 'valid_until']
     }
 }
 

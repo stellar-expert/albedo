@@ -50,6 +50,7 @@ export default function (responder) {
                     network: network,
                     session: sessionKey,
                     pubkey: data.publicKey,
+                    intents,
                     grants: intents,
                     valid_until: validUntil
                 }

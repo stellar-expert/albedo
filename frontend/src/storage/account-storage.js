@@ -8,7 +8,7 @@ const accountKeyPrefix = 'account_'
  * Load all stored accounts.
  * @returns {String[]} all accounts stored in the browser.
  */
-function enumerateStoredAccounts() {
+export function enumerateStoredAccounts() {
     return Object.keys(localStorage)
         .filter(key => key.indexOf(accountKeyPrefix) === 0)
         .map(key => key.substring(accountKeyPrefix.length))
@@ -19,7 +19,7 @@ function enumerateStoredAccounts() {
  * @param {String} id - User account id.
  * @returns {Promise<Object>}
  */
-function loadAccountDataFromBrowserStorage(id) {
+export function loadAccountDataFromBrowserStorage(id) {
     if (!id || typeof id !== 'string' || id.length < 5) return Promise.reject(`Invalid account key: ${id}.`)
     const storedAccount = localStorage.getItem(accountKeyPrefix + id)
     if (!storedAccount) throw new Error(`Account ${id} is not stored in the browser.`)
@@ -37,7 +37,7 @@ function loadAccountDataFromBrowserStorage(id) {
  * @param {String} secret - Account secret key.
  * @returns {String}
  */
-function encryptAccountSecret(credentials, secret) {
+export function encryptAccountSecret(credentials, secret) {
     return encryptDataAes(secret, credentials.encryptionKey)
 }
 
@@ -46,7 +46,7 @@ function encryptAccountSecret(credentials, secret) {
  * @param {Credentials} credentials - User credentials.
  * @returns {String}
  */
-function decryptAccountSecret(credentials) {
+export function decryptAccountSecret(credentials) {
     const {account} = credentials
     if (!account.encryptedSecret) return null
     return decryptDataAes(account.encryptedSecret, credentials.encryptionKey)
@@ -57,19 +57,19 @@ function decryptAccountSecret(credentials) {
  * @param {Account} account - An account to save.
  * @returns {Account}
  */
-function persistAccountInBrowser(account) {
+export function persistAccountInBrowser(account) {
     if (!account.id) throw new Error('Account can\'t be stored.')
     localStorage.setItem(accountKeyPrefix + account.id, JSON.stringify(account.toJSON()))
     return account
 }
 
-function forgetAccount(account) {
+export function forgetAccount(account) {
     if (!account.id) throw new Error('Invalid account.')
     localStorage.removeItem(accountKeyPrefix + account.id)
     return account
 }
 
-function updateRecentAccount(account) {
+export function updateRecentAccount(account) {
     if (!account || !account.id) {
         localStorage.removeItem('activeAccount')
     } else if ((retrieveRecentAccount() || {}).id !== account) {
@@ -77,17 +77,6 @@ function updateRecentAccount(account) {
     }
 }
 
-function retrieveRecentAccount() {
+export function retrieveRecentAccount() {
     return localStorage.getItem('activeAccount') || null
-}
-
-export {
-    enumerateStoredAccounts,
-    encryptAccountSecret,
-    decryptAccountSecret,
-    persistAccountInBrowser,
-    loadAccountDataFromBrowserStorage,
-    forgetAccount,
-    updateRecentAccount,
-    retrieveRecentAccount
 }
