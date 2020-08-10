@@ -140,6 +140,14 @@ const intentInterface = {
                 description: 'Trust limit.',
                 required: false
             },
+            memo: {
+                description: 'Transaction memo (required for exchanges and some anchors).',
+                required: false
+            },
+            memo_type: {
+                description: 'Transaction memo type.',
+                required: false
+            },
             pubkey: {
                 description: 'Specific public key requested by the application.',
                 required: false
@@ -162,7 +170,7 @@ const intentInterface = {
                 type: Boolean
             }
         },
-        returns: ['asset_code', 'asset_issuer', 'limit', 'signed_envelope_xdr', 'pubkey', 'tx_signature', 'network', 'horizon']
+        returns: ['asset_code', 'asset_issuer', 'limit', 'memo', 'memo_type', 'signed_envelope_xdr', 'pubkey', 'tx_signature', 'network', 'horizon']
     },
     exchange: {
         risk: 'high',
@@ -195,6 +203,14 @@ const intentInterface = {
                 description: 'Maximum price the user willing to pay.',
                 required: true
             },
+            memo: {
+                description: 'Transaction memo (required for exchanges and some anchors).',
+                required: false
+            },
+            memo_type: {
+                description: 'Transaction memo type.',
+                required: false
+            },
             pubkey: {
                 description: 'Specific public key requested by the application.',
                 required: false
@@ -217,7 +233,7 @@ const intentInterface = {
                 type: Boolean
             }
         },
-        returns: ['amount', 'max_price', 'sell_asset_code', 'sell_asset_issuer', 'buy_asset_code', 'buy_asset_issuer', 'tx_signature', 'network', 'horizon']
+        returns: ['amount', 'max_price', 'sell_asset_code', 'sell_asset_issuer', 'buy_asset_code', 'buy_asset_issuer', 'memo', 'memo_type', 'signed_envelope_xdr', 'pubkey', 'tx_signature', 'network', 'horizon']
     },
     implicit_flow: {
         risk: 'high',
