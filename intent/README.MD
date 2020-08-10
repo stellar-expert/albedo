@@ -150,6 +150,8 @@ Requests permission to create a trustline to a given Stellar asset. Gradually si
 - `asset_code` - *(required)* Trustline asset code.
 - `asset_issuer` - *(required)* Trustline asset issuer address.
 - `limit` - *(optional)* Trust limit.
+- `memo` - *(optional)* Transaction memo (required for exchanges and some anchors).
+- `memo_type` - *(optional)* Transaction memo type.
 - `pubkey` - *(optional)* Specific public key requested by the application.
 - `network` - *(optional)* Stellar network identifier or private network passphrase.
 - `horizon` - *(optional)* The URL of the Horizon server.
@@ -161,6 +163,8 @@ Requests permission to create a trustline to a given Stellar asset. Gradually si
 - `asset_code`
 - `asset_issuer`
 - `limit`
+- `memo`
+- `memo_type`
 - `signed_envelope_xdr`
 - `pubkey`
 - `tx_signature`
@@ -189,6 +193,8 @@ Requests permission to buy tokens on Stellar DEX at market price.
 - `buy_asset_issuer` - *(optional)* Issuer account of the asset to buy.
 - `amount` - *(required)* The amount of asset to buy.
 - `max_price` - *(required)* Maximum price the user willing to pay.
+- `memo` - *(optional)* Transaction memo (required for exchanges and some anchors).
+- `memo_type` - *(optional)* Transaction memo type.
 - `pubkey` - *(optional)* Specific public key requested by the application.
 - `network` - *(optional)* Stellar network identifier or private network passphrase.
 - `horizon` - *(optional)* The URL of the Horizon server.
@@ -203,6 +209,10 @@ Requests permission to buy tokens on Stellar DEX at market price.
 - `sell_asset_issuer`
 - `buy_asset_code`
 - `buy_asset_issuer`
+- `memo`
+- `memo_type`
+- `signed_envelope_xdr`
+- `pubkey`
 - `tx_signature`
 - `network`
 - `horizon`
