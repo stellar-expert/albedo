@@ -1,4 +1,3 @@
-import accountManager from '../state/account-manager'
 import standardErrors from '../util/errors'
 
 export default function (responder) {

@@ -72,7 +72,7 @@ class AuthorizationRequestView extends React.Component {
 
     cancel() {
         if (authorizationService.credentialsRequestCallback) {
-            authorizationService.credentialsRequestCallback.reject(new Error(`Authorization was cancelled by a user.`))
+            authorizationService.credentialsRequestCallback.reject(errors.actionRejectedByUser)
         } else {
             __history.push('/')
         }

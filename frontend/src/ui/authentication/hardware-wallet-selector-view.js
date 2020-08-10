@@ -69,20 +69,20 @@ class HardwareWalletSelectorView extends Component {
         const {accountType} = this.state
         return <div className="hw-selector">
             <Actions className="row">
-                <div className="column column-50">
+                <div className="column column-50 column-offset-25">
                     <a href="#" id="ledger-signup" title="Ledger Nano"
                        className={cn('button button-block keypair-selector-option', {'button-outline': accountType !== ACCOUNT_TYPES.LEDGER_ACCOUNT})}
                        onClick={() => this.setHardwareWalletType(ACCOUNT_TYPES.LEDGER_ACCOUNT)}>
                         <img src="/img/vendor/ledger.svg"/>
                     </a>
                 </div>
-                <div className="column column-50">
+                {/*<div className="column column-50">
                     <a href="#" id="trezor-signup" title="Trezor"
                        className={cn('button button-block keypair-selector-option', {'button-outline': accountType !== ACCOUNT_TYPES.TREZOR_ACCOUNT})}
                        onClick={() => this.setHardwareWalletType(ACCOUNT_TYPES.TREZOR_ACCOUNT)}>
                         <img src="/img/vendor/trezor.svg"/>
                     </a>
-                </div>
+                </div>*/}
             </Actions>
             {this.renderPathSelector()}
         </div>

@@ -78,7 +78,7 @@ class AccountManager {
             this.accounts.splice(pos, 1)
         }
         forgetAccount(account)
-        if (this.activeAccount === account) {
+        if (this.activeAccount.id === account.id) {
             this.setActiveAccount(this.accounts[0])
         }
     }

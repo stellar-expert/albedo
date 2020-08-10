@@ -234,6 +234,7 @@ Requests temporary access token for one or more intents that can be used to exec
 
 - `granted`
 - `intents`
+- `grants`
 - `session`
 - `pubkey`
 - `network`

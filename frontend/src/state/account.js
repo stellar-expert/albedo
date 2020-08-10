@@ -1,11 +1,11 @@
-import {observable, action, computed, runInAction} from 'mobx'
+import {observable, action, computed} from 'mobx'
 import {Keypair, StrKey} from 'stellar-sdk'
 import errors from '../util/errors'
 import {
     encryptAccountSecret,
     decryptAccountSecret,
     persistAccountInBrowser,
-    loadAccountDataFromBrowserStorage
+    forgetAccount
 } from '../storage/account-storage'
 import {formatAddress} from '../util/formatter'
 import {extractDeviceId} from '../util/device-id-generator'
@@ -117,10 +117,15 @@ class Account {
         return account
     }
 
-    @action
-    async save(credentials) {
+    save(credentials) {
         this.verifyCredentials(credentials)
         persistAccountInBrowser(this)
+        return this
+    }
+
+    forget(credentials) {
+        this.verifyCredentials(credentials)
+        forgetAccount(this)
         return this
     }
 

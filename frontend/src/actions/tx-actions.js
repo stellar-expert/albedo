@@ -82,7 +82,7 @@ async function prepareTxOperations(actionContext, source) {
                 operations = []
 
             //calculate send max amount from max price the user willing to pay
-            const sendMax = (Math.floor(amount * 10000000 / max_price) / 10000000).toFixed(7)
+            const sendMax = (Math.floor(amount * max_price * 10000000) / 10000000).toFixed(7)
 
             //check whether the trustline exists
             const trustlineExists = source.balances.some(balance =>

@@ -6,6 +6,7 @@ import {intentInterface} from '@albedo-link/intent'
 import {resolveNetworkParams} from '../../util/network-resolver'
 import Amount from '../components/amount'
 import Address from '../components/account-address'
+import AssetName from '../components/asset-name'
 
 function FormattedAmount({amount, params, prefix = ''}) {
     const asset = params[prefix + 'asset_issuer'] ? {
@@ -25,7 +26,7 @@ function IntentErrorView() {
         text += ` It's likely an external application error. Please contact support team of ${intentParams.app_origin}.`
     }
     if (intentErrors)
-    return <div className="error">{text}</div>
+        return <div className="error">{text}</div>
 }
 
 function IntentTextDescriptionView() {
@@ -73,11 +74,11 @@ function IntentTextDescriptionView() {
             </>
         case 'exchange':
             return <>
-                The application requested permission to exchange max{' '}
-                <FormattedAmount params={intentParams} prefix="sell_" amount={intentParams.amount}/>{' '}
-                for
-                <FormattedAmount params={intentParams} prefix="buy_" amount={intentParams.amount}/>{' '}
-                at price <b>{intentParams.max_price}</b> or lower.
+                The application requested permission to buy {' '}
+                <FormattedAmount params={intentParams} prefix="buy_" amount={intentParams.amount}/>{' '}for{' '}
+                <AssetName asset={{code: intentParams.sell_asset_code, issuer: intentParams.sell_asset_issuer}}/>{' '}
+                at <b>{intentParams.max_price} {intentParams.sell_asset_code || 'XLM'}/{intentParams.buy_asset_code || 'XLM'}</b> or
+                lower.
             </>
         /*case 'create_keypair':
             return <>

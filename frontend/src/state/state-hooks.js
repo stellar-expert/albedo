@@ -1,7 +1,7 @@
 import {useState, useEffect, useRef} from 'react'
 import isEqual from 'react-fast-compare'
 
-function ensureDependencies(dependencies){
+function ensureDependencies(dependencies) {
     if (!(dependencies instanceof Array))
         throw new Error('Parameter dependencies is required for useDependantState hook')
 }
@@ -18,11 +18,24 @@ function useDependantState(stateInitializer, dependencies, finalizer) {
     const [state, updateState] = useState(function () {
         return typeof stateInitializer === 'function' ? stateInitializer(dependencies) : stateInitializer
     })
-    //re-initialize state when any of the dependencies changed
-    useDeepEffect(function () {
-        updateState(typeof stateInitializer === 'function' ? stateInitializer(dependencies) : stateInitializer)
+    //pin dependencies object to invoke effect update only if dependencies changed
+    const pinnedDeps = useRef(dependencies)
+    let dependenciesChanged = !isEqual(dependencies, pinnedDeps.current)
+    //check that dependencies really changed
+    if (dependenciesChanged) {
+        pinnedDeps.current = dependencies
+    }
+
+    //effect invokes the initializer each time dependencies changed
+    useEffect(function () {
+        //check that dependencies really changed
+        if (dependenciesChanged) {
+            //re-initialize state when any of the dependencies changed
+            updateState(typeof stateInitializer === 'function' ? stateInitializer(dependencies) : stateInitializer)
+        }
         return finalizer || undefined
-    }, dependencies)
+    }, pinnedDeps.current)
+
     return [state, updateState]
 }
 
@@ -36,7 +49,7 @@ function useDeepEffect(effect, dependencies) {
     //pin dependencies object to invoke effect update only if dependencies changed
     const pinnedDeps = useRef([])
     //check that dependencies really changed
-    if (!isEqual(dependencies, pinnedDeps.current)){
+    if (!isEqual(dependencies, pinnedDeps.current)) {
         pinnedDeps.current = dependencies
     }
     //effect invokes the initializer each time dependencies changed

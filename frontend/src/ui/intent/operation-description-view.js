@@ -104,7 +104,8 @@ function OperationDescriptionView({op, source}) {
             if (parseFloat(op.limit) > 0)
                 return <span>
                     <b>Create trustline</b> to <AssetName
-                    asset={op.line} compact/> with limit <Amount amount={op.limit} asset={op.line} compact/>
+                    asset={op.line} compact/> with limit <Amount amount={op.limit} asset={{code: op.line.code}}
+                                                                 compact/>
                     <SourceAccount op={op} source={source}/>.
             </span>
             return <span>

@@ -7,19 +7,27 @@ import AccountAddress from '../components/account-address'
 import AccountLedgerDataView from './account-ledger-info-view'
 import NetworkSelectorView from './network-selector-view'
 import AccountActivityView from '../account/account-activity-view'
+import {useDependantState} from '../../state/state-hooks'
+import AccountLedgerData from '../../state/account-ledger-data'
+import {useStellarNetwork} from '../../state/network-selector'
 
 function AccountDashboardView() {
-    const account = accountManager.activeAccount
+    const account = accountManager.activeAccount,
+        currentNetwork = useStellarNetwork()
     if (!account) {
         __history.push('/')
         return null
-        return <div>
-            <h2>Welcome</h2>
-            <div className="space">
-
-            </div>
-        </div>
     }
+    const [accountLedgerData] = useDependantState(() => {
+        if (!account) return null
+        const data = new AccountLedgerData(account.publicKey, currentNetwork)
+        data.init()
+        return data
+    }, [account.publicKey, currentNetwork], () => {
+        if (accountLedgerData) {
+            accountLedgerData.finalize()
+        }
+    })
     return <div>
         <h2><AccountSelectorView/></h2>
         <div className="dual-layout">
@@ -36,11 +44,11 @@ function AccountDashboardView() {
         </div>
         <div className="space">
             <h3>Balances</h3>
-            <AccountLedgerDataView address={account.publicKey}/>
+            <AccountLedgerDataView ledgerData={accountLedgerData}/>
         </div>
         <div className="space"/>
         <hr className="space"/>
-        <AccountActivityView address={account.publicKey}/>
+        <AccountActivityView ledgerData={accountLedgerData}/>
     </div>
 }
 
