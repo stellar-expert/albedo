@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {parseQuery} from '../../util/url-utils'
 import actionContext from '../../state/action-context'
+import {replaceTokens} from '../../util/tx-replace-utils'
 
 const allowedIntents = ['tx', 'pay']
 
@@ -25,6 +26,10 @@ function WebStellarLinkHandlerView() {
         if (referrer) {
             params.app_origin = referrer
         }
+        if (params.network_passphrase) {
+            params.network = params.network_passphrase
+        }
+        replaceTokens(params)
         setError(null)
         actionContext.setContext(params)
         __history.push('/confirm')

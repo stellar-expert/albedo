@@ -35,9 +35,9 @@ function RiskLevelIconView({risk}) {
 }
 
 function IntentDetailsView({expanded}) {
-    const {intentProps, intentErrors, txContext} = actionContext,
+    const {intentProps, intentErrors, txContext, networkName} = actionContext,
         {title, risk, unsafe} = intentProps,
-        {app_origin, network, pubkey} = actionContext.intentParams
+        {app_origin, pubkey} = actionContext.intentParams
 
     return <div>
         <h2 style={{marginBottom: 0}}>{title}</h2>
@@ -45,26 +45,26 @@ function IntentDetailsView({expanded}) {
             Requested by <a href={app_origin || '#'} target="_blank">{app_origin || 'Unknown application'}</a>
         </div>
         <div className="space">
-            <IntentContextIconView color="info" main="sitemap"/> Network: <b>{network || 'public'}</b>.
+            <IntentContextIconView color="info" main="sitemap"/> Network: <b>{networkName}</b>
         </div>
         {!!pubkey &&
         <div>
-            <IntentContextIconView color="warning" main="key" sub=""/> Public key: <AccountAddress account={pubkey}/>.
+            <IntentContextIconView color="warning" main="key" sub=""/> Public key: <AccountAddress account={pubkey}/>
         </div>}
         <div>
-            <RiskLevelIconView risk={risk}/> Risk level: <b>{risk}</b>.
+            <RiskLevelIconView risk={risk}/> Risk level: <b>{risk}</b>
         </div>
         {unsafe ?
             <div>
-                <IntentContextIconView color="warning" main="shield" sub="exclamation-triangle"/> Potentially unsafe.
+                <IntentContextIconView color="warning" main="shield" sub="exclamation-triangle"/> Potentially unsafe
             </div> :
             <div>
-                <IntentContextIconView color="primary" main="shield"/> Your funds are safe.
+                <IntentContextIconView color="primary" main="shield"/> Your funds are safe
             </div>}
         {(intentErrors || expanded) && <div className="space text-small"><IntentTextDescription/></div>}
         {txContext && txContext.signatures.length > 0 && <div>
             <hr/>
-            <h3>Signatures:</h3>
+            <h4>Signatures:</h4>
             <Signatures/>
             <div className="space"/>
         </div>}

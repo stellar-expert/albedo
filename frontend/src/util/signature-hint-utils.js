@@ -48,12 +48,10 @@ function findSignatureByKey(key, allSignatures = []) {
     return allSignatures.find(sig => hintMatchesKey(sig.hint(), key))
 }
 
-const zeroAccount = 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF'
 
 export {
     hintMatchesKey,
     formatHint,
     findKeyByHint,
-    findSignatureByKey,
-    zeroAccount
+    findSignatureByKey
 }

@@ -1,5 +1,4 @@
 import {Asset, Memo, Operation, TransactionBuilder} from 'stellar-sdk'
-import {zeroAccount} from '../util/signature-hint-utils'
 import {createHorizon} from '../util/horizon-connector'
 import {resolveNetworkParams} from '../util/network-resolver'
 import standardErrors from '../util/errors'

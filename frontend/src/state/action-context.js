@@ -39,6 +39,9 @@ class ActionContext {
     @observable.shallow
     intentParams = null
 
+    @observable
+    networkName = 'public'
+
     /**
      * Requested transaction context.
      * @type {TxContext}
@@ -128,6 +131,10 @@ class ActionContext {
             this.intentErrors = 'Invalid "account" parameter. Stellar account public key expected.'
             return
         }*/
+
+        const {network, networkName} = resolveNetworkParams(intentParams)
+
+        this.networkName = networkName
 
         this.intentProps = intentInterface[intent]
         if (!this.intentProps) {
