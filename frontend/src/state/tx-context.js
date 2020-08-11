@@ -1,7 +1,9 @@
 import {observable, action, runInAction, computed} from 'mobx'
 import {Transaction, xdr as xdrTypes, Server} from 'stellar-sdk'
+import Bignumber from 'bignumber.js'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
-import {hintMatchesKey, zeroAccount} from '../util/signature-hint-utils'
+import {hintMatchesKey} from '../util/signature-hint-utils'
+import {substituteSourceAccount, substituteSourceSequence, zeroAccount} from '../util/tx-replace-utils'
 import {resolveNetworkParams} from '../util/network-resolver'
 import standardErrors from '../util/errors'
 
@@ -96,39 +98,35 @@ class TxContext {
      * Replace source account if transaction sourceAccount is empty.
      * @param {String} sourceAccountPublicKey
      */
-
-    /*@action
+    @action
     async setTxSourceAccount(sourceAccountPublicKey) {
-        //TODO: check that sequence always updated if the source account is updated.
-        if (!this.hasEmptyTxSource) throw new Error('Failed to change transaction source account. Source account has been set already.')
-        this.tx.source = sourceAccountPublicKey //update ths source field in the transaction itself
-        this.tx.tx._attributes.sourceAccount = Keypair.fromPublicKey(sourceAccountPublicKey).xdrAccountId() //update nested xdr
+        substituteSourceAccount(this.tx, sourceAccountPublicKey)
         await this.updateSignatureSchema()
-    }*/
+        const newSequence = sourceAccountPublicKey === zeroAccount ? '0' : undefined
+        await this.setTxSequence(newSequence)
+
+    }
 
     /**
      * Replace transaction sequence if it wasn't provided in the original transaction.
      * @param {String} [newSequence]
      */
     @action
-    async setTxSequence(newSequence = null) {
-        if (!this.hasEmptyTxSequence) throw new Error('Failed to change transaction sequence. Sequence has been set already.')
+    async setTxSequence(newSequence) {
         try {
-            if (!newSequence) {
+            if (newSequence === undefined) {
                 const horizon = new Server(this.horizon),
                     sourceAccount = await horizon.loadAccount(this.sourceAccount)
 
-                newSequence = sourceAccount.sequenceNumber()
+                newSequence = new Bignumber(sourceAccount.sequenceNumber()).add(1).toString()
             }
-            //const sequenceNumber = new BigNumber(sourceAccount.sequenceNumber()).add(1).toString()
-            this.tx.sequence = newSequence
-            this.tx.tx._attributes.seqNum = xdrTypes.SequenceNumber.fromString(newSequence)
+            substituteSourceSequence(this.tx, newSequence)
         } catch (err) {
             console.error(err)
             if (err.response) { //treat as Horizon error
                 if (err.response.status === 404)
                     throw standardErrors.externalError(new Error('Source account doesn\'t exist on the network.'))
-                throw standardErrors.externalError('Horizon error.')
+                throw standardErrors.horizonError('Horizon error.')
             }
         }
     }
@@ -147,12 +145,16 @@ class TxContext {
 
     /**
      * Remove a signature by signer key.
-     * @param key
+     * @param {String} key - Signer key.
      */
+    @action
     removeSignatureByKey(key) {
         const sig = this.findSignatureByKey(key)
         if (sig) {
             this.signatures.splice(this.signatures.indexOf(sig), 1)
+            if (this.sourceAccount === key) {
+                this.setTxSourceAccount(zeroAccount) //reset source account
+            }
         }
     }
 
@@ -190,10 +192,9 @@ class TxContext {
     @action
     async signDirect(executionContext) {
         //replace tx source account and sequence number if necessary
-        /*if (this.hasEmptyTxSource) {
-            await this.setTxSourceAccount(publicKey)
-        }*/
-        if (this.hasEmptyTxSequence) {
+        if (this.hasEmptyTxSource) {
+            await this.setTxSourceAccount(executionContext.publicKey)
+        } else if (this.hasEmptyTxSequence) {
             await this.setTxSequence()
         }
         const newSignature = await executionContext.signTransaction(this.tx)

@@ -3,6 +3,7 @@ import {observer} from 'mobx-react'
 import actionContext from '../../state/action-context'
 import {isTestnet} from '../../util/network-resolver'
 import AccountAddress from '../components/account-address'
+import standardErrors from '../../util/errors'
 
 function AccountFundingStatusView() {
     const {selectedPublicKey, selectedAccountInfo, intentParams, requiresExistingAccount} = actionContext
@@ -22,9 +23,9 @@ function AccountFundingStatusView() {
     }, [selectedPublicKey])
     if (!selectedAccountInfo) return <div className="loader"/>
     const {error} = selectedAccountInfo
-    if (error) return <div>
+    if (error && error.code !== standardErrors.accountNotSelected.code) return <div>
         {error.text}
-        {error.code === 404 && <div className="warning-block text-small">
+        {error.code === standardErrors.accountDoesNotExist.code && <div className="warning-block text-small">
             {isTestnet(intentParams) ? <>
                     Please wait, automatic testnet account creation requested.
                     <div className="loader small"/>

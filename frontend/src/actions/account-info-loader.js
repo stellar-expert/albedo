@@ -1,21 +1,12 @@
 import {createHorizon} from '../util/horizon-connector'
 import {isTestnet} from '../util/network-resolver'
+import standardErrors from '../util/errors'
 
 const pending = {}
 
-//TODO: use unified errors here
-function buildError(code, text) {
-    return {
-        error: {
-            text,
-            code
-        }
-    }
-}
-
 function loadSelectedAccountInfo(actionContext) {
     const {intentParams, selectedPublicKey} = actionContext
-    if (!selectedPublicKey) return Promise.resolve(buildError(0, 'Account not selected.'))
+    if (!selectedPublicKey) return Promise.resolve(standardErrors.accountNotSelected)
     //check whether we already loading the requested account info
     const pendingPromise = pending[selectedPublicKey]
     if (pendingPromise) return pendingPromise
@@ -33,10 +24,10 @@ function loadSelectedAccountInfo(actionContext) {
                         .catch(err => console.error(err))
 
                 }
-                return buildError(404, 'Account does not exists on the ledger.')
+                return standardErrors.accountDoesNotExist
             }
             console.error(err)
-            return buildError(-1, 'Unhandled error.')
+            return standardErrors.unhandledError(err)
         })
         .finally(() => {
             delete pending[selectedPublicKey]

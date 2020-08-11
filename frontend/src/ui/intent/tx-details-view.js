@@ -1,9 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Transaction} from 'stellar-sdk'
+import {observer} from 'mobx-react'
 import OperationDescription from './operation-description-view'
 import AccountAddress from '../components/account-address'
-import {zeroAccount} from '../../util/signature-hint-utils'
+import {zeroAccount} from '../../util/tx-replace-utils'
+import accountManager from '../../state/account-manager'
 
 /**
  * Normalize transaction memo
@@ -14,7 +16,7 @@ function TxFormattedMemo({rawMemo}) {
     switch (rawMemo && rawMemo._type) {
         case 'id':
         case 'text':
-            return <><code className="word-break">{rawMemo._value}</code> <span
+            return <><code className="word-break">{rawMemo._value.toString()}</code> <span
                 className="dimmed">(MEMO_{rawMemo._type.toUpperCase()})</span></>
         case 'hash':
         case 'return':
@@ -25,8 +27,9 @@ function TxFormattedMemo({rawMemo}) {
 }
 
 function formatDateUTC(rawDate) {
-    if (!rawDate) return 'undefined'
-    return new Date(rawDate).toISOString().replace(/(T|\.\d+Z)/g, ' ') + 'UTC'
+    rawDate = parseInt(rawDate || 0)
+    if (!rawDate) return 'unrestricted'
+    return new Date(rawDate * 1000).toISOString().replace(/(T|\.\d+Z)/g, ' ') + 'UTC'
 }
 
 function normalizeAsset(asset) {
@@ -49,15 +52,22 @@ function TxDetailsView({xdr, network}) {
     if (!tx) return <div>
         <span className="fa fa-exclamation-circle color-danger"/> Transaction is invalid and cannot be signed.
     </div>
-
+    const {activeAccount} = accountManager
     return <div className="tx-view space">
         <div>
             <span className="label">Source account: </span>
-            {tx.source === zeroAccount ? 'unspecified' : <AccountAddress account={tx.source}/>}
+            {tx.source === zeroAccount ?
+                (activeAccount ?
+                        activeAccount.displayName :
+                        <code>unspecified</code>
+                ) :
+                <AccountAddress account={tx.source}/>}
         </div>
         <div>
             <span className="label">Source account sequence: </span>
-            <code className="word-break">{tx.sequence == 0 ? 'unspecified' : tx.sequence}</code>
+            <code className="word-break">{tx.sequence === '0' ?
+                (activeAccount ? 'auto' : 'unspecified')
+                : tx.sequence}</code>
         </div>
         <div>
             <span className="label">Memo: </span><TxFormattedMemo rawMemo={tx.memo}/>
@@ -70,7 +80,7 @@ function TxDetailsView({xdr, network}) {
             <span className="label">Hash: </span><code className="word-break">{tx.hash().toString('hex')}</code>
         </div>
 
-        <div className="space"><b>Operations:</b></div>
+        <h4>Operations:</h4>
         <ol className="block-indent">
             {tx.operations.map((op, i) => <li key={i}>
                 <OperationDescription key={i} op={op} source={tx.source}/>
@@ -84,4 +94,4 @@ TxDetailsView.propTypes = {
     network: PropTypes.string.isRequired
 }
 
-export default TxDetailsView
+export default observer(TxDetailsView)

@@ -105,6 +105,20 @@ class StandardErrors {
         })
     }
 
+    get accountNotSelected(){
+        return buildError({
+            message: 'Account not selected.',
+            code: -1105
+        })
+    }
+
+    get accountDoesNotExist(){
+        return buildError({
+            message: 'Account does not exist on the ledger.',
+            code: -1106
+        })
+    }
+
 
     get messageSigningFailed() {
         return buildError({
