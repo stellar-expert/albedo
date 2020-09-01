@@ -69,6 +69,15 @@ async function prepareTxOperations(actionContext, source) {
         case 'pay': {
             const {amount, destination, asset_code, asset_issuer} = intentParams,
                 asset = asset_issuer ? new Asset(asset_code, asset_issuer) : Asset.native()
+            if (!asset_issuer) {
+                try {
+                    const acc = await createHorizon(intentParams).loadAccount(destination)
+                } catch (e) {
+                    if (e.name === 'NotFoundError') {
+                        return [Operation.createAccount({startingBalance: amount, destination})]
+                    }
+                }
+            }
             return [Operation.payment({asset, amount, destination})]
         }
         case 'trust': {

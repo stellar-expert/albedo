@@ -13,6 +13,7 @@ import AccountSettings from './account/settings/account-settings-view'
 import IntroView from './pages/intro-view'
 import WebStellarLinkHandler from './intent/web-stellar-link-handler-view'
 import InstallExtensionView from './pages/install-extension-view'
+import TxResultView from './intent/tx-result-view'
 
 function AppRouter({history}) {
     return <Layout>
@@ -25,6 +26,7 @@ function AppRouter({history}) {
                 <Route path="/import" component={ImportAccount}/>
                 <Route path="/signup" component={CreateAccount}/>
                 <Route path="/confirm" component={Intent}/>
+                <Route path="/result" component={TxResultView}/>
                 <Route path="/account" component={AccountDashboard}/>
                 <Route path="/extension" component={AccountDashboard}/>
                 <Route path="/account-settings" component={AccountSettings}/>

@@ -32,7 +32,7 @@ function ConfirmIntentView() {
         {' '}
         <button className="button button-outline button-block" disabled={isFinalized}
                 onClick={() => actionContext.rejectRequest()}>
-            {intentErrors ? 'Back to website' : 'Reject'}
+            {intentErrors ? 'Proceed' : 'Reject'}
         </button>
     </ActionsBlock>
 }

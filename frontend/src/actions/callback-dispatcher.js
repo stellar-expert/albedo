@@ -31,7 +31,7 @@ function execCallback(callback, data) {
 function postMessage(res, actionContext) {
     const target = locateCallerWindow(actionContext)
     if (!target) {
-        alert('Unable to process. Caller application browser window has been closed.')
+        //alert('Unable to process. Caller application browser window has been closed.')
         return Promise.reject('Caller application browser window was not found.')
     }
     target.postMessage({albedoIntentResult: res}, '*')
@@ -49,6 +49,8 @@ async function dispatchIntentResponse(res, actionContext) {
     if (callback) {
         await execCallback(callback, res)
     }
+    const callerWindow = locateCallerWindow()
+    if (!callerWindow || callerWindow === window) return res
     return postMessage(res, actionContext)
 }
 
