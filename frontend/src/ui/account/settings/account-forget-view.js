@@ -33,8 +33,7 @@ export default function AccountForgetView({credentials}) {
         <div className="row">
             <div className="column column-50 column-offset-25">
                 <button className="button button-outline button-block" onClick={forgetAccount}>
-                    <i className="fa fa-warning"/>{' '}
-                    Remove account <AccountAddress account={account.publicKey} link={false}/>
+                    <i className="fa fa-warning"/> Remove account
                 </button>
             </div>
         </div>

@@ -11,6 +11,7 @@ import {resolveNetworkParams} from '../util/network-resolver'
 import {restoreImplicitSession} from '../storage/implicit-session-storage'
 import {isImplicitIntentRequested} from '../ui/intent/implicit-intent-detector'
 import {loadSelectedAccountInfo} from '../actions/account-info-loader'
+import lastActionResult from './last-action-result'
 
 /**
  * Provides context for initiated action.
@@ -243,7 +244,10 @@ class ActionContext {
         try {
             if (!this.response)
                 throw new Error('Tried to finalize the action without a response.')
+
+            lastActionResult.setResult(this.response)
             const res = await dispatchIntentResponse(this.response, this)
+            __history.push('/result')
             this.reset()
             return res
         } catch (e) {
