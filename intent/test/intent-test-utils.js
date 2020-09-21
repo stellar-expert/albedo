@@ -2,7 +2,7 @@ class FrontendStub {
     postMessage(data) {
         const response = Object.assign({}, data)
         setTimeout(() => {
-            this.callPostMessageHandler({data: response})
+            this.callPostMessageHandler({ data: { albedoIntentResult: response } })
         }, 100)
     }
 
@@ -10,7 +10,7 @@ class FrontendStub {
     }
 
     notifyConnected() {
-        this.callPostMessageHandler('hello')
+        this.callPostMessageHandler({ data: { albedo: {} } })
     }
 
     setup() {
@@ -23,6 +23,7 @@ class FrontendStub {
                 if (event !== 'message') throw new Error('Unsupported event: ' + event)
                 this.callPostMessageHandler = handler
             },
+            removeEventListener: (e) => {},
             screenLeft: 0,
             screenTop: 0,
             innerWidth: 1280,
