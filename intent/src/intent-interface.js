@@ -11,7 +11,7 @@ const intentInterface = {
                 required: false
             }
         },
-        returns: ['pubkey', 'token', 'token_signature']
+        returns: ['pubkey', 'signed_message', 'signature']
     },
     sign_message: {
         risk: 'medium',
@@ -237,7 +237,7 @@ const intentInterface = {
     },
     implicit_flow: {
         risk: 'high',
-        title: 'Grant session permissions',
+        title: 'Implicit permissions',
         description: 'Requests temporary access token for one or more intents that can be used to execute actions without explicit confirmation from the user. In order to be executed implicitly, an implicit flow permissions for a given intent should be granted and "pubkey" parameter set.',
         unsafe: true,
         implicitFlow: false,
