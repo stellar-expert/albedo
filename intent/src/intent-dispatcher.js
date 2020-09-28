@@ -1,6 +1,7 @@
 import intentInterface from './intent-interface'
 import {createDialogTransport, createIframeTransport} from './transport-builder'
 import {getImplicitSession, saveImplicitSession} from './implicit-session-storage'
+import intentErrors from './intent-errors'
 
 /**
  * Request user's confirmation for the specified action.
@@ -81,7 +82,11 @@ function prepareRequestParams(intentDescriptor, params) {
         if (value) {
             requestParams[key] = value
         } else if (props.required)
-            throw new Error(`Parameter "${key}" is required for intent "${intent}".`)
+        {
+            const err = Object.assign(new Error(), intentErrors.invalidIntentRequest)
+            err.ext = `Parameter "${key}" is required for intent "${intent}".`
+            throw err
+        }
     }
     return requestParams
 }
