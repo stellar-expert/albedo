@@ -30,8 +30,8 @@ Requests account public key. It's a simple way of authentication for Stellar-bas
 **Returns**
 
 - `pubkey`
-- `token`
-- `token_signature`
+- `signed_message`
+- `signature`
 
 **Example**
 
