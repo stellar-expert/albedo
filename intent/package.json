@@ -15,7 +15,8 @@
   },
   "scripts": {
     "postbuild": "node ./build/update-readme.js",
-    "build": "webpack --mode=production --config ./webpack.config.js"
+    "build": "webpack --mode=production --config ./webpack.config.js",
+    "test": "./node_modules/.bin/mocha --require @babel/register"
   },
   "main": "./lib/albedo.intent.js",
   "module": "./src/index.js",

@@ -1,8 +1,13 @@
+import intentInterface from '../src/intent-interface'
+
 class FrontendStub {
     postMessage(data) {
-        const response = Object.assign({}, data)
+        const intent = intentInterface[data.intent]
+        const result = Object.assign({}, data)
+        for (const prop of intent.returns)
+            result[prop] = `${prop}Value`
         setTimeout(() => {
-            this.callPostMessageHandler({data: response})
+            this.callPostMessageHandler({ data: { albedoIntentResult: result } })
         }, 100)
     }
 
@@ -10,7 +15,7 @@ class FrontendStub {
     }
 
     notifyConnected() {
-        this.callPostMessageHandler('hello')
+        this.callPostMessageHandler({ data: { albedo: {} } })
     }
 
     setup() {
@@ -22,6 +27,15 @@ class FrontendStub {
             addEventListener: (event, handler) => {
                 if (event !== 'message') throw new Error('Unsupported event: ' + event)
                 this.callPostMessageHandler = handler
+            },
+            removeEventListener: (e) => {
+                this.callPostMessageHandler = null
+            },
+            sessionStorage: {
+                __items: {},
+                setItem: function (key, value) {
+                    this.__items[key] = value
+                }
             },
             screenLeft: 0,
             screenTop: 0,
