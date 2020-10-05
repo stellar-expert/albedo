@@ -58,12 +58,7 @@ module.exports = function (env, argv) {
         node: {
             fs: 'empty'
         },
-        optimization: {},
-        resolve: {
-            alias: {
-                components: path.resolve(__dirname, 'ui/components/')
-            }
-        }
+        optimization: {}
     }
 
     if (!isProduction) {

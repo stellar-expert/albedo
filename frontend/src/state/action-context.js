@@ -103,6 +103,17 @@ class ActionContext {
     }
 
     @computed
+    get isFinalized() {
+        return this.confirmed && !!this.response
+    }
+
+    @computed
+    get hasNoMatchingKey() {
+        const {pubkey} = this.intentParams
+        return pubkey && !accountManager.accounts.some(acc => acc.publicKey === pubkey)
+    }
+
+    @computed
     get autoSubmitToHorizon() {
         return this?.intentParams?.submit || false
     }
@@ -204,11 +215,6 @@ class ActionContext {
             confirmed: false,
             processed: false
         })
-    }
-
-    @computed
-    get isFinalized() {
-        return this.confirmed && !!this.response
     }
 
     /**

@@ -53,7 +53,6 @@ module.exports = function (env, argv) {
                             options: {
                                 ident: 'postcss',
                                 plugins: [
-                                    autoprefixer(),
                                     cssnano({
                                         autoprefixer: true,
                                         discardComments: {removeAll: true}
@@ -66,7 +65,7 @@ module.exports = function (env, argv) {
                             loader: 'sass-loader',
                             options: {
                                 sourceMap: !isProduction,
-                                prependData: '@import "./src/ui/variables.scss";'
+                                additionalData: '@import "./src/ui/variables.scss";'
                             }
                         }
                     ]
