@@ -6,9 +6,9 @@ import accountManager from '../../state/account-manager'
 import ActionsBlock from '../components/actions-block'
 
 function ConfirmIntentView() {
-    const {txContext, intentErrors, confirmed, isFinalized, autoSubmitToHorizon, requiresExistingAccount, selectedAccountInfo, selectedPublicKey, directKeyInput} = actionContext,
+    const {txContext, intentErrors, confirmed, isFinalized, autoSubmitToHorizon, requiresExistingAccount, selectedAccountInfo, selectedPublicKey, directKeyInput, hasNoMatchingKey} = actionContext,
         alreadySigned = txContext && txContext.findSignatureByKey(selectedPublicKey),
-        accountUnavailable = !selectedPublicKey || requiresExistingAccount && (!selectedAccountInfo || selectedAccountInfo.error),
+        accountUnavailable = !selectedPublicKey || hasNoMatchingKey || requiresExistingAccount && (!selectedAccountInfo || selectedAccountInfo.error),
         signButtonVisible = !directKeyInput && !intentErrors,
         sendPartiallySigned = txContext && txContext.signatures.length > 0 && !txContext.isFullySigned
 

@@ -35,10 +35,14 @@ function AuthActionLink({action, children}) {
 }
 
 function AuthSelectorView() {
-    const {activeAccount, accounts: allAccounts} = accountManager,
-        {intentParams, directKeyInput} = actionContext,
-        {pubkey: requestedKey} = intentParams,
-        noMatchingKey = requestedKey && activeAccount && !activeAccount.keypairs.some(keyPair => keyPair.publicKey === requestedKey)
+    const {intentParams, directKeyInput, hasNoMatchingKey} = actionContext,
+        {pubkey: requestedKey} = intentParams
+    let {activeAccount, accounts: allAccounts} = accountManager
+    if (requestedKey && hasNoMatchingKey) {
+        const matchedAccount = allAccounts.find(acc => acc.publicKey === requestedKey)
+        accountManager.setActiveAccount(matchedAccount)
+        activeAccount = matchedAccount
+    }
 
     const dropdownOptions = [{
         value: 'title',
@@ -79,14 +83,15 @@ function AuthSelectorView() {
         <Dropdown className="dimmed" value="title" onChange={handleAccountAction} options={dropdownOptions}/>
         <div className="space"/>
         {directKeyInput ? <DirectKeyInputView/> : <>
-            {noMatchingKey && <div className="space">
+            {hasNoMatchingKey && <div className="space">
                 The application requested specific key (<AccountAddress account={requestedKey}/>).
-                Either <AuthActionLink action="signup">add another Albedo account</AuthActionLink>
-                or provide the requested secret key <AuthActionLink action="direct-input">directly</AuthActionLink>.
+                Either <AuthActionLink action="signup">add another Albedo account</AuthActionLink> or
+                provide the requested secret key <AuthActionLink action="direct-input">directly</AuthActionLink>.
             </div>}
-            {!activeAccount && <p className="space">
+            {!activeAccount && <div className="space">
                 <a href="/signup">Create new Albedo account</a> to proceed.
-            </p>}
+            </div>}
+            <div className="space"/>
         </>}
     </div>
 }
