@@ -1,3 +1,3 @@
 export function isInsideFrame() {
-    return window !== window.top
+    return window !== window.parent
 }
