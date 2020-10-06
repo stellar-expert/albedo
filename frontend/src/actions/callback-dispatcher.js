@@ -39,7 +39,7 @@ function postMessage(res, actionContext) {
 }
 
 function locateCallerWindow() {
-    return isInsideFrame() ? window.top : window.opener
+    return isInsideFrame() ? window.parent : window.opener
 }
 
 async function dispatchIntentResponse(res, actionContext) {
