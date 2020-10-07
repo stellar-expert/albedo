@@ -18,7 +18,7 @@ function createDialogTransport(frontendUrl) {
         top = ((currentWindowHeight / 2) - (h / 2)) + dualScreenTop
 
     const dialogWindow = window.open(url, 'auth.albedo.link', `height=${h},width=${w},top=${top},left=${left},menubar=0,toolbar=0,location=0,status=0,personalbar=0,scrollbars=0,dependent=1`)
-    return new TransportHandler(dialogWindow, true)
+    return new TransportHandler(dialogWindow, true).onLoaded
 }
 
 let sharedIframeTransport = null
@@ -38,12 +38,12 @@ function createIframeTransport(frontendUrl) {
             height: '0',
             frameBorder: '0',
             referrerPolicy: 'origin',
-            src: `${frontendUrl}/implicit`
+            src: `${frontendUrl}`
         })
         document.body.appendChild(iframe)
         sharedIframeTransport = new TransportHandler(iframe.contentWindow)
     }
-    return sharedIframeTransport
+    return sharedIframeTransport.onLoaded
 }
 
 export {createDialogTransport, createIframeTransport}

@@ -7,13 +7,13 @@ import pkgInfo from '../package.json'
  * @param {Window} targetWindow - Transport window|iframe reference.
  * @param {Boolean} ephemeral - If set to true, automatically closes the window opened after receiving the response.
  */
-function TransportHandler(targetWindow, ephemeral = false){
+function TransportHandler(targetWindow, ephemeral = false) {
     this.windowHandler = targetWindow
     this.ephemeral = !!ephemeral
     this.isLoaded = false
     this.pendingRequests = {}
     this.preprocessRequestParams = null
-    this.onLoaded = new Promise((resolve, reject) => this.onLoadedCallback = resolve)
+    this.onLoaded = new Promise((resolve, reject) => this.onLoadedCallback = resolve).then(() => this)
     this.messageHandler = this.messageHandler.bind(this)
     window.addEventListener('message', this.messageHandler, false)
 }
@@ -22,11 +22,11 @@ TransportHandler.prototype = {
     isLoaded: false,
 
     markLoaded() {
-        this.isLoaded = true
-        if (this.onLoadedCallback) {
-            const onTransportWindowLoaded = this.onLoadedCallback
+        const {onLoadedCallback} = this
+        if (onLoadedCallback) {
             this.onLoadedCallback = null
-            onTransportWindowLoaded()
+            this.isLoaded = true
+            onLoadedCallback()
         }
     },
 

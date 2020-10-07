@@ -1,4 +1,10 @@
-import {generateRandomEncryptionKey, encryptDataAes, decryptDataAes, encodeBase64, decodeBase64} from '../util/crypto-utils'
+import {
+    generateRandomEncryptionKey,
+    encryptDataAes,
+    decryptDataAes,
+    encodeBase64,
+    decodeBase64
+} from '../util/crypto-utils'
 
 const sessionPrefix = 'session_'
 
@@ -24,8 +30,8 @@ function isSessionExpired(session) {
  * @param {String|Uint8Array} sessionKey
  * @return {{uid: String, encryptionKey: Uint8Array}}
  */
-function splitSessionKey(sessionKey){
-    if (typeof sessionKey === 'string'){
+function splitSessionKey(sessionKey) {
+    if (typeof sessionKey === 'string') {
         sessionKey = decodeBase64(sessionKey)
     }
     return {
@@ -73,14 +79,18 @@ function saveImplicitSession(account, duration, data) {
     }
 }
 
+function parseSessionData(sessionKey) {
+    const {uid, encryptionKey} = splitSessionKey(sessionKey)
+    return {sessionData: localStorage.getItem(uid), encryptionKey}
+}
+
 /**
  *
  * @param {String} sessionKey
  * @return {Boolean|SessionDescriptor}
  */
 function restoreImplicitSession(sessionKey) {
-    const {uid, encryptionKey} = splitSessionKey(sessionKey),
-        sessionData = localStorage.getItem(uid)
+    const {sessionData, encryptionKey} = parseSessionData(sessionKey)
     if (!sessionData) return false
     const {encryptedSecret} = JSON.parse(sessionData),
         decrypted = decryptDataAes(encryptedSecret, encryptionKey)
@@ -121,6 +131,7 @@ function scheduleCleanupExpiredSessions() {
 
 export {
     saveImplicitSession,
+    parseSessionData,
     restoreImplicitSession,
     scheduleCleanupExpiredSessions
 }

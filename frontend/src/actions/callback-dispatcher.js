@@ -1,5 +1,6 @@
 import errors from '../util/errors'
 import {isInsideFrame} from '../util/frame-utils'
+import {isSafari} from '../util/browser-detection'
 
 const urlSchema = 'url:'
 
@@ -42,6 +43,25 @@ function locateCallerWindow() {
     return isInsideFrame() ? window.parent : window.opener
 }
 
+function syncLocalStorage(caller, res) {
+    if (!isSafari()) return //use this hack only for Safari (Mac & iOS) browsers
+    const dataToSync = {}
+    for (let key of Object.keys(localStorage)) {
+        dataToSync[key] = localStorage.getItem(key)
+    }
+    const {frames} = caller
+    for (let i = 0; i < frames.length; i++) {
+        try {
+            const frame = frames[i]
+            if (frame.origin === window.origin) { //assume its an implicit container iframe
+                frame.postMessage({sync: dataToSync}, window.origin)
+            }
+        } catch (e) {
+            //the frame is inaccessible - ignore errors
+        }
+    }
+}
+
 async function dispatchIntentResponse(res, actionContext) {
     const {callback, __reqid} = actionContext.intentParams
     res.__reqid = __reqid
@@ -51,6 +71,9 @@ async function dispatchIntentResponse(res, actionContext) {
     }
     const callerWindow = locateCallerWindow()
     if (!callerWindow || callerWindow === window) return res
+    if (actionContext.intent === 'implicit_flow' && !isInsideFrame()) {
+        syncLocalStorage(callerWindow, res)
+    }
     return postMessage(res, actionContext)
 }
 
