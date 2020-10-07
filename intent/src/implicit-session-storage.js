@@ -50,7 +50,9 @@ export function getImplicitSession(intent, pubkey) {
 
 export function getAllImplicitSessions() {
     const storage = getStorage()
-    return Object.keys(storage).map(key => storage.getItem(key))
+    return Object.keys(storage)
+        .filter(key => key.indexOf(storagePrefix) === 0)
+        .map(key => JSON.parse(storage.getItem(key)))
 }
 
 export function forgetSession(pubkey) {
