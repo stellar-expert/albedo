@@ -137,6 +137,7 @@ module.exports = function (env, argv) {
                 disableDotRule: true
             },
             compress: true,
+            disableHostCheck: true,
             host: '0.0.0.0',
             port: 5001,
             contentBase: [path.join(__dirname, './distr/app')],

@@ -7,7 +7,7 @@ class FrontendStub {
         for (const prop of intent.returns)
             result[prop] = `${prop}Value`
         setTimeout(() => {
-            this.callPostMessageHandler({ data: { albedoIntentResult: result } })
+            this.callPostMessageHandler({data: {albedoIntentResult: result}})
         }, 100)
     }
 
@@ -15,7 +15,7 @@ class FrontendStub {
     }
 
     notifyConnected() {
-        this.callPostMessageHandler({ data: { albedo: {} } })
+        this.callPostMessageHandler({data: {albedo: {}}})
     }
 
     setup() {
@@ -43,9 +43,12 @@ class FrontendStub {
             innerHeight: 720
         }
         global.document = {
-            createElement: () => {
+            createElement: (tag) => {
                 setTimeout(() => this.notifyConnected(), 200)
-                return this
+                switch (tag) {
+                    case 'iframe':
+                        return {style: {}, contentWindow: null}
+                }
             },
             body: {
                 appendChild: function () {

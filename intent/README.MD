@@ -19,6 +19,7 @@ import albedo from '@albedo-link/intent'
 
 ### Intents
 
+
 #### Intent `public_key`
 
 Requests account public key. It's a simple way of authentication for Stellar-based applications. The response ensures that a user owns the corresponding secret key.
@@ -257,6 +258,64 @@ albedo.implicitFlow({
     intents: 'tx,pay,trust,sign_message'
 })
     .then(res => console.log(res))
+```
+
+### Implicit session utils
+
+Collection of helpers to simplify various operations in the implicit mode. 
+
+#### `isImplicitSessionAllowed(intent, pubkey)`
+
+Checks whether an implicit session has been granted earlier for an intent + pubkey pair.
+
+**Parameters**
+
+- `intent` - *(required)* Intent to check.
+- `pubkey` - *(required)* Public key of the account which granted access.
+
+**Returns**
+
+- `true/false`
+
+**Example**
+
+```js
+const isAllowed = albedo.isImplicitSessionAllowed(
+    'tx', 
+    'GBQW4KLMRXIMSDWBEWX4AWQKWYW7R3E7SFPSHTUDTFFT22NNUC6COL72'
+)
+```
+
+#### `listImplicitSessions()`
+
+Enumerates all currently active implicit sessions.
+
+**Returns**
+
+- An array of active session descriptors. 
+
+**Example**
+
+```js 
+for (let session of albedo.listImplicitSessions()){
+    console.log(session.pubkey, session.valid_until, session.grants)
+}
+```
+
+#### `forgetImplicitSession(pubkey)`
+
+Revokes session permission granted for an account.
+
+**Parameters**
+
+- `pubkey` - *(required)* Public key of the account which granted access.
+
+**Example**
+
+```js
+const pubkey = 'GBQW4KLMRXIMSDWBEWX4AWQKWYW7R3E7SFPSHTUDTFFT22NNUC6COL72'
+albedo.forgetImplicitSession(pubkey)
+console.log(albedo.listImplicitSessions().some(s => s.pubkey === pubkey))
 ```
 
 ## Development
