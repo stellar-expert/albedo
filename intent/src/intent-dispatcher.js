@@ -23,32 +23,44 @@ export function requestIntentConfirmation(params, frontendUrl) {
     } catch (e) {
         return Promise.reject(e)
     }
-    //dispatch intent
-    return sendRequest(requestParams, frontendUrl)
+    return prepareTransport(requestParams, frontendUrl)
+        //dispatch intent
+        .then(transport => sendRequest(requestParams, transport))
 }
 
 /**
- * Send confirmation request for a specific intent using a suitable transport.
+ * Create/retrieve an appropriate window transport for given intent params.
  * @param {Object} params - Intent params provided by the third-party app.
  * @param {String} frontendUrl - URL of the Albedo website.
- * @return {Promise<Object>}
+ * @return {TransportHandler}
  */
-function sendRequest(params, frontendUrl) {
+function prepareTransport(params, frontendUrl) {
     //check if intent supports implicit flow and the permission was granted to the app
-    let transport
-    //try to retrieve an implicit session
     if (params.pubkey) {
         const session = getImplicitSession(params.intent, params.pubkey)
         if (session) {
             params.session = session.key
             //implicit session can be executed without a dialog window
-            transport = createIframeTransport(frontendUrl)
+            return createIframeTransport(frontendUrl)
         }
     }
+    //create iframe transport in advance if the implicit flow has been requested
+    setTimeout(() => {
+        if (params.intent === 'implicit_flow') {
+            createIframeTransport(frontendUrl)
+        }
+    }, 200)
     //create dialog window transport if only interactive authorization flow is available
-    if (!transport) {
-        transport = createDialogTransport(frontendUrl)
-    }
+    return createDialogTransport(frontendUrl)
+}
+
+/**
+ * Send confirmation request for a specific intent using a suitable transport.
+ * @param {Object} params - Intent params provided by the third-party app.
+ * @param {TransportHandler} transport - PostMessage transport window handler.
+ * @return {Promise<Object>}
+ */
+function sendRequest(params, transport) {
     return transport.postMessage(params)
         .then(result => {
             //handle implicit session grant response if any
@@ -81,8 +93,7 @@ function prepareRequestParams(intentDescriptor, params) {
             value = params[key]
         if (value) {
             requestParams[key] = value
-        } else if (props.required)
-        {
+        } else if (props.required) {
             const err = Object.assign(new Error(), intentErrors.invalidIntentRequest)
             err.ext = `Parameter "${key}" is required for intent "${intent}".`
             throw err

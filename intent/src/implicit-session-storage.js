@@ -1,8 +1,11 @@
 import ImplicitSession from './implicit-session'
 
-const sessionStoragePrefix = 'albedo_session_'
+const storagePrefix = 'albedo_session_',
+    implicitSessions = {}
 
-const implicitSessions = {}
+function getStorage() {
+    return window.sessionStorage
+}
 
 /**
  * Whether to save the session to the browser internal session storage - allows sharing of session data
@@ -16,7 +19,7 @@ export function saveImplicitSession(intentResult) {
     if (!saveToBrowserStorage) {
         implicitSessions[session.pubkey] = session
     } else {
-        window.sessionStorage.setItem(sessionStoragePrefix + session.pubkey, JSON.stringify(session))
+        getStorage().setItem(storagePrefix + session.pubkey, JSON.stringify(session))
     }
 }
 
@@ -26,12 +29,12 @@ export function saveImplicitSession(intentResult) {
  * @param {String} pubkey - Public key associated with the session.
  * @return {ImplicitSession|null}
  */
-export function getImplicitSession (intent, pubkey) {
+export function getImplicitSession(intent, pubkey) {
     let session
     if (!saveToBrowserStorage) {
         session = implicitSessions[pubkey]
     } else {
-        const restored = window.sessionStorage.getItem(sessionStoragePrefix + pubkey)
+        const restored = getStorage().getItem(storagePrefix + pubkey)
         if (restored) {
             session = new ImplicitSession(JSON.parse(restored))
         }
@@ -43,4 +46,13 @@ export function getImplicitSession (intent, pubkey) {
     }
     if (!session.grants.includes(intent)) return null
     return session
+}
+
+export function getAllImplicitSessions() {
+    const storage = getStorage()
+    return Object.keys(storage).map(key => storage.getItem(key))
+}
+
+export function forgetSession(pubkey) {
+    getStorage().removeItem(storagePrefix + pubkey)
 }

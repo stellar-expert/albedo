@@ -2,7 +2,7 @@ import {generateRandomToken} from './random-token-generator'
 import intentInterface from './intent-interface'
 import intentErrors from './intent-errors'
 import {requestIntentConfirmation} from './intent-dispatcher'
-import {getImplicitSession} from './implicit-session-storage'
+import {getAllImplicitSessions, getImplicitSession} from './implicit-session-storage'
 import {bindWebStellarLinkHandler} from './web+stellar-handler'
 
 if (typeof window === 'object' && typeof window.fetch !== 'function') {
@@ -151,6 +151,22 @@ AlbedoIntent.prototype = {
      */
     isImplicitSessionAllowed(intent, pubkey) {
         return !!getImplicitSession(intent, pubkey)
+    },
+
+    /**
+     * Enumerate all currently active implicit sessions.
+     * @returns {Array<{pubkey: String, session: String, valid_until: Number, grants: Array<String>}>}
+     */
+    listImplicitSessions() {
+        return getAllImplicitSessions()
+    },
+
+    /**
+     * Revoke session permission granted for an account.
+     * @param {String} pubkey
+     */
+    forgetImplicitSession(pubkey){
+        forgetSession(pubkey)
     }
 }
 

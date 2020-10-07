@@ -9,12 +9,21 @@ export interface AlbedoIntent {
     exchange: (params: object) => Promise<object>,
     signMessage: (params: object) => Promise<object>,
     generateRandomToken: () => string,
-    isImplicitSessionAllowed: (intent: string, pubkey: string) => boolean
+    isImplicitSessionAllowed: (intent: string, pubkey: string) => boolean,
+    listImplicitSessions: () => AlbedoImplicitSessionDescriptor[]
+    forgetImplicitSession: (pubkey: string) => void
 }
 
 declare const albedo: AlbedoIntent
 
 export default albedo
+
+export interface AlbedoImplicitSessionDescriptor {
+    pubkey: string,
+    session: string,
+    valid_until: number,
+    grants: string[]
+}
 
 export interface AlbedoIntentInterfaceParamDescriptor {
     description: string,
