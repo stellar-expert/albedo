@@ -8,21 +8,11 @@ import {
     updateRecentAccount,
     retrieveRecentAccount
 } from '../storage/account-storage'
+import {syncLocalStorage} from '../actions/callback-dispatcher'
 
 class AccountManager {
     constructor() {
-        this.loadAvailableAccounts()
-        this.activeAccount = this.get(retrieveRecentAccount()) || null
-    }
-
-    /**
-     * Find account persisted in browser storage by an id
-     * @param id
-     * @returns {Account|null}
-     */
-    get(id) {
-        if (!id) return null
-        return this.accounts.find(a => a.id === id)
+        this.reload()
     }
 
     /**
@@ -46,10 +36,21 @@ class AccountManager {
     @observable.shallow
     accounts = []
 
+    /**
+     * Find account persisted in browser storage by an id
+     * @param id
+     * @returns {Account|null}
+     */
+    get(id) {
+        if (!id) return null
+        return this.accounts.find(a => a.id === id)
+    }
+
     @action
     setActiveAccount(account) {
         this.activeAccount = account
         updateRecentAccount(account)
+        syncLocalStorage()
     }
 
     /**
@@ -113,6 +114,11 @@ class AccountManager {
         }
         n.sort()
         return 'Account ' + (1 + n.pop())
+    }
+
+    reload() {
+        this.loadAvailableAccounts()
+        this.activeAccount = this.get(retrieveRecentAccount()) || null
     }
 }
 

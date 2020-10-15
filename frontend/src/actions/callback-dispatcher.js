@@ -32,7 +32,6 @@ function execCallback(callback, data) {
 function postMessage(res, actionContext) {
     const target = locateCallerWindow(actionContext)
     if (!target) {
-        //alert('Unable to process. Caller application browser window has been closed.')
         return Promise.reject('Caller application browser window was not found.')
     }
     target.postMessage({albedoIntentResult: res}, '*')
@@ -43,17 +42,26 @@ function locateCallerWindow() {
     return isInsideFrame() ? window.parent : window.opener
 }
 
-function syncLocalStorage(caller, res) {
-    if (!isSafari()) return //use this hack only for Safari (Mac & iOS) browsers
+/**
+ * Send synchronize localStorage command to same origin iframes.
+ */
+export function syncLocalStorage() {
+    //do not allow to send sync commands from iframes
+    if (isInsideFrame()) return
+    //obtain caller window reference
+    const caller = window.opener
+    if (!caller || caller === window) return
+    //copy all data from localStorage
     const dataToSync = {}
     for (let key of Object.keys(localStorage)) {
         dataToSync[key] = localStorage.getItem(key)
     }
+    //try to find and sync implicit transport iframe
     const {frames} = caller
     for (let i = 0; i < frames.length; i++) {
         try {
             const frame = frames[i]
-            if (frame.origin === window.origin) { //assume its an implicit container iframe
+            if (frame.origin === window.origin) { //assume it's an implicit container iframe
                 frame.postMessage({sync: dataToSync}, window.origin)
             }
         } catch (e) {
@@ -62,7 +70,13 @@ function syncLocalStorage(caller, res) {
     }
 }
 
-async function dispatchIntentResponse(res, actionContext) {
+/**
+ * Process and send intent response back to the caller window.
+ * @param {Object} res - Response object.
+ * @param {ActionContext} actionContext - Action context to use
+ * @return {Promise<void>}
+ */
+export async function dispatchIntentResponse(res, actionContext) {
     const {callback, __reqid} = actionContext.intentParams
     res.__reqid = __reqid
 
@@ -71,8 +85,8 @@ async function dispatchIntentResponse(res, actionContext) {
     }
     const callerWindow = locateCallerWindow()
     if (!callerWindow || callerWindow === window) return res
-    if (actionContext.intent === 'implicit_flow' && !isInsideFrame()) {
-        syncLocalStorage(callerWindow, res)
+    if (actionContext.intent === 'implicit_flow') {
+        syncLocalStorage()
     }
     return postMessage(res, actionContext)
 }
@@ -82,7 +96,7 @@ async function dispatchIntentResponse(res, actionContext) {
  * @param {Error|String} [error] - Rejection reason or validation error.
  * @param {ActionContext} actionContext - Current action context.
  */
-function handleIntentResponseError(error, actionContext) {
+export function handleIntentResponseError(error, actionContext) {
     if (!error) {
         error = errors.actionRejectedByUser
     }
@@ -96,5 +110,3 @@ function handleIntentResponseError(error, actionContext) {
             .catch(e => console.error(e))
     }
 }
-
-export {dispatchIntentResponse, handleIntentResponseError}

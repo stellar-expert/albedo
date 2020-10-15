@@ -44,12 +44,12 @@ export default function (responder) {
         return executionContext.retrieveSessionData()
             .then(data => {
                 Object.assign(data, {intents, network})
-                const {sessionKey, validUntil} = saveImplicitSession(activeAccount, 3600, data)
+                const {sessionKey, validUntil, pubkey} = saveImplicitSession(activeAccount, 3600, data)
                 return {
                     granted: true,
                     network: network,
                     session: sessionKey,
-                    pubkey: data.publicKey,
+                    pubkey,
                     intents,
                     grants: intents,
                     valid_until: validUntil

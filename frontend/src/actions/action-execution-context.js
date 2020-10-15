@@ -136,15 +136,14 @@ class ActionExecutionContext {
     }
 
     async retrieveSessionData() {
-        if (this.account.accountType !== ACCOUNT_TYPES.STORED_ACCOUNT)
-            return {accountType: this.account.accountType}
-
-        const secret = this.account.requestAccountSecret(this.credentials)
-        return {
-            accountType: ACCOUNT_TYPES.STORED_ACCOUNT,
-            publicKey: this.publicKey,
-            secret
+        const res = {
+            accountType: this.account.accountType,
+            publicKey: this.publicKey
         }
+        if (res.accountType === ACCOUNT_TYPES.STORED_ACCOUNT) {
+            res.secret = this.account.requestAccountSecret(this.credentials)
+        }
+        return res
     }
 }
 
