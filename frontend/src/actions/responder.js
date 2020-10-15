@@ -72,7 +72,8 @@ class Responder {
                 //for HW accounts, load an account from the localStorage
             } else if (accountType === ACCOUNT_TYPES.TREZOR_ACCOUNT || accountType === ACCOUNT_TYPES.LEDGER_ACCOUNT) {
                 //TODO: retrieve an account by id and find a keypair by publicKey
-                throw new Error(`Implicit sessions for HW accounts is not implemented.`)
+                const account = accountManager.accounts.find(a => a.publicKey === publicKey)
+                executionContext = ActionExecutionContext.forAccount(account)
             } else
                 throw new Error(`Implicit sessions are not supported for account type ${accountType}.`)
         } else {

@@ -46,7 +46,7 @@ function splitSessionKey(sessionKey) {
  * @param {Account} account - Account to save.
  * @param {Number|String} duration - Implicit session duration in seconds.
  * @param {Object} data - Extra data to encrypt.
- * @return {{sessionKey: String, validUntil: Number}}
+ * @return {{pubkey: String, sessionKey: String, validUntil: Number}}
  */
 function saveImplicitSession(account, duration, data) {
     duration = parseInt(duration) || 0
@@ -75,7 +75,8 @@ function saveImplicitSession(account, duration, data) {
     localStorage.setItem(uid, JSON.stringify(sessionData))
     return {
         sessionKey: encodeBase64(sessionKey),
-        validUntil
+        validUntil,
+        pubkey: account.publicKey
     }
 }
 

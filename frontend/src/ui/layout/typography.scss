@@ -54,9 +54,9 @@ hr {
   border: none;
   font-size: $font-size-base;
   margin: 15px auto;
-  width: 90%;
+  width: 100%;
   max-width: 90vw;
-  height: 0.9px;
+  height: 0.7px;
   background: linear-gradient(to right, transparentize($color-highlight, 1) 0%, $color-highlight 15%, $color-highlight 85%, transparentize($color-highlight, 1) 100%);
 
   &.double-space {
