@@ -19,7 +19,8 @@ module.exports = function (env, argv) {
         entry: {
             'albedo': [path.join(__dirname, './app.js')],
             'albedo-intent': [path.join(__dirname, './ui/intent/intent-script-global-import.js')],
-            'albedo-payment-button': [path.join(__dirname, './payment-request-script/payment-button.js')]
+            'albedo-payment-button': [path.join(__dirname, './payment-request-script/payment-button.js')],
+            'albedo-intent-button': [path.join(__dirname, './payment-request-script/payment-button.js')]
         },
         output: {
             path: path.join(__dirname, '../distr/app/'),
