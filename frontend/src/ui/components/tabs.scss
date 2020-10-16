@@ -1,6 +1,6 @@
 .tabs {
   .tabs-header {
-    border-bottom: 2px solid $color-contrast-border;
+    border-bottom: 1px solid $color-contrast-border;
     margin: 1em -1em;
     display: flex;
     justify-content: space-between;
@@ -12,11 +12,11 @@
       font-weight: 300;
       line-height: 2;
       display: inline-block;
-      font-size: 2rem;
-      border-bottom: 2px solid transparent;
+      font-size: 1.15*$font-size-base;
+      border-bottom-color: transparent;
       text-decoration: none;
       padding: 0 1em;
-      margin-bottom: -2px;
+      margin-bottom: -1px;
 
       &:hover {
 

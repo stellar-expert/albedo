@@ -75,12 +75,12 @@ class DemoView extends React.Component {
             <div className="column">
                 <h2>Demos & How-To</h2>
                 <div className="row">
-                    <div className="column column-40">
-                        <div className="segment" style={{margin: '0 -0.5em', padding: '0.5em 1em'}}>
+                    <div className="column column-33">
+                        <div className="segment" style={{marginLeft: '-0.5em', padding: '0.5em 1em'}}>
                             {this.renderNav()}
                         </div>
                     </div>
-                    <div className="column column-60">
+                    <div className="column column-66">
                         {this.renderSection()}
                     </div>
                 </div>
