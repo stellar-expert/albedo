@@ -62,7 +62,7 @@ AlbedoIntent.prototype = {
     },
 
     /**
-     * Request transaction signing, returns signed transaction envelope.
+     * Request transaction signing, returns the signed transaction envelope.
      * @param {Object} params - Intent parameters.
      * @param {String} params.xdr - A Stellar transaction in XDR format encoded in base64.
      * @param {String} [params.pubkey] - Specific public key requested by the application.
