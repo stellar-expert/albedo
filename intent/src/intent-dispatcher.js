@@ -1,7 +1,11 @@
 import intentInterface from './intent-interface'
+import intentErrors from './intent-errors'
 import {createDialogTransport, createIframeTransport} from './transport-builder'
 import {getImplicitSession, saveImplicitSession} from './implicit-session-storage'
-import intentErrors from './intent-errors'
+
+function intentError(msg) {
+    return Object.assign(new Error(), intentErrors.invalidIntentRequest, {ext: msg})
+}
 
 /**
  * Request user's confirmation for the specified action.
@@ -10,22 +14,29 @@ import intentErrors from './intent-errors'
  * @return {Promise}
  */
 export function requestIntentConfirmation(params, frontendUrl) {
-    const {intent} = params
-    //intent should be present
-    if (!intent) return Promise.reject(new Error('Parameter "intent" is required.'))
-    const intentDescriptor = intentInterface[intent]
-    //check interface compliance
-    if (!intentDescriptor) return Promise.reject(new Error(`Unknown intent: "${intent}".`))
-    //build request data
-    let requestParams
     try {
-        requestParams = prepareRequestParams(intentDescriptor, params)
+        const {intent} = params
+        //intent should be present
+        if (!intent)
+            throw intentError('Parameter "intent" is required.')
+        const intentDescriptor = intentInterface[intent]
+        //check interface compliance
+        if (!intentDescriptor)
+            throw intentError(`Unknown intent: "${intent}".`)
+        //build request data
+        const requestParams = prepareRequestParams(intentDescriptor, params)
+        //create transport and dispatch request
+        return prepareTransport(requestParams, frontendUrl)
+            //dispatch intent request
+            .then(transport => sendRequest(requestParams, transport))
     } catch (e) {
-        return Promise.reject(e)
+        const {code = -1, message, ext} = e,
+            res = {message, code}
+        if (ext) {
+            res.ext = ext
+        }
+        return Promise.reject(res)
     }
-    return prepareTransport(requestParams, frontendUrl)
-        //dispatch intent
-        .then(transport => sendRequest(requestParams, transport))
 }
 
 /**
@@ -81,12 +92,12 @@ function sendRequest(params, transport) {
 function prepareRequestParams(intentDescriptor, params) {
     //validate parameters
     if (typeof params !== 'object')
-        throw new Error('Intent parameters expected.')
+        throw intentError('Intent parameters expected.')
     const {intent, pubkey} = params,
         requestParams = {intent}
     //basic account public key validation
     if (pubkey && !/^G[0-9A-Z]{55}$/.test(pubkey))
-        throw new Error('Invalid "pubkey" parameter. Stellar account public key expected.')
+        throw intentError('Invalid "pubkey" parameter. Stellar account public key expected.')
     //check required params
     for (const key in intentDescriptor.params) {
         const props = intentDescriptor.params[key],
@@ -94,9 +105,7 @@ function prepareRequestParams(intentDescriptor, params) {
         if (value) {
             requestParams[key] = value
         } else if (props.required) {
-            const err = Object.assign(new Error(), intentErrors.invalidIntentRequest)
-            err.ext = `Parameter "${key}" is required for intent "${intent}".`
-            throw err
+            throw intentError(`Parameter "${key}" is required for intent "${intent}".`)
         }
     }
     return requestParams
