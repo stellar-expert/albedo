@@ -55,12 +55,12 @@ function AccountActivityView({ledgerData}) {
                         {' '}<ElapsedTime className="dimmed" ts={new Date(tx.created_at)} suffix=" ago"/>
 
                     </div>
-                    <ul className="block-indent">
+                    {tx.operations.length > 0 && <ul className="block-indent">
                         {tx.operations.map(op => <li key={op.id} className="appear">
                             <OperationDescriptionView op={op} source={tx.source_account}/>{' '}
                             <ExplorerLink type="op" path={op.id}><i className="fa fa-external-link"/></ExplorerLink>
                         </li>)}
-                    </ul>
+                    </ul>}
                 </li>)}
                 {!ledgerData.txHistory.length && <div className="dimmed text-micro text-center">
                     (No transactions so far)

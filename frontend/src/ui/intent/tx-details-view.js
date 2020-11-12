@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Transaction} from 'stellar-sdk'
+import {TransactionBuilder} from 'stellar-sdk'
 import {observer} from 'mobx-react'
 import OperationDescription from './operation-description-view'
 import AccountAddress from '../components/account-address'
@@ -43,7 +43,7 @@ function normalizeAsset(asset) {
 function TxDetailsView({xdr, network}) {
     let tx
     try {
-        tx = new Transaction(xdr, network)
+        tx = TransactionBuilder.fromXDR(xdr, network)
     } catch (e) {
         console.error(e)
         tx = null
@@ -52,8 +52,12 @@ function TxDetailsView({xdr, network}) {
     if (!tx) return <div>
         <span className="fa fa-exclamation-circle color-danger"/> Transaction is invalid and cannot be signed.
     </div>
-    const {activeAccount} = accountManager
+    const {activeAccount} = accountManager,
+        isFeeBump = !!tx.innerTransaction
     return <div className="tx-view space">
+        {isFeeBump && <div>
+            <span className="label">Fee bump transaction</span>
+        </div>}
         <div>
             <span className="label">Source account: </span>
             {tx.source === zeroAccount ?
@@ -79,12 +83,12 @@ function TxDetailsView({xdr, network}) {
         <div>
             <span className="label">Hash: </span><code className="word-break">{tx.hash().toString('hex')}</code>
         </div>
-
         <h4>Operations:</h4>
         <ol className="block-indent">
-            {tx.operations.map((op, i) => <li key={i}>
-                <OperationDescription key={i} op={op} source={tx.source}/>
-            </li>)}
+            {(isFeeBump ? tx.operations : tx.innerTransaction.operations)
+                .map((op, i) => <li key={i}>
+                    <OperationDescription key={i} op={op} source={tx.source}/>
+                </li>)}
         </ol>
     </div>
 }
