@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed} from 'mobx'
-import {Transaction, Keypair} from 'stellar-sdk'
+import {Transaction, Keypair, TransactionBuilder} from 'stellar-sdk'
 import {intentInterface} from '@albedo-link/intent'
 import accountManager from './account-manager'
 import responder from '../actions/responder'
@@ -167,7 +167,7 @@ class ActionContext {
         //set transaction context in advance for the tx intent
         if (intent === 'tx') {
             const {network} = resolveNetworkParams(intentParams)
-            const tx = new Transaction(intentParams.xdr, network)
+            const tx = TransactionBuilder.fromXDR(intentParams.xdr, network)
             await this.setTxContext(tx)
         }
 

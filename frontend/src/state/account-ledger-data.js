@@ -1,18 +1,26 @@
 import {observable, action, runInAction, transaction} from 'mobx'
 import {createHorizon} from '../util/horizon-connector'
-import {Networks, Transaction} from 'stellar-sdk'
+import {Networks, Transaction, TransactionBuilder} from 'stellar-sdk'
 import Bignumber from 'bignumber.js'
 
 const maxRecentEntries = 15
 
 function retrieveOperations(tx, network) {
-    const parsed = new Transaction(tx.envelope_xdr, Networks[network.toUpperCase()])
-    tx.operations = parsed.operations.map((op, i) => {
-        const opid = new Bignumber(tx.paging_token)
-            .add(i + 1)
-        op.id = opid.toString()
-        return op
-    })
+    let parsed = TransactionBuilder.fromXDR(tx.envelope_xdr, Networks[network.toUpperCase()])
+    //handle fee bumps
+    if (parsed.innerTransaction) {
+        parsed = parsed.innerTransaction
+    }
+    if (parsed.operations) {
+        tx.operations = parsed.operations.map((op, i) => {
+            const opid = new Bignumber(tx.paging_token)
+                .add(i + 1)
+            op.id = opid.toString()
+            return op
+        })
+    } else {
+        tx.operations = []
+    }
     return tx
 }
 
