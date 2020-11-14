@@ -18,7 +18,7 @@ const allSections = [
 
 export default function DemoNavigationView() {
     const location = useLocation()
-    const {section: activeSection} = parseQuery(location.search)
+    const {section: activeSection = 'intro'} = parseQuery(location.search)
     return <ul>
         {allSections.map(section => {
             let title = section

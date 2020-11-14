@@ -7,7 +7,7 @@ import {parseQuery} from '../../util/url-utils'
 
 export default function DemoView() {
     const location = useLocation(),
-        {section} = parseQuery(location.search)
+        {section = 'intro'} = parseQuery(location.search)
 
     return <div className="row wide no-center">
         <div className="column">
