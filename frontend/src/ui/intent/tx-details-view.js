@@ -85,7 +85,7 @@ function TxDetailsView({xdr, network}) {
         </div>
         <h4>Operations:</h4>
         <ol className="block-indent">
-            {(isFeeBump ? tx.operations : tx.innerTransaction.operations)
+            {(isFeeBump ? tx.innerTransaction.operations : tx.operations)
                 .map((op, i) => <li key={i}>
                     <OperationDescription key={i} op={op} source={tx.source}/>
                 </li>)}
