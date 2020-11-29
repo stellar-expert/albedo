@@ -1,7 +1,9 @@
 import React from 'react'
+import {observer} from 'mobx-react'
 import {formatAssetUnifiedLink, formatCurrency} from '../../util/formatter'
 import {parseAssetInfo} from '../../util/asset-info-parser'
 import AssetName from '../components/asset-name'
+import {requestFriendbotFunding} from '../../util/horizon-connector'
 import './account-balance-view.scss'
 
 function AccountBalanceView({balance, asset}) {
@@ -13,19 +15,30 @@ function AccountBalanceView({balance, asset}) {
     </div>
 }
 
-function AllAccountBalancesView({balances, nonExisting}) {
-    if (nonExisting) {
+function AllAccountBalancesView({ledgerData}) {
+    let {balances} = ledgerData
+    if (ledgerData.nonExisting) {
         balances = [{asset_type: 'native', balance: 0}]
     }
+
+    function createTestnetAccount() {
+        requestFriendbotFunding(ledgerData.address)
+            .then(() => ledgerData.loadAccountInfo())
+    }
+
     return <div>
         {balances.map(balance => {
             const asset = formatAssetUnifiedLink(parseAssetInfo(balance))
             return <AccountBalanceView key={asset} balance={balance} asset={asset}/>
         })}
-        {nonExisting && <div className="dimmed text-micro space text-center">
+        {ledgerData.nonExisting && <div className="dimmed text-micro space text-center">
             (Balances unavailable - account doesn't exist on the ledger)
+            {ledgerData.network === 'testnet' && <div>
+                We can create a <b>testnet</b> account for you.
+                <a href="#" onClick={createTestnetAccount}>Create it now?</a>
+            </div>}
         </div>}
     </div>
 }
 
-export default AllAccountBalancesView
+export default observer(AllAccountBalancesView)

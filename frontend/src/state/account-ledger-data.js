@@ -113,16 +113,18 @@ class AccountLedgerData {
                 })
             })
             .catch(e => {
-                let nonExisting = false
+                let nonExisting = false,
+                    error
                 if (e.name === 'NotFoundError') {
-                    this.error = 'Account does not exist on the ledger'
+                    error = 'Account does not exist on the ledger'
                     nonExisting = true
                 } else {
                     console.error(e)
-                    this.error = 'Failed to load account data from Horizon'
+                    error = 'Failed to load account data from Horizon'
                 }
                 transaction(() => {
                     this.nonExisting = nonExisting
+                    this.error = error
                     this.balances = []
                     this.thresholds = defaultThresholds
                     this.signers = []

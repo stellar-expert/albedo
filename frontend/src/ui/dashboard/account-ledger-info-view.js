@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import AccountBalanceView from './account-balance-view'
 import {observer} from 'mobx-react'
+import AccountBalanceView from './account-balance-view'
 import AccountLedgerData from '../../state/account-ledger-data'
 
 function AccountLedgerDataView({ledgerData}) {
@@ -10,7 +10,7 @@ function AccountLedgerDataView({ledgerData}) {
         <i className="fa fa-warning"/> {ledgerData.error}
     </div>
     return <>
-        <AccountBalanceView {...ledgerData}/>
+        <AccountBalanceView {...{ledgerData}}/>
     </>
 }
 
