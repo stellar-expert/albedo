@@ -1,4 +1,4 @@
-import {createHorizon} from '../util/horizon-connector'
+import {createHorizon, requestFriendbotFunding} from '../util/horizon-connector'
 import {isTestnet} from '../util/network-resolver'
 import standardErrors from '../util/errors'
 
@@ -19,10 +19,7 @@ function loadSelectedAccountInfo(actionContext) {
         .catch(err => {
             if (err.name === 'NotFoundError') {
                 if (isTestnet(intentParams)) {
-                    //request Friendbot funding
-                    fetch('https://friendbot.stellar.org/?addr=' + selectedPublicKey)
-                        .catch(err => console.error(err))
-
+                    requestFriendbotFunding(selectedPublicKey)
                 }
                 return standardErrors.accountDoesNotExist
             }
