@@ -4,16 +4,6 @@ import {formatAssetUnifiedLink, formatCurrency} from '../../util/formatter'
 import {parseAssetInfo} from '../../util/asset-info-parser'
 import AssetName from '../components/asset-name'
 import {requestFriendbotFunding} from '../../util/horizon-connector'
-import './account-balance-view.scss'
-
-function AccountBalanceView({balance, asset}) {
-    return <div className="account-balance dual-layout">
-        <AssetName asset={asset}/>
-        <div className="balance">
-            {formatCurrency(balance.balance)}<span className="dimmed text-small">{asset.split('-')[0]}</span>
-        </div>
-    </div>
-}
 
 function AllAccountBalancesView({ledgerData}) {
     let {balances} = ledgerData
@@ -29,7 +19,10 @@ function AllAccountBalancesView({ledgerData}) {
     return <div>
         {balances.map(balance => {
             const asset = formatAssetUnifiedLink(parseAssetInfo(balance))
-            return <AccountBalanceView key={asset} balance={balance} asset={asset}/>
+            return <div key={asset} className="segment text-center micro-space" style={{padding: '0.3em 0.8em 0.8em'}}>
+                <h3>{formatCurrency(balance.balance)}</h3>
+                <div className="text-small"><AssetName asset={asset}/></div>
+            </div>
         })}
         {ledgerData.nonExisting && <div className="dimmed text-micro space text-center">
             (Balances unavailable - account doesn't exist on the ledger)

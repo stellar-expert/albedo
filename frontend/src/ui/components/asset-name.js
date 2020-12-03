@@ -27,7 +27,7 @@ function AssetName({asset}) {
     const currentNetwork = useStellarNetwork()
     const [tomlData, setTomlData] = useDependantState(() => {
         resolveAssetMeta(asset, currentNetwork)
-            .then(data=>setTomlData(data))
+            .then(data => setTomlData(data))
         return null
     }, [asset?.code, asset?.issuer, currentNetwork])
     if (!tomlData) return null
@@ -40,8 +40,7 @@ function AssetName({asset}) {
     }
 
     return <span className="asset-name">
-        {tomlData.icon && <><img src={tomlData.icon}/> </>}
-        {asset.code}{issuerInfo}
+        {tomlData.icon ? <img src={tomlData.icon}/> : <i className="fa fa-cube"/>} {asset.code}{issuerInfo}
     </span>
 }
 
