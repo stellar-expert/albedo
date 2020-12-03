@@ -38,35 +38,38 @@ function AccountActivityView({ledgerData}) {
         return () => ledgerData.stopHistoryStreaming()
     }, [ledgerData.address, ledgerData.network])
 
-    return <div>
-        <h3>Activity</h3>
+    return <>
         {ledgerData.txHistory === null ?
             <div className="loader"/> :
-            <ul style={{maxHeight: '40vh', minHeight: '20vmin', overflowY: 'auto', overflowX: 'hidden'}}
+            <ul style={{minHeight: '20vmin', overflowY: 'auto', overflowX: 'hidden'}} className="text-small"
                 ref={container} onScroll={throttle(200, () => handleInteraction())}>
-                {ledgerData.txHistory.map(tx => <li className="tx" key={tx.hash}>
-                    <div>
-                        <span className="dimmed">Transaction</span>&nbsp;
-                        <ExplorerLink type="tx" path={tx.hash}>
-                            <span title={tx.hash}>{shortenBinaryString(tx.hash)}</span>
-                        </ExplorerLink>
-                        {!tx.successful &&
-                        <span className="dimmed"> <i className="fa fa-w icon-warning warning"/> failed</span>}
-                        {' '}<ElapsedTime className="dimmed" ts={new Date(tx.created_at)} suffix=" ago"/>
+                {ledgerData.txHistory.map(tx => <li key={tx.hash}>
+                    <div className="dual-layout">
+                        <div>
+                            <span className="dimmed">Transaction</span>&nbsp;
+                            <ExplorerLink type="tx" path={tx.hash}>
+                                <span title={tx.hash}>{shortenBinaryString(tx.hash)}</span>
+                            </ExplorerLink>
+                            {!tx.successful &&
+                            <span className="dimmed"> <i className="fa fa-w icon-warning warning"/> failed</span>}
+                        </div>
+                        <div>
+                            <ElapsedTime className="dimmed" ts={new Date(tx.created_at)} suffix=" ago"/>
+                        </div>
 
                     </div>
                     {tx.operations.length > 0 && <ul className="block-indent">
                         {tx.operations.map(op => <li key={op.id} className="appear">
-                            <OperationDescriptionView op={op} source={tx.source_account}/>{' '}
-                            <ExplorerLink type="op" path={op.id}><i className="fa fa-external-link"/></ExplorerLink>
+                            <OperationDescriptionView op={op} source={tx.source_account}/>
                         </li>)}
                     </ul>}
+                    <hr/>
                 </li>)}
                 {!ledgerData.txHistory.length && <div className="dimmed text-micro text-center">
                     (No transactions so far)
                 </div>}
             </ul>}
-    </div>
+    </>
 }
 
 AccountActivityView.propTypes = {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {observer} from 'mobx-react'
 import accountManager from '../../state/account-manager'
 import AccountSelectorView from './account-selector-view'
@@ -10,10 +10,13 @@ import AccountActivityView from '../account/account-activity-view'
 import {useDependantState} from '../../state/state-hooks'
 import AccountLedgerData from '../../state/account-ledger-data'
 import {useStellarNetwork} from '../../state/network-selector'
+import Tabs from '../components/tabs'
 
 function AccountDashboardView() {
-    const account = accountManager.activeAccount,
+    const [tab, setTab] = useState('balance'),
+        account = accountManager.activeAccount,
         currentNetwork = useStellarNetwork()
+
     if (!account) {
         __history.push('/')
         return null
@@ -42,13 +45,17 @@ function AccountDashboardView() {
             </div>
             <div className="text-right"><NetworkSelectorView/></div>
         </div>
-        <div className="space">
-            <h3>Balances</h3>
-            <AccountLedgerDataView ledgerData={accountLedgerData}/>
-        </div>
-        <div className="space"/>
-        <hr className="space"/>
-        <AccountActivityView ledgerData={accountLedgerData}/>
+        <Tabs tabs={[
+            {
+                name: 'balance',
+                title: 'Balances',
+                render: () => <AccountLedgerDataView ledgerData={accountLedgerData}/>
+            },
+            {
+                name: 'activity',
+                title: 'Activity',
+                render: () => <AccountActivityView ledgerData={accountLedgerData}/>
+            }]} selectedTab={tab} onChange={tab => setTab(tab)}/>
     </div>
 }
 

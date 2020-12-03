@@ -102,14 +102,23 @@ class AccountLedgerData {
         horizon.loadAccount(this.address)
             .then(accountData => {
                 transaction(() => {
-                    this.nonExisting = false
-                    this.balances = accountData.balances
+                    const {balances} = accountData
+                    //sort balances
+                    const [xlmBalance] = balances.splice(balances.findIndex(b => b.asset_type === 'native'), 1)
+                    accountData.balances.sort((a, b) => {
+                        if (a.balance == 0 && b.balance > 0) return 1
+                        if (b.balance == 0 && a.balance > 0) return -1
+                        if (a.asset_code === b.asset_code) return a.balance - b.balance
+                        return (a.asset_code > b.asset_code) ? 1 : (a.asset_code < b.asset_code) ? -1 : 0
+                    })
+                    this.balances = [xlmBalance, ...accountData.balances]
                     this.thresholds = {
                         low: accountData.thresholds.low_threshold,
                         med: accountData.thresholds.med_threshold,
                         high: accountData.thresholds.high_threshold
                     }
                     this.signers = accountData.signers
+                    this.nonExisting = false
                 })
             })
             .catch(e => {
