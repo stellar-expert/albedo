@@ -39,9 +39,9 @@ body {
   min-height: calc(100vh - 8rem);
   display: flex;
   flex-direction: column;
-  @media (min-width: $responsive-mobile-browser-width) {
+  /*@media (min-width: $responsive-mobile-browser-width) {
     justify-content: center;
-  }
+  }*/
 
   > .no-center {
     margin-bottom: auto;

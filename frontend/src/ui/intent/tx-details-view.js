@@ -54,7 +54,7 @@ function TxDetailsView({xdr, network}) {
     </div>
     const {activeAccount} = accountManager,
         isFeeBump = !!tx.innerTransaction
-    return <div className="tx-view space">
+    return <div className="space">
         {isFeeBump && <div>
             <span className="label">Fee bump transaction</span>
         </div>}
@@ -83,7 +83,6 @@ function TxDetailsView({xdr, network}) {
         <div>
             <span className="label">Hash: </span><code className="word-break">{tx.hash().toString('hex')}</code>
         </div>
-        <h4>Operations:</h4>
         <ol className="block-indent">
             {(isFeeBump ? tx.innerTransaction.operations : tx.operations)
                 .map((op, i) => <li key={i}>

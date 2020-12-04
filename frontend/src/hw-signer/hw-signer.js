@@ -2,7 +2,6 @@ import EventEmitter from 'events'
 import {DEVICE_CONNECTED, DEVICE_DISCONNECTED} from './adapters/adapter-events'
 import {ACCOUNT_TYPES} from '../state/account'
 import LedgerAdapter from './adapters/ledger-adapter'
-import TrezorAdapter from './adapters/trezor-adapter'
 
 export default class HwSigner extends EventEmitter {
     constructor(accountType) {
@@ -11,9 +10,6 @@ export default class HwSigner extends EventEmitter {
         switch (accountType) {
             case ACCOUNT_TYPES.LEDGER_ACCOUNT:
                 this.setAdapter(LedgerAdapter)
-                break
-            case ACCOUNT_TYPES.TREZOR_ACCOUNT:
-                this.setAdapter(TrezorAdapter)
                 break
             default:
                 throw new Error(`Unsupported hardware wallet type: ${accountType}.`)
