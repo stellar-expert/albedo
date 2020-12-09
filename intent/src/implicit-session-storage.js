@@ -23,13 +23,7 @@ export function saveImplicitSession(intentResult) {
     }
 }
 
-/**
- * Find active implicit session by intent and pubkey.
- * @param {String} intent - Intent code.
- * @param {String} pubkey - Public key associated with the session.
- * @return {ImplicitSession|null}
- */
-export function getImplicitSession(intent, pubkey) {
+function retrieveSessionFromStorage(pubkey) {
     let session
     if (!saveToBrowserStorage) {
         session = implicitSessions[pubkey]
@@ -41,20 +35,44 @@ export function getImplicitSession(intent, pubkey) {
     }
     if (!session) return null
     if (session.isExpired) {
-        delete implicitSessions[pubkey]
+        forgetSession(pubkey)
         return null
     }
-    if (!session.grants.includes(intent)) return null
     return session
 }
 
+/**
+ * Find active implicit session by intent and pubkey.
+ * @param {String} intent - Intent code.
+ * @param {String} pubkey - Public key associated with the session.
+ * @return {ImplicitSession|null}
+ */
+export function getImplicitSession(intent, pubkey) {
+    const session = retrieveSessionFromStorage(pubkey)
+    if (!session || !session.grants.includes(intent)) return null
+    return session
+}
+
+/**
+ * Retrieve all active sessions.
+ * @return {Array<ImplicitSession>}
+ */
 export function getAllImplicitSessions() {
     const storage = getStorage()
     return Object.keys(storage)
         .filter(key => key.indexOf(storagePrefix) === 0)
-        .map(key => JSON.parse(storage.getItem(key)))
+        .map(key => retrieveSessionFromStorage(key.substr(storagePrefix.length)))
+        .filter(session => !!session)
 }
 
+/**
+ * Remove an explicit session handler from the storage.
+ * @param {String} pubkey - Public key associated with the session.
+ */
 export function forgetSession(pubkey) {
-    getStorage().removeItem(storagePrefix + pubkey)
+    if (!saveToBrowserStorage) {
+        delete implicitSessions[pubkey]
+    } else {
+        getStorage().removeItem(storagePrefix + pubkey)
+    }
 }

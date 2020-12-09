@@ -2,7 +2,7 @@ import {generateRandomToken} from './random-token-generator'
 import intentInterface from './intent-interface'
 import intentErrors from './intent-errors'
 import {requestIntentConfirmation} from './intent-dispatcher'
-import {getAllImplicitSessions, getImplicitSession} from './implicit-session-storage'
+import {forgetSession, getAllImplicitSessions, getImplicitSession} from './implicit-session-storage'
 import {bindWebStellarLinkHandler} from './web+stellar-handler'
 
 if (typeof window === 'object' && typeof window.fetch !== 'function') {
