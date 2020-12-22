@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill'
-import {contentscriptMessageDispatcher} from './messaging/contenscript-message-dispatcher'
+import {contentscriptMessageDispatcher as dispatcher} from './messaging/contenscript-message-dispatcher'
 
 function executeInPageContext({source, file}) {
     const script = document.createElement('script')
@@ -15,7 +15,13 @@ function executeInPageContext({source, file}) {
     (document.head || document.documentElement).appendChild(script)
 }
 
-contentscriptMessageDispatcher.proxyToBackgroundPage('get-stored-credentials')
-contentscriptMessageDispatcher.proxyToBackgroundPage('save-stored-credentials')
+dispatcher.proxyToBackgroundPage('get-stored-credentials')
+dispatcher.proxyToBackgroundPage('save-stored-credentials')
 
-window.sessionStorage.setItem('albedoExtensionInstalled', '1')
+window.sessionStorage && window.sessionStorage.setItem('albedoExtensionInstalled', '1')
+
+dispatcher.sendToBackgroundPage('is-blocked', {domain: window.location.hostname})
+    .then(res => {
+        if (res.blocked)
+            window.location.href = `${albedoOrigin}/blocked?from=${encodeURIComponent(window.location.hostname)}`
+    })
