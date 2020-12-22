@@ -1,9 +1,10 @@
 import {version} from '../../package'
 import actionContext from '../state/action-context'
 import accountManager from '../state/account-manager'
+import stoplistTracker from '../stoplist/stoplist-tracker'
 import {isInsideFrame} from './frame-utils'
 
-function handleInternalCommand(data) {
+function handleInternalCommand(data, origin) {
     if (data.sync) {
         for (let key of Object.keys(data.sync)) {
             localStorage.setItem(key, data.sync[key])
@@ -12,7 +13,7 @@ function handleInternalCommand(data) {
     }
 }
 
-function handleIntentRequest(data) {
+function handleIntentRequest(data, origin) {
     data.app_origin = origin || null
     actionContext.setContext(data)
         .then(() => {
@@ -43,14 +44,22 @@ function notifyOpener() {
 
 export function registerMessageListeners(window) {
     window.addEventListener('message', function ({data = {}, origin, source}) {
-        //synchronize localStorage inside iframe if requested during implicit request confirmation
-        if (isInsideFrame() && origin === window.origin) {
-            handleInternalCommand(data)
-        }
-        //TODO: we can store source in the actionContext to avoid possible source window disambiguation
-        if (data.__albedo_intent_version && data.intent) {
-            handleIntentRequest(data)
-        }
+        const originDomain = new URL(origin).hostname
+        stoplistTracker.isDomainBlocked(originDomain)
+            .then(blocked => {
+                if (blocked) {
+                    window.location = `${albedoOrigin}/blocked?from=${encodeURIComponent(originDomain)}`
+                    return
+                }
+                //synchronize localStorage inside iframe if requested during implicit request confirmation
+                if (isInsideFrame() && origin === window.origin) {
+                    handleInternalCommand(data, origin)
+                }
+                //TODO: we can store source in the actionContext to avoid possible source window disambiguation
+                if (data.__albedo_intent_version && data.intent) {
+                    handleIntentRequest(data, origin)
+                }
+            })
     })
     notifyOpener()
 }

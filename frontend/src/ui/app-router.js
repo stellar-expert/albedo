@@ -14,6 +14,7 @@ import IntroView from './pages/intro-view'
 import WebStellarLinkHandler from './intent/web-stellar-link-handler-view'
 import InstallExtensionView from './pages/install-extension-view'
 import TxResultView from './intent/tx-result-view'
+import BlockedPageView from './pages/blocked-page-view'
 
 function AppRouter({history}) {
     return <Layout>
@@ -30,6 +31,7 @@ function AppRouter({history}) {
                 <Route path="/account" component={AccountDashboard}/>
                 <Route path="/extension" component={AccountDashboard}/>
                 <Route path="/account-settings" component={AccountSettings}/>
+                <Route path="/blocked" component={BlockedPageView}/>
                 <Route path="/install-extension" component={InstallExtensionView}/>
                 <Route path="/web-stellar-handler" component={WebStellarLinkHandler}/>
                 <Route path="/" exact component={IntroView}/>
