@@ -16,7 +16,7 @@ class StoplistTracker {
             //check whether the cache is stale
             if (!this.shouldUpdate) return Promise.resolve()
             //refetch fresh stoplist from Albedo
-            this.fetchPromise = fetch(`${albedoOrigin}/stoplist`)
+            this.fetchPromise = fetch(`${albedoOrigin}/stoplist?q=${new Date().getTime()}`)
                 .then(res => res.text())
                 .then(data => {
                     //process data
