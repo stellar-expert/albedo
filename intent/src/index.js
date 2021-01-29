@@ -10,19 +10,9 @@ if (typeof window === 'object' && typeof window.fetch !== 'function') {
 }
 
 /**
- * Intent invocation options.
- * @typedef {Object} IntentOptions
- * @property {String} [pubkey] - Specific public key requested by the application.
- * @property {String} [network] - Stellar account network identifier or private network passphrase..
- * @property {String} [horizon] - The URL of the Horizon server.
- * @property {Boolean} [submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
- */
-
-/**
- * External SSO/signing calling interface implementation.
+ * Albedo API external interface implementation.
  */
 function AlbedoIntent() {
-    this.frontendUrl = 'https://albedo.link'
 }
 
 AlbedoIntent.prototype = {
@@ -67,7 +57,6 @@ AlbedoIntent.prototype = {
      * @param {String} params.xdr - A Stellar transaction in XDR format encoded in base64.
      * @param {String} [params.pubkey] - Specific public key requested by the application.
      * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
-     * @param {String} [params.horizon] - The URL of the Horizon server.
      * @param {Boolean} [params.submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
      * @returns {Promise<Object>}
      */
@@ -87,7 +76,6 @@ AlbedoIntent.prototype = {
      * @param {('MEMO_TEXT' | 'MEMO_ID' | 'MEMO_HASH' | 'MEMO_RETURN')} [params.memo_type] - [Optional] Memo type to be included in the payment.
      * @param {String} [params.pubkey] - Specific public key requested by the application.
      * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
-     * @param {String} [params.horizon] - The URL of the Horizon server.
      * @param {Boolean} [params.submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
      * @returns {Promise<Object>}
      */
@@ -103,7 +91,6 @@ AlbedoIntent.prototype = {
      * @param {String} [params.limit] - [Optional] Trustline limit.
      * @param {String} [params.pubkey] - Specific public key requested by the application.
      * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
-     * @param {String} [params.horizon] - The URL of the Horizon server.
      * @param {Boolean} [params.submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
      * @returns {Promise<Object>}
      */
@@ -121,7 +108,7 @@ AlbedoIntent.prototype = {
      * @param {String} [params.sell_asset_issuer] - [Optional] Selling asset issuer (if not set XLM is implied).
      * @param {String} [params.buy_asset_code] - [Optional] Selling asset code (if not set XLM is implied).
      * @param {String} [params.buy_asset_issuer] - [Optional] Selling asset issuer (if not set XLM is implied).
-     * @return {Promise<Object>}
+     * @return {Promise<ExchangeIntentResult>}
      */
     exchange(params) {
         return this.request('exchange', params)

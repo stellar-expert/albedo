@@ -9,7 +9,6 @@ import Tabs from '../../components/tabs'
 import {generateInvocation} from '../demo-code-generator'
 import {useDependantState} from '../../../state/state-hooks'
 import {parseQuery} from '../../../util/url-utils'
-import DemoHtmlPreviewView from './demo-html-preview-view'
 
 albedo.frontendUrl = location.origin
 

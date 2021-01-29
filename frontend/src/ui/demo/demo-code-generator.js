@@ -24,7 +24,7 @@ ${args.join(',\n')}
 }
 
 export function generateAlbedoCode(intent, params, returns) {
-    const formattedOutput = returns.map(returnParam => 'res.' + returnParam).join(', ')
+    const formattedOutput = Object.keys(returns).map(returnParam => 'res.' + returnParam).join(', ')
 
     return `${generateInvocation(intent, params)}
     .then(res => console.log(${formattedOutput}))`

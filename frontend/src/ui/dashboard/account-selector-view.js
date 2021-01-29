@@ -42,23 +42,6 @@ export default function AccountSelectorView() {
         value: 'title',
         title: <><IdenticonView address={current.publicKey} large/> {current.shortDisplayName}</>
     }]
-
-    dropdownOptions.push({
-        value: 'settings',
-        title: <>Manage settings for this account</>
-    })
-
-    dropdownOptions.push({
-        value: 'explorer',
-        title: <>View details on StellarExpert</>
-    })
-
-    if (dropdownOptions.length > 1) {
-        dropdownOptions.push({
-            value: ''
-        })
-    }
-
     for (let account of allAccounts)
         if (account !== current) {
             dropdownOptions.push({
@@ -70,6 +53,22 @@ export default function AccountSelectorView() {
     dropdownOptions.push({
         value: 'signup',
         title: <>Create/import new account</>
+    })
+
+    if (dropdownOptions.length > 1) {
+        dropdownOptions.push({
+            value: ''
+        })
+    }
+
+    dropdownOptions.push({
+        value: 'settings',
+        title: <>Manage settings for this account</>
+    })
+
+    dropdownOptions.push({
+        value: 'explorer',
+        title: <>View details on StellarExpert</>
     })
 
     return <Dropdown className="dimmed" value="title" onChange={handleAccountAction} options={dropdownOptions}

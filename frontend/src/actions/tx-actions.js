@@ -132,7 +132,7 @@ async function processTxIntent({actionContext, executionContext}) {
 
         await txContext.signDirect(executionContext)
 
-        const {network, horizon} = txContext
+        const {network} = txContext
         //prepare return params
         const res = {
             intent,
@@ -141,7 +141,7 @@ async function processTxIntent({actionContext, executionContext}) {
         }
 
         //copy other fields from request
-        const fieldsToCopyFromRequest = [...intentProps.returns, 'memo', 'memo_type']
+        const fieldsToCopyFromRequest = [...Object.keys(intentProps.returns), 'memo', 'memo_type']
         for (let field of fieldsToCopyFromRequest) {
             const val = intentParams[field]
             if (val) res[field] = val

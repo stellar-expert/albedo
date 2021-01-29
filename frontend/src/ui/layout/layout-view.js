@@ -2,6 +2,7 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import Logo from './logo-view'
 import DialogContainer from './dialog-container-view'
+import CatcherView from './catcher-view'
 
 function LayoutView({children}) {
     return <>
@@ -9,7 +10,7 @@ function LayoutView({children}) {
             <Logo/>
         </div>
         <div className="page-container container space">
-            {children}
+            <CatcherView>{children}</CatcherView>
         </div>
         <DialogContainer/>
         <div className="dimmed text-center text-small container">

@@ -1,6 +1,7 @@
 const fs = require('fs'),
     path = require('path'),
-    {generateIntentsSection} = require('./generate-intents-description')
+    {generateIntentsSection} = require('./generate-intents-description'),
+    {generateTypescriptInterface} = require('./generate-typescript-interface-types')
 
 const startMarker = '### Intents'
 
@@ -25,4 +26,10 @@ const nextSection = nextSectionStart < 0 ? '' : contents.substr(nextSectionStart
 contents = prevSection + '\n' + generateIntentsSection() + nextSection
 fs.writeFileSync(readmePath, contents)
 
-console.log(`Updated ${readmePath}`)
+console.log(`${readmePath} updated`)
+
+const tsFilePath = path.join(path.dirname(process.argv[1]), '../src/index.d.ts')
+
+fs.writeFileSync(tsFilePath, generateTypescriptInterface())
+
+console.log(`${tsFilePath} generated`)

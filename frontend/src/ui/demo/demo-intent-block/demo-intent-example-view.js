@@ -10,7 +10,6 @@ import {
 } from '../demo-code-generator'
 import {intentInterface} from '@albedo-link/intent'
 import {useDependantState} from '../../../state/state-hooks'
-import DemoIntentResultsView from './demo-intent-results-view'
 import DemoHtmlPreviewView from './demo-html-preview-view'
 
 function generateExample(intent, allParams, selectedTab, inProgress, onExec) {
@@ -50,6 +49,9 @@ export default function DemoIntentExampleView({intent, allParams, selectedTab, i
     if (!example) return null
 
     return <div className="space">
+        <div className="space">
+            <DemoHtmlPreviewView script={example} selectedTab={selectedTab}/>
+        </div>
         <Highlight lang={lang}>{example}</Highlight>
         <div className="space row">
             <div className="column column-50">
@@ -63,9 +65,6 @@ export default function DemoIntentExampleView({intent, allParams, selectedTab, i
                     </button>
                 </CopyToClipboard>
             </div>
-        </div>
-        <div className="space">
-            <DemoHtmlPreviewView script={example} selectedTab={selectedTab}/>
         </div>
     </div>
 }
