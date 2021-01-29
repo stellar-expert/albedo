@@ -9,7 +9,7 @@ function select(target) {
     sel.addRange(range)
 }
 
-function BlockSelect({value, title, maxWidth, wrap}) {
+function BlockSelect({children, title, maxWidth, wrap}) {
     const props = {
         className: 'block-select',
         onFocus: e => select(e.target),
@@ -24,11 +24,11 @@ function BlockSelect({value, title, maxWidth, wrap}) {
     if (wrap) {
         props.style = Object.assign(props.style || {}, {whiteSpace: 'normal', overflow: 'visible'})
     }
-    return <span {...props}>{value}</span>
+    return <span {...props}>{children}</span>
 }
 
 BlockSelect.propTypes = {
-    value: PropTypes.any.isRequired,
+    children: PropTypes.any.isRequired,
     title: PropTypes.string,
     maxWidth: PropTypes.string,
     wrap: PropTypes.bool

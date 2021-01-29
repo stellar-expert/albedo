@@ -162,7 +162,7 @@ describe('intent tests', function () {
             let error
             try {
                 const res = await intentLib[method](params)
-                const expected = intentInterface[intent].returns
+                const expected = Object.keys(intentInterface[intent].returns)
                 for (const prop of expected) {
                     if (!res.hasOwnProperty(prop))
                         assert.fail(`Response must contain property "${prop}"`)

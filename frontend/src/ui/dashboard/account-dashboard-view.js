@@ -31,6 +31,11 @@ function AccountDashboardView() {
             accountLedgerData.finalize()
         }
     })
+
+    let walletLink = 'https://accountviewer.stellar.org'
+    if (currentNetwork === 'testnet') {
+        walletLink += '?testnet=true'
+    }
     return <div>
         <h2><AccountSelectorView/></h2>
         <div className="dual-layout">
@@ -44,6 +49,11 @@ function AccountDashboardView() {
                         </span>
             </div>
             <div className="text-right"><NetworkSelectorView/></div>
+        </div>
+
+        <div className="dual-layout space">
+            <a href={walletLink} target="_blank" className="button button-block">Transfer funds</a>
+            <a href="/account-settings" className="button button-block">Account settings</a>
         </div>
         <Tabs tabs={[
             {

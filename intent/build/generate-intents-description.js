@@ -1,4 +1,3 @@
-//global.document = {}
 const {intentInterface} = require('../lib/albedo.intent')
 
 const defaults = {
@@ -47,11 +46,15 @@ function generateDescription(intent) {
     const {title, description, params, returns} = intentInterface[intent]
 
     const requestParams = Object.entries(params)
-        .map(([key, {description, required}]) =>
-            `- \`${key}\` - *(${required ? 'required' : 'optional'})* ${description}`)
+        .map(([key, {description, type, required}]) =>
+            `- \`${key}\` *(${type})* - *(${required ? 'required' : 'optional'})* ${description}`)
+
+    const resultParams = Object.entries(returns)
+        .map(([key, {description, type}]) =>
+            `- \`${key}\` *(${type})* - ${description}`)
 
     return `
-#### Intent \`${intent}\`
+#### Intent \`${intent}\` - ${title}
 
 ${description}
 
@@ -61,7 +64,7 @@ ${requestParams.join('\n')}
 
 **Returns**
 
-${returns.map(r => `- \`${r}\``).join('\n')}
+${resultParams.join('\n')}
 
 **Example**
 

@@ -7,9 +7,6 @@ describe('utilities tests', function () {
     before(() => {
         frontendStub.setup()
     })
-    after(() => {
-        frontendStub.destroy()
-    })
 
     it('generates new random token each time', function () {
         const rnd = new Set(),

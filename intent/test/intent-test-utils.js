@@ -49,7 +49,7 @@ class WindowStub {
     postMessage(data) {
         const intent = intentInterface[data.intent]
         const result = Object.assign({}, data)
-        for (const prop of intent.returns)
+        for (const prop of Object.keys(intent.returns))
             result[prop] = `${prop}Value`
         setTimeout(() => {
             this.callPostMessageHandler({data: {albedoIntentResult: result}})

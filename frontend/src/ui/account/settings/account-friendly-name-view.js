@@ -16,6 +16,7 @@ export default function AccountFriendlyNameView({credentials}) {
         <label>Friendly name
             <input name="friendly-name" placeholder="i.e. 'Primary Account' or 'Reserve Funds'" maxLength={15}
                    value={name} onChange={e => setName(e.target.value.substr(0, 15))}
+                   style={{marginBottom:0}}
                    onKeyDown={e => e.keyCode === 13 && saveFriendlyName()} onBlur={() => saveFriendlyName()}/>
         </label>
         <div className="text-small dimmed">

@@ -31,15 +31,11 @@ module.exports = function () {
                 'process.env.NODE_ENV': JSON.stringify('production')
             })
         ],
-        node: {
-            fs: 'empty'
-        },
         optimization: {
+            minimize: true,
             minimizer: [new TerserPlugin({
                 parallel: true,
-                sourceMap: true,
                 terserOptions: {
-                    //warnings: true,
                     toplevel: true
                 }
             })]

@@ -76,10 +76,8 @@ function AccountSettingsView() {
                 <AccountSecretKeyView credentials={credentials}/>
             </div>
         </div>
-        <div className="space">
-            <AccountForgetView credentials={credentials}/>
-        </div>
-        <hr className="space"/>
+        <AccountForgetView credentials={credentials}/>
+        <hr className="double-space"/>
         <div className="space row">
             <div className="column column-50 column-offset-25">
                 <button className="button button-block button-outline" onClick={finish}>Back</button>

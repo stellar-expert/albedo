@@ -37,7 +37,7 @@ export default function AccountForgetView({credentials}) {
                 </button>
             </div>
         </div>
-        <p className="dimmed text-small">
+        <p className="dimmed text-small micro-space">
             Please note, removing the account from Albedo will not affect your Stellar account on the ledger.
             You can use <a href="https://stellar.expert/demolisher/public" target="_blank">StellarExpert Demolisher
             tool</a> to delete Stellar account completely and recover all reserved funds.
