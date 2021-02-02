@@ -35,8 +35,9 @@ function RiskLevelIconView({risk}) {
 }
 
 function IntentDetailsView({expanded}) {
-    const {intentProps, intentErrors, txContext, networkName} = actionContext,
-        {title, risk, unsafe} = intentProps,
+    const {intentProps, intentErrors, txContext, networkName} = actionContext
+    if (!intentProps) return null
+    const {title, risk, unsafe} = intentProps,
         {app_origin, pubkey} = actionContext.intentParams
 
     return <div>
