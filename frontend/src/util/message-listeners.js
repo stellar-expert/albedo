@@ -17,14 +17,14 @@ function handleIntentRequest(data, origin) {
     data.app_origin = origin || null
     actionContext.setContext(data)
         .then(() => {
-            if (!isInsideFrame()) {
+            if (!actionContext.isImplicitIntent) {
                 //interactive flow
                 window.__history.push('/confirm')
                 return
             }
             //check implicit flow prerequisites
-            if (!actionContext.isImplicitIntent)
-                return actionContext.rejectRequest(new Error(`Attempt to execute an invalid implicit intent in the iframe mode`))
+            //if ()
+            //    return actionContext.rejectRequest(new Error(`Attempt to execute an invalid implicit intent in the iframe mode`))
             //implicit flow
             actionContext.confirmRequest()
                 .then(() => {
