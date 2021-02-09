@@ -25,9 +25,6 @@ async function handleIntentRequest(data, origin) {
         window.__history.push('/confirm')
         return
     }
-    //check implicit flow prerequisites
-    //if ()
-    //    return actionContext.rejectRequest(new Error(`Attempt to execute an invalid implicit intent in the iframe mode`))
     try {
         //implicit flow
         await actionContext.confirmRequest()
