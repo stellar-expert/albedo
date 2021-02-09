@@ -11,10 +11,6 @@ import {
 import {syncLocalStorage} from '../actions/callback-dispatcher'
 
 class AccountManager {
-    constructor() {
-        this.reload()
-    }
-
     /**
      * Whether account selector menu is open or not.
      * @type {boolean}
@@ -47,22 +43,26 @@ class AccountManager {
     }
 
     @action
-    setActiveAccount(account) {
+    async setActiveAccount(account) {
         this.activeAccount = account
-        updateRecentAccount(account)
-        syncLocalStorage()
+        await updateRecentAccount(account)
+        await syncLocalStorage()
     }
 
     /**
      * Load all accounts saved in browser localStorage.
      */
     @action
-    loadAvailableAccounts() {
-        //console.log('Enumerating accounts', Object.keys(storageAbstraction.storage))
-        this.accounts = enumerateStoredAccounts()
-            .map(id => loadAccountDataFromBrowserStorage(id))
-            .filter(a => !!a)
-            .map(a => new Account(a))
+    async loadAvailableAccounts() {
+        const accounts = await enumerateStoredAccounts()
+
+        this.accounts = []
+        for (let id of accounts) {
+            const accountInfo = await loadAccountDataFromBrowserStorage(id)
+            if (accountInfo) {
+                this.accounts.push(new Account(accountInfo))
+            }
+        }
     }
 
     @action
@@ -73,14 +73,14 @@ class AccountManager {
         }
     }
 
-    forget(account) {
+    async forget(account) {
         const pos = this.accounts.indexOf(account)
         if (pos >= 0) {
             this.accounts.splice(pos, 1)
         }
-        forgetAccount(account)
+        await forgetAccount(account)
         if (this.activeAccount.id === account.id) {
-            this.setActiveAccount(this.accounts[0])
+            await this.setActiveAccount(this.accounts[0])
         }
     }
 
@@ -98,7 +98,7 @@ class AccountManager {
             shouldUpdate = true
         }
         if (shouldUpdate) {
-            persistAccountInBrowser(account)
+            await persistAccountInBrowser(account)
         }
         return account
     }
@@ -116,12 +116,12 @@ class AccountManager {
         return 'Account ' + (1 + n.pop())
     }
 
-    reload() {
-        this.loadAvailableAccounts()
-        this.activeAccount = this.get(retrieveRecentAccount()) || null
+    async reload() {
+        await this.loadAvailableAccounts()
+        this.activeAccount = this.get(await retrieveRecentAccount()) || null
     }
 }
 
-const manager = new AccountManager()
+const accountManager = new AccountManager()
 
-export default manager
+export default accountManager

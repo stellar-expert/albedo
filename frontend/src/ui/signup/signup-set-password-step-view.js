@@ -40,7 +40,7 @@ export default function SignupSetPasswordStepView({secret, onSuccess}) {
                     if (!secret) throw errors.invalidPassword
                 }
             }
-            accountManager.setActiveAccount(account)
+            await accountManager.setActiveAccount(account)
             //save credentials if in extension
             if (account.isStoredAccount) {
                 await saveCredentialsInExtensionStorage(credentials)

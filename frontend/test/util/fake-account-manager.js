@@ -25,7 +25,7 @@ async function setupAccountManager() {
     await fakeAccount.updateAccountSecret(fakeCredetials, sensitiveData)
     accountManager.addAccount(fakeAccount)
     accountManager.setSelectedKeypair(keypair)
-    accountManager.setActiveAccount(fakeAccount)
+    await accountManager.setActiveAccount(fakeAccount)
 }
 
 export {setupAccountManager, publicKey, privateKey}

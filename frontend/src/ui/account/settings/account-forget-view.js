@@ -13,13 +13,11 @@ export default function AccountForgetView({credentials}) {
             confirmation += '\r\nPlease make sure that you backed up the recovery phrase or transferred all funds from this account.'
         }
         if (confirm(confirmation)) {
-            account.forget(credentials)
+            account.verifyCredentials(credentials)
             accountManager.forget(account)
-            if (!actionContext.intent) {
-                __history.push('/account')
-            } else {
-                __history.push('/confirm')
-            }
+                .then(() => {
+                    __history.push(actionContext.intent ? '/confirm' : '/account')
+                })
         }
     }
 

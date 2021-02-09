@@ -17,26 +17,6 @@ function findFriendlyName(account, desiredName) {
 }
 
 export default function (responder) {
-    /*responder.registerReaction('create_keypair', function ({actionContext, sensitiveData}) {
-        const {intentParams} = actionContext,
-            {activeAccount} = accountManager,
-            {name: desiredName} = intentParams
-        return findFriendlyName(desiredName)
-            .then(friendlyName => {
-                const kp = Keypair.random()
-                //add/modify a keypair
-                sensitiveData.addOrUpdateKeypair({secret: kp.secret(), friendlyName})
-                //update the data
-                return activeAccount.updateAccountSecret(credentials, sensitiveData)
-                //save account on the server and in browser
-                    .then(() => activeAccount.save(credentials))
-                    .then(() => ({
-                        pubkey: kp.publicKey(),
-                        friendlyName
-                    }))
-            })
-    })*/
-
     responder.registerReaction('implicit_flow', function ({actionContext, executionContext}) {
         const {intentParams} = actionContext,
             {activeAccount} = accountManager,
@@ -44,16 +24,16 @@ export default function (responder) {
         return executionContext.retrieveSessionData()
             .then(data => {
                 Object.assign(data, {intents, network})
-                const {sessionKey, validUntil, pubkey} = saveImplicitSession(activeAccount, 3600, data)
-                return {
-                    granted: true,
-                    network: network,
-                    session: sessionKey,
-                    pubkey,
-                    intents,
-                    grants: intents,
-                    valid_until: validUntil
-                }
+                return saveImplicitSession(activeAccount, 3600, data)
             })
+            .then(({sessionKey, validUntil, pubkey}) => ({
+                granted: true,
+                network: network,
+                session: sessionKey,
+                pubkey,
+                intents,
+                grants: intents,
+                valid_until: validUntil
+            }))
     })
 }

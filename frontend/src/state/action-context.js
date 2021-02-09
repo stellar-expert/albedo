@@ -17,15 +17,6 @@ import lastActionResult from './last-action-result'
  * Provides context for initiated action.
  */
 class ActionContext {
-    @computed
-    get isImplicitIntent() {
-        if (!isImplicitIntentRequested({intent: this.intent, ...this.intentParams})) return false
-        //try to find corresponding session
-        if (!restoreImplicitSession(this.intentParams.session)) return false
-        //looks ok
-        return true
-    }
-
     /**
      * Requested intent.
      * @type {String}
@@ -84,6 +75,20 @@ class ActionContext {
 
     @observable
     selectedAccountInfo = null
+
+    /**
+     * Contains information about the restored implicit session - only for intents requested in the implicit mode.
+     * @type {Object}
+     */
+    implicitSession = null
+
+    /**
+     * An implicit intent mode has been requested if true
+     * @type {Boolean}
+     */
+    get isImplicitIntent() {
+        return !!this.implicitSession
+    }
 
     @computed
     get selectedPublicKey() {
@@ -164,6 +169,12 @@ class ActionContext {
                 }
             }
 
+        //check whether we deal with an implicit intent
+        if (isImplicitIntentRequested({intent, ...intentParams})) {
+            //try to find corresponding session
+            this.implicitSession = await restoreImplicitSession(intentParams.session)
+        }
+
         //set transaction context in advance for the tx intent
         if (intent === 'tx') {
             const {network} = resolveNetworkParams(intentParams)
@@ -213,7 +224,8 @@ class ActionContext {
             response: null,
             intentErrors: null,
             confirmed: false,
-            processed: false
+            processed: false,
+            implicitSession: null
         })
     }
 

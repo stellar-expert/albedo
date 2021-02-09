@@ -50,7 +50,7 @@ class Responder {
             executionContext = ActionExecutionContext.forSecret(actionContext.secret)
             actionContext.secret = null
         } else if (actionContext.isImplicitIntent) { //process implicit requests
-            const session = restoreImplicitSession(intentParams.session)
+            const session = actionContext.implicitSession
             let {network: requestedNetwork} = resolveNetworkParams(intentParams)
             //TODO: request interactive session if the request can't be confirmed in implicit mode
             if (!session)

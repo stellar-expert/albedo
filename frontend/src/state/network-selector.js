@@ -1,8 +1,17 @@
 import {useState, useEffect} from 'react'
+import storageProvider from './storage-provider'
 
 const listeners = [],
     lsKey = 'preferredNetwork'
-let currentNetwork = localStorage.getItem(lsKey) || 'testnet'
+let currentNetwork = 'testnet'
+
+//load from
+storageProvider.getItem(lsKey)
+    .then(network => {
+        if (network) {
+            setStellarNetwork(network)
+        }
+    })
 
 function removeListener(callback, newCallback) {
     const idx = listeners.indexOf(callback)
@@ -15,11 +24,15 @@ function removeListener(callback, newCallback) {
  * @param {'testnet'|'public'} network
  */
 export function setStellarNetwork(network) {
+    if (currentNetwork === network) return
     currentNetwork = network
-    localStorage.setItem(lsKey, network)
-    for (const listener of listeners) {
-        listener(network)
-    }
+    storageProvider.setItem(lsKey, network)
+        .then(() => {
+            for (const listener of listeners) {
+                listener(network)
+            }
+        })
+        .catch(e => console.error(e))
 }
 
 /**
