@@ -1,12 +1,7 @@
 import {observable, action, computed} from 'mobx'
 import {Keypair, StrKey} from 'stellar-sdk'
 import errors from '../util/errors'
-import {
-    encryptAccountSecret,
-    decryptAccountSecret,
-    persistAccountInBrowser,
-    forgetAccount
-} from '../storage/account-storage'
+import {encryptAccountSecret, decryptAccountSecret, persistAccountInBrowser} from '../storage/account-storage'
 import {formatAddress} from '../util/formatter'
 import {extractDeviceId} from '../util/device-id-generator'
 import {currentStorageVersion} from '../storage/storage-version'
@@ -113,19 +108,13 @@ class Account {
             publicKey: pubkey,
             encryptedSecret: encryptAccountSecret(credentials, secret)
         })
-        persistAccountInBrowser(account)
+        await persistAccountInBrowser(account)
         return account
     }
 
-    save(credentials) {
+    async save(credentials) {
         this.verifyCredentials(credentials)
-        persistAccountInBrowser(this)
-        return this
-    }
-
-    forget(credentials) {
-        this.verifyCredentials(credentials)
-        forgetAccount(this)
+        await persistAccountInBrowser(this)
         return this
     }
 

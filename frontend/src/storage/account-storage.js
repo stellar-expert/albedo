@@ -1,15 +1,16 @@
-import {decryptDataAes, encryptDataAes, derivePublicKeyFromSecret} from '../util/crypto-utils'
-import Account from '../state/account'
+import {decryptDataAes, encryptDataAes} from '../util/crypto-utils'
 import {currentStorageVersion} from './storage-version'
+import storageProvider from '../state/storage-provider'
 
 const accountKeyPrefix = 'account_'
 
 /**
  * Load all stored accounts.
- * @returns {String[]} all accounts stored in the browser.
+ * @returns {Promise<String[]>} all accounts stored in the browser.
  */
-export function enumerateStoredAccounts() {
-    return Object.keys(localStorage)
+export async function enumerateStoredAccounts() {
+    const keys = await storageProvider.enumerateKeys()
+    return keys
         .filter(key => key.indexOf(accountKeyPrefix) === 0)
         .map(key => key.substring(accountKeyPrefix.length))
 }
@@ -19,9 +20,9 @@ export function enumerateStoredAccounts() {
  * @param {String} id - User account id.
  * @returns {Promise<Object>}
  */
-export function loadAccountDataFromBrowserStorage(id) {
+export async function loadAccountDataFromBrowserStorage(id) {
     if (!id || typeof id !== 'string' || id.length < 5) return Promise.reject(`Invalid account key: ${id}.`)
-    const storedAccount = localStorage.getItem(accountKeyPrefix + id)
+    const storedAccount = await storageProvider.getItem(accountKeyPrefix + id)
     if (!storedAccount) throw new Error(`Account ${id} is not stored in the browser.`)
     const res = JSON.parse(storedAccount)
     if (res.version !== currentStorageVersion) {
@@ -55,28 +56,28 @@ export function decryptAccountSecret(credentials) {
 /**
  * Save an account to the browser storage.
  * @param {Account} account - An account to save.
- * @returns {Account}
+ * @returns {Promise<Account>}
  */
-export function persistAccountInBrowser(account) {
+export async function persistAccountInBrowser(account) {
     if (!account.id) throw new Error('Account can\'t be stored.')
-    localStorage.setItem(accountKeyPrefix + account.id, JSON.stringify(account.toJSON()))
+    await storageProvider.setItem(accountKeyPrefix + account.id, JSON.stringify(account.toJSON()))
     return account
 }
 
-export function forgetAccount(account) {
+export async function forgetAccount(account) {
     if (!account.id) throw new Error('Invalid account.')
-    localStorage.removeItem(accountKeyPrefix + account.id)
+    await storageProvider.removeItem(accountKeyPrefix + account.id)
     return account
 }
 
-export function updateRecentAccount(account) {
+export async function updateRecentAccount(account) {
     if (!account || !account.id) {
-        localStorage.removeItem('activeAccount')
-    } else if ((retrieveRecentAccount() || {}).id !== account) {
-        localStorage.setItem('activeAccount', account.id)
+        await storageProvider.removeItem('activeAccount')
+    } else if ((await retrieveRecentAccount() || {}).id !== account) {
+        await storageProvider.setItem('activeAccount', account.id)
     }
 }
 
-export function retrieveRecentAccount() {
-    return localStorage.getItem('activeAccount') || null
+export async function retrieveRecentAccount() {
+    return await storageProvider.getItem('activeAccount') || null
 }

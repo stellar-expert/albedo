@@ -1,6 +1,6 @@
 import errors from '../util/errors'
 import {isInsideFrame} from '../util/frame-utils'
-import {isSafari} from '../util/browser-detection'
+import storageProvider from '../state/storage-provider'
 
 const urlSchema = 'url:'
 
@@ -45,7 +45,7 @@ function locateCallerWindow() {
 /**
  * Send synchronize localStorage command to same origin iframes.
  */
-export function syncLocalStorage() {
+export async function syncLocalStorage() {
     //do not allow to send sync commands from iframes
     if (isInsideFrame()) return
     //obtain caller window reference
@@ -53,8 +53,9 @@ export function syncLocalStorage() {
     if (!caller || caller === window) return
     //copy all data from localStorage
     const dataToSync = {}
-    for (let key of Object.keys(localStorage)) {
-        dataToSync[key] = localStorage.getItem(key)
+    const allKeys = await storageProvider.enumerateKeys()
+    for (let key of allKeys) {
+        dataToSync[key] = await storageProvider.getItem(key)
     }
     //try to find and sync implicit transport iframe
     const {frames} = caller

@@ -3,37 +3,37 @@ import actionContext from '../state/action-context'
 import accountManager from '../state/account-manager'
 import stoplistTracker from '../stoplist/stoplist-tracker'
 import {isInsideFrame} from './frame-utils'
+import storageProvider from '../state/storage-provider'
 
-function handleInternalCommand(data, origin) {
+async function handleInternalCommand(data, origin) {
     if (data.sync) {
         for (let key of Object.keys(data.sync)) {
-            localStorage.setItem(key, data.sync[key])
+            await storageProvider.setItem(key, data.sync[key])
         }
-        accountManager.reload()
+        await accountManager.reload()
+        return true
     }
+    return false
 }
 
-function handleIntentRequest(data, origin) {
+async function handleIntentRequest(data, origin) {
     data.app_origin = origin || null
-    actionContext.setContext(data)
-        .then(() => {
-            if (!actionContext.isImplicitIntent) {
-                //interactive flow
-                window.__history.push('/confirm')
-                return
-            }
-            //check implicit flow prerequisites
-            //if ()
-            //    return actionContext.rejectRequest(new Error(`Attempt to execute an invalid implicit intent in the iframe mode`))
-            //implicit flow
-            actionContext.confirmRequest()
-                .then(() => {
-                    if (actionContext.response) {
-                        actionContext.finalize()
-                    }
-                })
-                .catch(e => actionContext.rejectRequest(e))
-        })
+    await actionContext.setContext(data)
+
+    if (!actionContext.isImplicitIntent) {
+        //interactive flow
+        window.__history.push('/confirm')
+        return
+    }
+    try {
+        //implicit flow
+        await actionContext.confirmRequest()
+        if (actionContext.response) {
+            await actionContext.finalize()
+        }
+    } catch (e) {
+        await actionContext.rejectRequest(e)
+    }
 }
 
 function notifyOpener() {
@@ -43,23 +43,20 @@ function notifyOpener() {
 }
 
 export function registerMessageListeners(window) {
-    window.addEventListener('message', function ({data = {}, origin, source}) {
+    window.addEventListener('message', async function ({data = {}, origin, source}) {
         const originDomain = new URL(origin).hostname
-        stoplistTracker.isDomainBlocked(originDomain)
-            .then(blocked => {
-                if (blocked) {
-                    window.location = `${albedoOrigin}/blocked?from=${encodeURIComponent(originDomain)}`
-                    return
-                }
-                //synchronize localStorage inside iframe if requested during implicit request confirmation
-                if (isInsideFrame() && origin === window.origin) {
-                    handleInternalCommand(data, origin)
-                }
-                //TODO: we can store source in the actionContext to avoid possible source window disambiguation
-                if (data.__albedo_intent_version && data.intent) {
-                    handleIntentRequest(data, origin)
-                }
-            })
+        if (await stoplistTracker.isDomainBlocked(originDomain)) {
+            window.location = `${albedoOrigin}/blocked?from=${encodeURIComponent(originDomain)}`
+            return
+        }
+        //synchronize localStorage inside iframe if requested during implicit request confirmation
+        if (isInsideFrame() && origin === window.origin) {
+            if (await handleInternalCommand(data, origin)) return
+        }
+        //TODO: we can store source in the actionContext to avoid possible source window disambiguation
+        if (data.__albedo_intent_version && data.intent) {
+            await handleIntentRequest(data, origin)
+        }
     })
     notifyOpener()
 }

@@ -28,7 +28,7 @@ export default function LoginPageView() {
                 account = await accountManager.loginHWAccount(data)
             }
             accountManager.addAccount(account)
-            accountManager.setActiveAccount(account)
+            await accountManager.setActiveAccount(account)
             //restore default state
             setInProgress(false)
             //route

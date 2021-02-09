@@ -5,6 +5,7 @@ import {
     encodeBase64,
     decodeBase64
 } from '../util/crypto-utils'
+import storageProvider from '../state/storage-provider'
 
 const sessionPrefix = 'session_'
 
@@ -46,9 +47,9 @@ function splitSessionKey(sessionKey) {
  * @param {Account} account - Account to save.
  * @param {Number|String} duration - Implicit session duration in seconds.
  * @param {Object} data - Extra data to encrypt.
- * @return {{pubkey: String, sessionKey: String, validUntil: Number}}
+ * @return {Promise<{pubkey: String, sessionKey: String, validUntil: Number}>}
  */
-function saveImplicitSession(account, duration, data) {
+async function saveImplicitSession(account, duration, data) {
     duration = parseInt(duration) || 0
     if (duration <= 0) {
         //min 1 hour
@@ -72,7 +73,7 @@ function saveImplicitSession(account, duration, data) {
             validUntil, //we save validUntil in both encrypted and open part intentionally to prevent possible session extension attacks
             encryptedSecret
         }
-    localStorage.setItem(uid, JSON.stringify(sessionData))
+    await storageProvider.setItem(uid, JSON.stringify(sessionData))
     return {
         sessionKey: encodeBase64(sessionKey),
         validUntil,
@@ -80,9 +81,10 @@ function saveImplicitSession(account, duration, data) {
     }
 }
 
-function parseSessionData(sessionKey) {
+async function parseSessionData(sessionKey) {
     const {uid, encryptionKey} = splitSessionKey(sessionKey)
-    return {sessionData: localStorage.getItem(uid), encryptionKey}
+    const sessionData = await storageProvider.getItem(uid)
+    return {sessionData, encryptionKey}
 }
 
 /**
@@ -90,15 +92,15 @@ function parseSessionData(sessionKey) {
  * @param {String} sessionKey
  * @return {Boolean|SessionDescriptor}
  */
-function restoreImplicitSession(sessionKey) {
-    const {sessionData, encryptionKey} = parseSessionData(sessionKey)
+async function restoreImplicitSession(sessionKey) {
+    const {sessionData, encryptionKey} = await parseSessionData(sessionKey)
     if (!sessionData) return false
     const {encryptedSecret} = JSON.parse(sessionData),
         decrypted = decryptDataAes(encryptedSecret, encryptionKey)
     const session = JSON.parse(decrypted)
     if (isSessionExpired(session)) {
         //remove expired token
-        localStorage.removeItem(uid)
+        await storageProvider.removeItem(splitSessionKey(sessionKey).uid)
         return false
     }
     return session
@@ -113,17 +115,18 @@ function removeAccountImplicitSessions(account) {
  * @return {number} - Interval handler.
  */
 function scheduleCleanupExpiredSessions() {
-    return setInterval(function () {
+    return setInterval(async function () {
+        const keys = await storageProvider.enumerateKeys()
         //iterate through all sessions
-        for (let key of Object.keys(localStorage)) {
+        for (let key of keys) {
             if (key.indexOf(sessionPrefix) !== 0) continue
-            const item = localStorage.getItem(key)
+            const item = await storageProvider.getItem(key)
             if (item) {
                 //parse data and check validity period
                 const descriptor = JSON.parse(item)
                 if (isSessionExpired(descriptor)) {
                     //remove expired
-                    localStorage.removeItem(key)
+                    await storageProvider.removeItem(key)
                 }
             }
         }
