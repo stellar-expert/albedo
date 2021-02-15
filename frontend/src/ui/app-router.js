@@ -15,28 +15,31 @@ import WebStellarLinkHandler from './intent/web-stellar-link-handler-view'
 import InstallExtensionView from './pages/install-extension-view'
 import TxResultView from './intent/tx-result-view'
 import BlockedPageView from './pages/blocked-page-view'
+import CatcherView from './layout/catcher-view'
 
 function AppRouter({history}) {
     return <Layout>
         <Router history={history}>
-            <Switch>
-                <Redirect from="/demo" to="/playground"/>
-                <Route path="/playground"
-                       component={loadable(() => import(/* webpackChunkName: "demo" */ './demo/demo-view'))}/>
-                <Route path="/login" component={Login}/>
-                <Route path="/import" component={ImportAccount}/>
-                <Route path="/signup" component={CreateAccount}/>
-                <Route path="/confirm" component={Intent}/>
-                <Route path="/result" component={TxResultView}/>
-                <Route path="/account" component={AccountDashboard}/>
-                <Route path="/extension" component={AccountDashboard}/>
-                <Route path="/account-settings" component={AccountSettings}/>
-                <Route path="/blocked" component={BlockedPageView}/>
-                <Route path="/install-extension" component={InstallExtensionView}/>
-                <Route path="/web-stellar-handler" component={WebStellarLinkHandler}/>
-                <Route path="/" exact component={IntroView}/>
-                <Route component={NotFound}/>
-            </Switch>
+            <CatcherView>
+                <Switch>
+                    <Redirect from="/demo" to="/playground"/>
+                    <Route path="/playground"
+                           component={loadable(() => import(/* webpackChunkName: "demo" */ './demo/demo-view'))}/>
+                    <Route path="/login" component={Login}/>
+                    <Route path="/import" component={ImportAccount}/>
+                    <Route path="/signup" component={CreateAccount}/>
+                    <Route path="/confirm" component={Intent}/>
+                    <Route path="/result" component={TxResultView}/>
+                    <Route path="/account" component={AccountDashboard}/>
+                    <Route path="/extension" component={AccountDashboard}/>
+                    <Route path="/account-settings" component={AccountSettings}/>
+                    <Route path="/blocked" component={BlockedPageView}/>
+                    <Route path="/install-extension" component={InstallExtensionView}/>
+                    <Route path="/web-stellar-handler" component={WebStellarLinkHandler}/>
+                    <Route path="/" exact component={IntroView}/>
+                    <Route component={NotFound}/>
+                </Switch>
+            </CatcherView>
         </Router>
     </Layout>
 }
