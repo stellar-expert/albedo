@@ -136,14 +136,24 @@ class ActionExecutionContext {
     }
 
     async retrieveSessionData() {
-        const res = {
-            accountType: this.account.accountType,
-            publicKey: this.publicKey
+        if (this.account) {
+            const res = {
+                accountType: this.account.accountType,
+                publicKey: this.publicKey
+            }
+            if (res.accountType === ACCOUNT_TYPES.STORED_ACCOUNT) {
+                res.secret = this.account.requestAccountSecret(this.credentials)
+            }
+            return res
         }
-        if (res.accountType === ACCOUNT_TYPES.STORED_ACCOUNT) {
-            res.secret = this.account.requestAccountSecret(this.credentials)
+        if (this.secret) {
+            return {
+                accountType: -1,
+                publicKey: this.publicKey,
+                secret: this.secret
+            }
         }
-        return res
+        throw new Error('Failed to prepare session data')
     }
 }
 

@@ -1,10 +1,17 @@
 import React from 'react'
+import {withRouter} from 'react-router'
 import BlockSelect from '../components/block-select'
 
-export default class CatcherView extends React.Component {
+class CatcherView extends React.Component {
     constructor(props) {
         super(props)
         this.state = {lastError: null}
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.state.lastError && prevProps.location.pathname !== this.props.location.pathname) {
+            this.setState({lastError: null})
+        }
     }
 
     componentDidCatch(e, errorInfo) {
@@ -20,7 +27,7 @@ export default class CatcherView extends React.Component {
                 <h2>Unhandled error occurred</h2>
                 <hr/>
                 <BlockSelect>
-                    <div className="error space" style={{overflow:'auto'}}>
+                    <div className="error space" style={{overflow: 'auto'}}>
                         <div className="text-small micro-space">
                             "{message}" at {window.location.href}
                         </div>
@@ -37,3 +44,5 @@ export default class CatcherView extends React.Component {
         return this.props.children
     }
 }
+
+export default withRouter(CatcherView)

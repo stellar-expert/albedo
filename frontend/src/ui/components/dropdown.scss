@@ -59,6 +59,16 @@
     &.visible {
       display: block;
     }
+
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: -2*$space-block;
+      left: 0;
+      width: 1px;
+      height: 1px;
+    }
   }
 
   &:hover {
