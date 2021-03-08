@@ -18,6 +18,7 @@ accountManager.reload()
         render(<Router history={nav.history}/>, appContainer)
 
         document.body.appendChild(appContainer)
+        document.body.removeChild(document.getElementById('pre-loader'))
 
         registerMessageListeners(window)
 
