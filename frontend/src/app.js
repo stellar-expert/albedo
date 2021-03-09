@@ -24,4 +24,3 @@ accountManager.reload()
 
         scheduleCleanupExpiredSessions()
     })
-
