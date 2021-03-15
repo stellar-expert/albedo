@@ -36,8 +36,32 @@
             box-sizing: border-box;
             background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1OCA1OCI+DQo8cGF0aCBmaWxsPSIjMDY5MUI3IiBkPSJNMzAuMTA1Njc4NiwyLjUyODA3NTJoLTIuMjExNDMxNUw1LjUwNzA0ODYsNTUuNDQzNjAzNWwwLjA2Njk0OTgsMC4wMjgzMjAzaDUuOTc0MDYwMWw0LjQ4MDAwMDUtMTAuNTg5MDAwNw0KCWM5LjMwOTgxNDUsMy4xMzc5Nzc2LDE5LjM5OTY3MTYsMy4wODUzODgyLDI4LjY3NjI2NzYtMC4xNDk0NzEzbDQuNTQzMjgxNiwxMC43Mzg0NjA1aDMuMTc4MzQwOWwwLjA2NzAwMTMtMC4wMjgzMjAzDQoJTDMwLjEwNTY3ODYsMi41MjgwNzUyeiBNMzAuMTUwNTk4NSw0NS4xOTg2MTIyYy00LjUzMzk0Ny0wLjAwMDg4NS05LjAzODA4MDItMC43MzI5NTIxLTEzLjMzODkzMDEtMi4xNjc5OTkzbDEzLjU4NjAwMDQtMzIuMTEyMzY5NQ0KCWwxMy41MjU5OTkxLDMxLjk3MDA4OUMzOS40OTI4NDM2LDQ0LjQxODEyOSwzNC44MzgwNzc1LDQ1LjE5ODkxMzYsMzAuMTUwNTk4NSw0NS4xOTg2MTIyeiIvPg0KPC9zdmc+");
             background-size: auto 2em;
-            transform: rotateX(180deg);
-            animation: loader-appear 1s, loader-rotate 2s infinite 1s;
+            animation: loader-appear 0.5s;
+            overflow: hidden;
+        }
+
+        .loader:before {
+            content: '';
+            display: block;
+            width: 0.2em;
+            height: 0.2em;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 0.4em 0.4em #FFF;
+            transform: translate(-1em, 1.3em);
+            animation: track-light 1.4s 0.5s infinite;
+        }
+
+        @keyframes track-light {
+            10% {
+                transform: translate(-1em, 1.3em);
+            }
+            50% {
+                transform: translate(-0.08em, -0.9em)
+            }
+            90%{
+                transform: translate(0.9em, 1.9em)
+            }
         }
 
         .loader.large {
@@ -46,18 +70,6 @@
 
         .loader.page-center {
             margin-top: 40vh;
-        }
-
-        @keyframes loader-rotate {
-            0%,
-            20%,
-            100%{
-                transform: rotateX(180deg) rotateY(0);
-            }
-            50%,
-            70% {
-                transform: rotateX(180deg) rotateY(180deg);
-            }
         }
 
         @keyframes loader-appear {
@@ -73,7 +85,9 @@
     </style>
 </head>
 <body>
-<div id="pre-loader"><div class="loader large"></div></div>
+<div id="pre-loader">
+    <div class="loader large"></div>
+</div>
 <script src="/albedo.js?v=0.0.0"></script>
 </body>
 </html>
