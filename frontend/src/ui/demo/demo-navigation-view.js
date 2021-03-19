@@ -13,7 +13,8 @@ const allSections = [
     'pay',
     'trust',
     'exchange',
-    'implicit_flow'
+    'implicit_flow',
+    'manage_account'
 ]
 
 export default function DemoNavigationView() {

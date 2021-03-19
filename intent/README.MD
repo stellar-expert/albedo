@@ -253,6 +253,26 @@ albedo.implicitFlow({
     .then(res => console.log(res))
 ```
 
+#### Intent `manage_account` - Open account settings
+
+Opens account settings window for a given account.
+
+**Parameters**
+
+- `pubkey` *(string)* - *(required)* Specific public key requested by the application.
+- `network` *(string)* - *(optional)* Stellar network identifier ("public" or "testnet").
+
+**Returns**
+
+- `pubkey` *(string)* - Public key from intent request.
+
+**Example**
+
+```js
+albedo.manageAccount()
+    .then(res => console.log(res))
+```
+
 ### Implicit session utils
 
 Collection of helpers to simplify various operations in the implicit mode. 

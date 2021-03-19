@@ -12,6 +12,7 @@ import {restoreImplicitSession} from '../storage/implicit-session-storage'
 import {isImplicitIntentRequested} from '../ui/intent/implicit-intent-detector'
 import {loadSelectedAccountInfo} from '../actions/account-info-loader'
 import lastActionResult from './last-action-result'
+import {setStellarNetwork} from './network-selector'
 
 /**
  * Provides context for initiated action.
@@ -209,6 +210,16 @@ class ActionContext {
                     this.intentErrors = `Intent ${requestedIntent} can't be used in the implicit flow.`
                     return this.rejectRequest()
                 }
+            }
+        }
+
+        if (intent === 'manage_account') {
+            const {pubkey} = intentParams
+            const acc = accountManager.accounts.find(a => a.publicKey === pubkey)
+            if (!acc) return this.rejectRequest()
+            await accountManager.setActiveAccount(acc)
+            if (intentParams.network) {
+                setStellarNetwork(networkName)
             }
         }
     }

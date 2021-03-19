@@ -31,6 +31,10 @@ export interface AlbedoIntent {
      */
     implicitFlow: (params: ImplicitFlowIntentParams) => Promise<ImplicitFlowIntentResult>,
     /**
+     * Opens account settings window for a given account.
+     */
+    manageAccount: (params: ManageAccountIntentParams) => Promise<ManageAccountIntentResult>,
+    /**
     * Check whether an implicit session exists for a given intent and pubkey.
     */
     isImplicitSessionAllowed: (intent: string, pubkey: string) => boolean,
@@ -457,6 +461,24 @@ export interface ImplicitFlowIntentResult {
     * Stellar network identifier.
     */
     network: string
+}
+
+export interface ManageAccountIntentParams {
+    /**
+    * Specific public key requested by the application.
+    */
+    pubkey: string,
+    /**
+    * Stellar network identifier ("public" or "testnet").
+    */
+    network?: string
+}
+
+export interface ManageAccountIntentResult {
+    /**
+    * Public key from intent request.
+    */
+    pubkey: string
 }
 
 export type StellarNetwork = 'public' | 'testnet'

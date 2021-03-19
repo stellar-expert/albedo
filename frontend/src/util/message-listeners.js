@@ -20,6 +20,11 @@ async function handleIntentRequest(data, origin) {
     data.app_origin = origin || null
     await actionContext.setContext(data)
 
+    if (actionContext.intent === 'manage_account') {
+        __history.push('/account')
+        return
+    }
+
     if (!actionContext.isImplicitIntent) {
         //interactive flow
         window.__history.push('/confirm')

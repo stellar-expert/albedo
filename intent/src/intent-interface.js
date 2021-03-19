@@ -486,6 +486,31 @@ const intentInterface = {
                 type: 'string'
             }
         }
+    },
+    manage_account: {
+        risk: 'low',
+        title: 'Open account settings',
+        description: 'Opens account settings window for a given account.',
+        unsafe: false,
+        implicitFlow: false,
+        params: {
+            pubkey: {
+                description: 'Specific public key requested by the application.',
+                type: 'string',
+                required: true
+            },
+            network: {
+                description: 'Stellar network identifier ("public" or "testnet").',
+                type: 'string',
+                required: false
+            }
+        },
+        returns: {
+            pubkey: {
+                description: 'Public key from intent request.',
+                type: 'string'
+            }
+        }
     }
 }
 

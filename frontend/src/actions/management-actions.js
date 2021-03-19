@@ -36,4 +36,11 @@ export default function (responder) {
                 valid_until: validUntil
             }))
     })
+
+    responder.registerReaction('manage_account', function ({actionContext, executionContext}) {
+        const {intentParams} = actionContext,
+            {activeAccount} = accountManager,
+            {network, pubkey} = intentParams
+        return Promise.resolve({pubkey})
+    })
 }
