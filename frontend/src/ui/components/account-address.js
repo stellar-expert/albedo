@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {CopyToClipboard} from 'react-copy-to-clipboard'
 import appSettings from '../../state/app-settings'
 import './account-address.scss'
-import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 const defaultStyle = {
     maxWidth: '100%'

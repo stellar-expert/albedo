@@ -18,7 +18,7 @@ class TxContext {
         //set up network passphrase and Horizon url
         Object.assign(this, resolveNetworkParams(intentParams))
         //TODO: retrieve pre-set signatures from tx
-        this.signatures = []
+        this.signatures = [...transaction.signatures]
         this.availableSigners = []
     }
 

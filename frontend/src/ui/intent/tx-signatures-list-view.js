@@ -1,8 +1,21 @@
 import React from 'react'
 import {observer} from 'mobx-react'
+import {StrKey} from 'stellar-sdk'
 import actionContext from '../../state/action-context'
 import accountManager from '../../state/account-manager'
 import {formatHint, hintMatchesKey} from '../../util/signature-hint-utils'
+import AccountAddress from '../components/account-address'
+
+function getAllPossibleSigners(signatureSchema) {
+    const allSigners = accountManager.accounts.map(a => ({key: a.publicKey, name: a.displayName}))
+    if (signatureSchema) {
+        for (let s of signatureSchema.getAllPotentialSigners())
+            if (!allSigners.includes(s)) {
+                allSigners.push({key: s, name: s})
+            }
+    }
+    return allSigners
+}
 
 function TxSignaturesListView() {
     const {txContext} = actionContext
@@ -11,24 +24,20 @@ function TxSignaturesListView() {
     const {signatures, signatureSchema} = txContext
     //loading signatures schema
     if (!signatureSchema) return <span className="loader small"/>
-    //the tx has'n been signed yet
+    //tx hasn't been signed yet
     if (!signatures || !signatures.length) return <span className="dimmed">No signatures yet</span>
-    //show signatures
-    const {accounts} = accountManager
-    return <div className="block-indent">
+    //find all possible signers
+    const allSigners = getAllPossibleSigners(signatureSchema)
+
+    return <div className="block-indent text-small">
         {signatures.map(s => {
             const hint = s.hint(),
-                formattedHint = formatHint(hint)
-            let displayName = formattedHint
-            for (const account of accounts) {
-                if (hintMatchesKey(hint, account.publicKey)) {
-                    displayName = account.displayName
-                    break
-                }
-            }
-            return <div key={formattedHint}>
+                displayName = allSigners.find(s => hintMatchesKey(hint, s.key))?.name || formatHint(hint)
+
+            return <div key={s.signature().toString('base64')}>
                 <i className="fa fa-edit"/>&nbsp;
-                {displayName}&nbsp;
+                {StrKey.isValidEd25519PublicKey(displayName) ?
+                    <AccountAddress account={displayName}/> : displayName}&nbsp;
                 {!!s.new && <a href="#" className="fa fa-close" onClick={e => txContext.removeSignatureByHint(hint)}
                                title="Remove signature"/>}
             </div>
