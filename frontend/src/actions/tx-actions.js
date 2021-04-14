@@ -130,7 +130,7 @@ async function processTxIntent({actionContext, executionContext}) {
             txContext = await actionContext.setTxContext(tx)
         }
 
-        await txContext.signDirect(executionContext)
+        if (!await txContext.sign(executionContext)) return null
 
         const {network} = txContext
         //prepare return params

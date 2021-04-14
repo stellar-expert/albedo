@@ -62,7 +62,10 @@ function IntentDetailsView({expanded}) {
             <div>
                 <IntentContextIconView color="primary" main="shield"/> Your funds are safe
             </div>}
-        {(intentErrors || expanded) && <div className="space text-small"><IntentTextDescription/></div>}
+        {(intentErrors || expanded) && <div className="space text-small">
+            <IntentTextDescription/>
+            <div className="space"/>
+        </div>}
         {txContext && txContext.signatures.length > 0 && <div>
             <hr/>
             <h4>Signatures:</h4>

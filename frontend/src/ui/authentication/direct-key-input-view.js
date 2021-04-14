@@ -1,21 +1,16 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, {useState} from 'react'
 import {StrKey} from 'stellar-sdk'
 import actionContext from '../../state/action-context'
 
-class DirectKeyInputView extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {secret: '', isValid: false}
+export default function DirectKeyInputView() {
+    const [secret, setSecret] = useState(''),
+        isValid = StrKey.isValidEd25519SecretSeed(secret)
+
+    function setKey(secret) {
+        setSecret(secret.replace(/[^a-zA-Z\d]/g, ''))
     }
 
-    setKey(secret) {
-        secret = secret.replace(/[^a-zA-Z\d]/g, '')
-        this.setState({secret, isValid: StrKey.isValidEd25519SecretSeed(secret)})
-    }
-
-    sign() {
-        const {secret, isValid} = this.state
+    function sign() {
         if (isValid) {
             actionContext.secret = secret
             actionContext.confirmRequest()
@@ -24,16 +19,14 @@ class DirectKeyInputView extends React.Component {
         }
     }
 
-    render() {
-        return <div>
-            <div className="dimmed">Provide a secret key you'd like to use:</div>
-            <input type="text" onChange={e => this.setKey(e.target.value)}
+    return <>
+        <div className="dimmed text-small">Provide a secret key you'd like to use:</div>
+        <div className="micro-space">
+            <input type="text" onChange={e => setKey(e.target.value)}
                    placeholder="Secret key starting with 'S', like 'SAK4...2PLT'"/>
-            <div>
-                <button className="button" onClick={() => this.sign()}>Sign directly</button>
-            </div>
         </div>
-    }
+        <div>
+            <button className="button" disabled={!isValid} onClick={() => sign()}>Sign directly</button>
+        </div>
+    </>
 }
-
-export default DirectKeyInputView

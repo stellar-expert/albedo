@@ -89,7 +89,7 @@ function CredentialsRequestView({confirmText = 'Confirm', onConfirm, onCancel, r
                 </button>
             </div>}
         </Actions>
-        {errorsToShow && <div className="error space">Error: {errorsToShow}</div>}
+        {errorsToShow && <div className="error space text-center text-small">Error: {errorsToShow}</div>}
         {!noRegistrationLink && <>
             <hr title="Not registered yet?"/>
             <div className="row">

@@ -1,16 +1,15 @@
-jest.mock('@ledgerhq/hw-transport-u2f')
+jest.mock('@ledgerhq/hw-transport-webusb')
 jest.mock('@ledgerhq/hw-app-str')
-import Transport from '@ledgerhq/hw-transport-u2f'
+import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
+import Transport from '@ledgerhq/hw-transport-webusb'
 import StellarApp from '@ledgerhq/hw-app-str'
 import appSettings from '../../../src/state/app-settings'
-import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
 
 import ledgerAdapter from '../../../src/hw-signer/adapters/ledger-adapter'
 
 const {appManifest} = appSettings
 const path = `44'/148'/0'`
 const publicKey = 'GARITBNKCUYWOYIUQWPARYLHYDYYKCYLLQZMX64LYEAMH3HKICGMKIVF'
-const privateKey = 'SD3J53SQNMRVYLWGSKGZRJNLJAMKQKG3Y5NXI3O226QF3QUEUAXB3FDJ'
 
 Transport.create.mockImplementation(() => {
     return {

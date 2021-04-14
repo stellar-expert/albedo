@@ -47,43 +47,11 @@ class Responder {
         //init actions wrapper
         let executionContext
         if (actionContext.secret) {
-            executionContext = ActionExecutionContext.forSecret(actionContext.secret)
-            actionContext.secret = null
-        } else if (actionContext.isImplicitIntent) { //process implicit requests
-            const session = actionContext.implicitSession
-            let {network: requestedNetwork} = resolveNetworkParams(intentParams)
-            //TODO: request interactive session if the request can't be confirmed in implicit mode
-            if (!session)
-                throw new Error(`Session doesn't exist or expired`)
-            const {accountType, publicKey, secret, intents, network} = session,
-                {network: enforcedNetwork} = resolveNetworkParams({network})
-            //session should allow the intent
-            if (!intents.includes(intent))
-                throw new Error(`Intent ${intent} is not allowed for this implicit session.`)
-            //session should allow the intent
-            if (requestedNetwork !== enforcedNetwork) {
-                //ignore network check for unrelated intents
-                if (!['sign_message', 'public_key'].includes(actionContext.intent))
-                    throw new Error(`Network "${network}" is not allowed for this implicit session.`)
-            }
-            //initiate wrapper if the session contains a secret key
-            if (secret) {
-                executionContext = ActionExecutionContext.forSecret(secret)
-                //for HW accounts, load an account from the localStorage
-            } else if (accountType === ACCOUNT_TYPES.TREZOR_ACCOUNT || accountType === ACCOUNT_TYPES.LEDGER_ACCOUNT) {
-                //TODO: retrieve an account by id and find a keypair by publicKey
-                const account = accountManager.accounts.find(a => a.publicKey === publicKey)
-                executionContext = ActionExecutionContext.forAccount(account)
-            } else
-                throw new Error(`Implicit sessions are not supported for account type ${accountType}.`)
+            executionContext = this.getDirectKeyInputExecutionContext(actionContext)
+        } else if (actionContext.isImplicitIntent) {
+            executionContext = this.getImplicitIntentExecutionContext(actionContext)
         } else {
-            const {activeAccount} = accountManager
-            if (!activeAccount)
-                throw new Error(`Account was not selected.`)
-            executionContext = ActionExecutionContext.forAccount(activeAccount)
-            if (activeAccount.isStoredAccount) {
-                executionContext.credentials = await authorizationService.requestAuthorization(activeAccount)
-            }
+            executionContext = await this.getInteractiveExecutionContext()
         }
 
         //execute action
@@ -91,12 +59,59 @@ class Responder {
             actionContext,
             executionContext
         })
+        if (!res) return null
         if (actionContext.isImplicitIntent) {
             res.executed_implicitly = true
         }
         //add extra fields to the response
         Object.assign(res, {intent: actionContext.intent})
         return res
+    }
+
+    getDirectKeyInputExecutionContext(actionContext) {
+        const {secret} = actionContext
+        actionContext.secret = null
+        return ActionExecutionContext.forSecret(secret)
+    }
+
+    getImplicitIntentExecutionContext(actionContext) {
+        const {intent, intentParams} = actionContext,
+            session = actionContext.implicitSession
+        let {network: requestedNetwork} = resolveNetworkParams(intentParams)
+        //TODO: request interactive session if the request can't be confirmed in implicit mode
+        if (!session)
+            throw new Error(`Session doesn't exist or expired`)
+        const {accountType, publicKey, secret, intents, network} = session,
+            {network: enforcedNetwork} = resolveNetworkParams({network})
+        //session should allow the intent
+        if (!intents.includes(intent))
+            throw new Error(`Intent ${intent} is not allowed for this implicit session.`)
+        //session should allow the intent
+        if (requestedNetwork !== enforcedNetwork) {
+            //ignore network check for unrelated intents
+            if (!['sign_message', 'public_key'].includes(intent))
+                throw new Error(`Network "${network}" is not allowed for this implicit session.`)
+        }
+        //initiate wrapper if the session contains a secret key
+        if (secret) return ActionExecutionContext.forSecret(secret)
+        //for HW accounts, load an account from the localStorage
+        if (accountType === ACCOUNT_TYPES.TREZOR_ACCOUNT || accountType === ACCOUNT_TYPES.LEDGER_ACCOUNT) {
+            //TODO: retrieve an account by id and find a keypair by publicKey
+            const account = accountManager.accounts.find(a => a.publicKey === publicKey)
+            return ActionExecutionContext.forAccount(account)
+        }
+        throw new Error(`Implicit sessions are not supported for account type ${accountType}.`)
+    }
+
+    async getInteractiveExecutionContext() {
+        const {activeAccount} = accountManager
+        if (!activeAccount)
+            throw new Error(`Account was not selected.`)
+        const executionContext = ActionExecutionContext.forAccount(activeAccount)
+        if (activeAccount.isStoredAccount) {
+            executionContext.credentials = await authorizationService.requestAuthorization(activeAccount)
+        }
+        return executionContext
     }
 }
 

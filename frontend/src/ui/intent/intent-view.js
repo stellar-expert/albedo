@@ -4,7 +4,7 @@ import {withRouter} from 'react-router'
 import {observer} from 'mobx-react'
 import actionContext from '../../state/action-context'
 import IntentDescription from './intent-details-view'
-import ConfirmIntentView from './confirm-intent-view'
+import ConfirmIntentView from './intent-action-view'
 import AuthSelectorView from '../authentication/auth-selector-view'
 import AccountFundingStatusView from '../account/account-funding-status-view'
 

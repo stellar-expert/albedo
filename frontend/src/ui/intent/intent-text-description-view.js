@@ -20,16 +20,18 @@ function IntentErrorView() {
     const {intentParams, intentErrors} = actionContext
     //TODO: use only unified error objects everywhere in intentErrors to prevent problems with type casting
 
-    let text = 'Error: ' + intentErrors.message || intentErrors
-
-    if (!intentErrors.code || intentErrors.code === -1) {
-        text += ` It's likely an external application error. Please contact support team of ${intentParams.app_origin}.`
+    let text
+    if (intentErrors) {
+        text = 'Error: ' + intentErrors.message || intentErrors
+        if (!intentErrors.code || intentErrors.code === -1) {
+            text += ` It's likely an external application error. Please contact support team of ${intentParams.app_origin}.`
+        }
     }
-    if (intentErrors)
-        return <div className="error">{text}</div>
+
+    if (text) return <div className="error">{text}</div>
 }
 
-function IntentTextDescriptionView() {
+export default function IntentTextDescriptionView() {
     const {intent, intentParams, intentErrors} = actionContext
     if (intentErrors) {
         return <>
@@ -102,5 +104,3 @@ function IntentTextDescriptionView() {
         Unknown intent: {intent}.
     </span>
 }
-
-export default IntentTextDescriptionView

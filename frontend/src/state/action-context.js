@@ -63,6 +63,13 @@ class ActionContext {
     @observable
     intentErrors = null
 
+    /**
+     * Temporary runtime error (non-blocking).
+     * @type {String}
+     */
+    @observable
+    runtimeErrors = null
+
     response = null
 
     @observable
@@ -76,6 +83,9 @@ class ActionContext {
 
     @observable
     selectedAccountInfo = null
+
+    @observable
+    dispatchingResponse = false
 
     /**
      * Contains information about the restored implicit session - only for intents requested in the implicit mode.
@@ -91,6 +101,10 @@ class ActionContext {
         return !!this.implicitSession
     }
 
+    get requiresExistingAccount() {
+        return !['public_key', 'sign_message', 'implicit_flow'].includes(this.intent)
+    }
+
     @computed
     get selectedPublicKey() {
         try {
@@ -104,15 +118,6 @@ class ActionContext {
         }
     }
 
-    get requiresExistingAccount() {
-        return !['public_key', 'sign_message', 'implicit_flow'].includes(this.intent)
-    }
-
-    @computed
-    get isFinalized() {
-        return this.confirmed && !!this.response
-    }
-
     @computed
     get hasNoMatchingKey() {
         const {pubkey} = this.intentParams
@@ -122,6 +127,24 @@ class ActionContext {
     @computed
     get autoSubmitToHorizon() {
         return this?.intentParams?.submit || false
+    }
+
+    @action
+    reset() {
+        Object.assign(this, {
+            intent: null,
+            intentProps: null,
+            intentParams: null,
+            secret: null,
+            txContext: null,
+            response: null,
+            intentErrors: null,
+            runtimeErrors: null,
+            confirmed: false,
+            processed: false,
+            implicitSession: null,
+            dispatchingResponse: false
+        })
     }
 
     /**
@@ -224,33 +247,17 @@ class ActionContext {
         }
     }
 
-    @action
-    reset() {
-        Object.assign(this, {
-            intent: null,
-            intentProps: null,
-            intentParams: null,
-            secret: null,
-            txContext: null,
-            response: null,
-            intentErrors: null,
-            confirmed: false,
-            processed: false,
-            implicitSession: null
-        })
-    }
-
     /**
      * Confirm the intent request.
      */
     @action
     async confirmRequest() {
         this.confirmed = true
+        this.runtimeErrors = null
         try {
             this.response = await responder.process(this)
             if (!this.response) return
             if (!this.txContext || this.txContext.isFullySigned) {
-                //TODO: do not auto-submit tx to the network
                 return await this.finalize()
             }
         } catch (e) {
@@ -275,6 +282,7 @@ class ActionContext {
                 throw new Error('Tried to finalize the action without a response.')
 
             lastActionResult.setResult(this.response)
+            this.dispatchingResponse = true
             const res = await dispatchIntentResponse(this.response, this)
             __history.push('/result')
             this.reset()

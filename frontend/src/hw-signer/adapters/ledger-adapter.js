@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import Transport from '@ledgerhq/hw-transport-u2f'
+import Transport from '@ledgerhq/hw-transport-webusb'
 import StellarApp from '@ledgerhq/hw-app-str'
 import {Keypair, xdr} from 'stellar-sdk'
 import standardErrors from '../../util/errors'
@@ -51,8 +51,8 @@ class LedgerAdapter extends EventEmitter {
 
     async signMessage({path, publicKey, message}) {
         try {
-            const {signature} = await this.stellarApp.signHash(normalizePath(path), message)
-            return signature
+            const res = await this.stellarApp.signHash(normalizePath(path), message)
+            return res.signature
         } catch (e) {
             if (e.message === 'Hash signing not allowed. Have you enabled it in the app settings?') {
                 throw standardErrors.hashSigningNotAllowed

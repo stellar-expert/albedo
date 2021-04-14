@@ -1,11 +1,12 @@
 import {Keypair} from 'stellar-sdk'
 import shajs from 'sha.js'
-import Account, {ACCOUNT_TYPES} from '../state/account'
+import {ACCOUNT_TYPES} from '../state/account'
 import HwSigner from '../hw-signer/hw-signer'
 import appSettings from '../state/app-settings'
 import isEqual from 'react-fast-compare'
+import actionContext from '../state/action-context'
 
-class ActionExecutionContext {
+export default class ActionExecutionContext {
     /**
      * Create new instance of AccountActionsWrapper for a given account.
      * @param {Account} account - Account to use.
@@ -95,18 +96,27 @@ class ActionExecutionContext {
             transaction.sign(await this.getStoredKeypair())
         } else if (this.account.isHWAccount) { //hardware wallet
             const keyPath = await this.getHWSignerPath()
-            await this.hwSigner.signTransaction({
-                path: keyPath,
-                publicKey: this.publicKey,
-                transaction
-            })
+            try {
+                await this.hwSigner.signTransaction({
+                    path: keyPath,
+                    publicKey: this.publicKey,
+                    transaction
+                })
+            } catch (e) {
+                switch (e.name) {
+                    case 'TransportStatusError':
+                    default:
+                        actionContext.runtimeErrors = 'Failed to connect. Please check hardware wallet connection.'
+                        break
+                }
+                return
+            }
         }
         let newSignature = null
         //find new signature and return it
         for (let sig of transaction.signatures.slice()) {
             //remove duplicates
             while (transaction.signatures.filter(s => isEqual(s.signature(), sig.signature())).length > 1) {
-                console.log('duplicate signature found')
                 const idx = transaction.signatures.findIndex(s => isEqual(s.signature(), sig.signature()))
                 transaction.signatures.splice(idx, 1)
             }
@@ -156,5 +166,3 @@ class ActionExecutionContext {
         throw new Error('Failed to prepare session data')
     }
 }
-
-export default ActionExecutionContext

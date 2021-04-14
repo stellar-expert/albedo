@@ -7,7 +7,7 @@ import {substituteSourceAccount, substituteSourceSequence, zeroAccount} from '..
 import {resolveNetworkParams} from '../util/network-resolver'
 import standardErrors from '../util/errors'
 
-class TxContext {
+export default class TxContext {
     /**
      *
      * @param {Transaction} transaction
@@ -73,10 +73,6 @@ class TxContext {
         return this.tx.sequence == '0'
     }
 
-    get isReadyForSigning() {
-        return this.tx && !this.hasEmptyTxSequence && !this.hasEmptyTxSource
-    }
-
     @action
     setAvailableSigners(availableSigners) {
         this.availableSigners = availableSigners || []
@@ -94,6 +90,15 @@ class TxContext {
         return this.signatureSchema.checkFeasibility(this.signatures.map(s => s.pubKey))
     }
 
+    get isReadyForSigning() {
+        return this.tx && !this.hasEmptyTxSequence && !this.hasEmptyTxSource
+    }
+
+    @computed
+    get isPartiallySigned() {
+        return this.signatures.length > 0 && !this.isFullySigned
+    }
+
     /**
      * Replace source account if transaction sourceAccount is empty.
      * @param {String} sourceAccountPublicKey
@@ -104,7 +109,6 @@ class TxContext {
         await this.updateSignatureSchema()
         const newSequence = sourceAccountPublicKey === zeroAccount ? '0' : undefined
         await this.setTxSequence(newSequence)
-
     }
 
     /**
@@ -162,6 +166,7 @@ class TxContext {
      * Remove a signature by hint.
      * @param hint
      */
+    @action
     removeSignatureByHint(hint) {
         const hintAsHex = hint.toString('hex')
         for (let i = 0; i < this.signatures.length; i++) {
@@ -188,9 +193,10 @@ class TxContext {
     /**
      * Sign the transaction using plain secret key.
      * @param {ActionExecutionContext} executionContext
+     * @return {Boolean}
      */
     @action
-    async signDirect(executionContext) {
+    async sign(executionContext) {
         //replace tx source account and sequence number if necessary
         if (this.hasEmptyTxSource) {
             await this.setTxSourceAccount(executionContext.publicKey)
@@ -198,6 +204,7 @@ class TxContext {
             await this.setTxSequence()
         }
         const newSignature = await executionContext.signTransaction(this.tx)
+        if (!newSignature) return false
         //add full pubkey to the decorated signature for the fast lookup
         Object.assign(newSignature, {
             pubKey: executionContext.publicKey,
@@ -205,7 +212,6 @@ class TxContext {
         })
         //TODO: append to the signatures list if it's not there yet
         this.signatures = this.tx.signatures.slice()
+        return true
     }
 }
-
-export default TxContext
