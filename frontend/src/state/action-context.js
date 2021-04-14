@@ -202,8 +202,13 @@ class ActionContext {
         //set transaction context in advance for the tx intent
         if (intent === 'tx') {
             const {network} = resolveNetworkParams(intentParams)
-            const tx = TransactionBuilder.fromXDR(intentParams.xdr, network)
-            await this.setTxContext(tx)
+            try {
+                const tx = TransactionBuilder.fromXDR(intentParams.xdr, network)
+                await this.setTxContext(tx)
+            } catch (e) {
+                this.intentErrors = `Invalid transaction XDR`
+                return this.rejectRequest()
+            }
         }
 
         //validate implicit flow request preconditions
@@ -238,7 +243,7 @@ class ActionContext {
 
         if (intent === 'manage_account') {
             const {pubkey} = intentParams
-            const acc = accountManager.accounts.find(a => a.publicKey === pubkey)
+            const acc = accountManager.get(pubkey)
             if (!acc) return this.rejectRequest()
             await accountManager.setActiveAccount(acc)
             if (intentParams.network) {

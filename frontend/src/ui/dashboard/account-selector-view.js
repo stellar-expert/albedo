@@ -24,7 +24,7 @@ export default function AccountSelectorView() {
                 __history.push('/signup')
                 break
             default:
-                const account = accountManager.accounts.find(a => a.id === action)
+                const account = accountManager.get(action)
                 if (account) {
                     accountManager.setActiveAccount(account)
                     setCurrentAccount(account)

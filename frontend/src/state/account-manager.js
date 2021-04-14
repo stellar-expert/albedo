@@ -1,4 +1,5 @@
 import {observable, action} from 'mobx'
+import {StrKey} from 'stellar-sdk'
 import Account, {ACCOUNT_TYPES} from './account'
 import {
     enumerateStoredAccounts,
@@ -39,7 +40,10 @@ class AccountManager {
      */
     get(id) {
         if (!id) return null
-        return this.accounts.find(a => a.id === id)
+        const filterCallback = StrKey.isValidEd25519PublicKey(id) ?
+                a => a.publicKey === id :
+                a => a.id === id
+        return this.accounts.find(filterCallback)
     }
 
     @action

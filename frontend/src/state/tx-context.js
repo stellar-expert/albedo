@@ -2,10 +2,11 @@ import {observable, action, runInAction, computed} from 'mobx'
 import {Transaction, xdr as xdrTypes, Server} from 'stellar-sdk'
 import Bignumber from 'bignumber.js'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
-import {hintMatchesKey} from '../util/signature-hint-utils'
+import {formatHint, hintMatchesKey} from '../util/signature-hint-utils'
 import {substituteSourceAccount, substituteSourceSequence, zeroAccount} from '../util/tx-replace-utils'
 import {resolveNetworkParams} from '../util/network-resolver'
 import standardErrors from '../util/errors'
+import accountManager from './account-manager'
 
 export default class TxContext {
     /**
@@ -20,6 +21,7 @@ export default class TxContext {
         //TODO: retrieve pre-set signatures from tx
         this.signatures = [...transaction.signatures]
         this.availableSigners = []
+        this.mapSignatureKeys()
     }
 
     /**
@@ -186,6 +188,7 @@ export default class TxContext {
         const schema = await inspectTransactionSigners(this.tx, {horizon: this.horizon})
         runInAction(() => {
             this.signatureSchema = schema
+            this.mapSignatureKeys()
         })
         return schema
     }
@@ -212,6 +215,27 @@ export default class TxContext {
         })
         //TODO: append to the signatures list if it's not there yet
         this.signatures = this.tx.signatures.slice()
+        this.mapSignatureKeys()
         return true
+    }
+
+    /**
+     * Map signatures to user-owned accounts or potential transaction signers.
+     */
+    mapSignatureKeys() {
+        const allSigners = accountManager.accounts.map(a => a.publicKey)
+        if (this.signatureSchema) {
+            for (let s of this.signatureSchema.getAllPotentialSigners())
+                if (!allSigners.includes(s)) {
+                    allSigners.push(s)
+                }
+        }
+        for (let s of this.signatures) {
+            const hint = s.hint()
+            const matchingKey = allSigners.find(s => hintMatchesKey(hint, s))
+            if (matchingKey) {
+                s.pubKey = matchingKey
+            }
+        }
     }
 }

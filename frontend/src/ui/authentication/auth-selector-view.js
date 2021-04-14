@@ -21,7 +21,7 @@ function handleAccountAction(action) {
             actionContext.directKeyInput = true
             break
         default:
-            const account = accountManager.accounts.find(a => a.id === action)
+            const account = accountManager.get(action)
             if (account) {
                 accountManager.setActiveAccount(account)
                 actionContext.directKeyInput = false
@@ -39,7 +39,7 @@ function AuthSelectorView() {
         {pubkey: requestedKey} = intentParams
     let {activeAccount, accounts: allAccounts} = accountManager
     if (requestedKey && hasNoMatchingKey) {
-        const matchedAccount = allAccounts.find(acc => acc.publicKey === requestedKey)
+        const matchedAccount = accountManager.get(requestedKey)
         accountManager.setActiveAccount(matchedAccount)
         activeAccount = matchedAccount
     }
