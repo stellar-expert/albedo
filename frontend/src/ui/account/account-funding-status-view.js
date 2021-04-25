@@ -1,12 +1,14 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import actionContext from '../../state/action-context'
 import {isTestnet} from '../../util/network-resolver'
 import AccountAddress from '../components/account-address'
 import standardErrors from '../../util/errors'
+import {requestFriendbotFunding} from '../../util/horizon-connector'
 
 function AccountFundingStatusView() {
-    const {selectedPublicKey, selectedAccountInfo, intentParams, requiresExistingAccount} = actionContext
+    const {selectedPublicKey, selectedAccountInfo, intent, intentParams, requiresExistingAccount} = actionContext,
+        [fundingInProgress, setFundingInProgress] = useState(false)
     if (!requiresExistingAccount) return null
     useEffect(() => {
         actionContext.loadSelectedAccountInfo()
@@ -21,18 +23,29 @@ function AccountFundingStatusView() {
             clearInterval(updateInfoIntervalHandler)
         }
     }, [selectedPublicKey])
-    if (!selectedAccountInfo) return <div className="loader"/>
+
+    function createTestnetAccount() {
+        setFundingInProgress(true)
+        requestFriendbotFunding(selectedPublicKey)
+            .then(() => actionContext.loadSelectedAccountInfo()
+                .finally(() => setFundingInProgress(false)))
+            .finally(() => setFundingInProgress(false))
+    }
+
+    if (!selectedAccountInfo || fundingInProgress) return <div className="loader"/>
     const {error} = selectedAccountInfo
     if (error && error.code !== standardErrors.accountNotSelected.code) return <div>
         {error.text}
         {error.code === standardErrors.accountDoesNotExist.code && <div className="warning-block text-small">
             {isTestnet(intentParams) ? <>
-                    Please wait, automatic testnet account creation requested.
-                    <div className="loader small"/>
+                    The account doesn't exist on the ledger. We can create a <b>testnet</b> account for you.{' '}
+                    <a href="#" onClick={createTestnetAccount}>Create it now?</a>
                 </> :
                 <>
-                    You need to create an account before using it – send at least 2 XLM to address{' '}
-                    <AccountAddress account={selectedPublicKey} chars={56} className="word-break text-condensed" copyToClipboard/>
+                    The account doesn't exist on the ledger. You need to create it before usage – send at least 2 XLM to
+                    the address{' '}
+                    <AccountAddress account={selectedPublicKey} chars={56} className="word-break text-condensed"
+                                    copyToClipboard/>
                 </>
             }
         </div>}

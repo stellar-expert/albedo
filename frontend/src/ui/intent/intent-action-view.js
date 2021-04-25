@@ -24,6 +24,7 @@ function PendingStatus({children}) {
 
 function IntentActionView() {
     const {
+            intent,
             txContext,
             intentErrors,
             confirmed,
@@ -40,7 +41,7 @@ function IntentActionView() {
         {activeAccount} = accountManager,
         alreadySigned = txContext && selectedPublicKey && txContext.findSignatureByKey(selectedPublicKey),
         [signingInProgress, setSigningInProgress] = useDependantState(() => false, [selectedPublicKey, alreadySigned]),
-        accountUnavailable = !selectedPublicKey || hasNoMatchingKey || requiresExistingAccount && (!selectedAccountInfo || selectedAccountInfo.error),
+        accountUnavailable = !selectedPublicKey || hasNoMatchingKey || (requiresExistingAccount && intent !== 'tx') && (!selectedAccountInfo || selectedAccountInfo.error),
         inProgress = confirmed && !intentErrors && !alreadySigned && signingInProgress,
         externalSignature = confirmed && activeAccount?.isHWAccount && !txContext?.isFullySigned,
         pendingHorizonSubmission = confirmed && autoSubmitToHorizon && txContext?.isFullySigned && !response

@@ -102,7 +102,7 @@ class ActionContext {
     }
 
     get requiresExistingAccount() {
-        return !['public_key', 'sign_message', 'implicit_flow'].includes(this.intent)
+        return !['public_key', 'sign_message', 'implicit_flow', 'tx'].includes(this.intent)
     }
 
     @computed
@@ -257,6 +257,10 @@ class ActionContext {
      */
     @action
     async confirmRequest() {
+        if (!this.selectedPublicKey || this.hasNoMatchingKey) {
+            this.runtimeErrors = errors.accountNotSelected
+            return this.rejectRequest(errors.accountNotSelected)
+        }
         this.confirmed = true
         this.runtimeErrors = null
         try {
@@ -361,7 +365,7 @@ class ActionContext {
 
     @action
     loadSelectedAccountInfo() {
-        loadSelectedAccountInfo(this)
+        return loadSelectedAccountInfo(this)
             .then(info => runInAction(() => {
                 this.selectedAccountInfo = info
             }))

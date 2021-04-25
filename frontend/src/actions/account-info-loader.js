@@ -1,11 +1,10 @@
-import {createHorizon, requestFriendbotFunding} from '../util/horizon-connector'
-import {isTestnet} from '../util/network-resolver'
+import {createHorizon} from '../util/horizon-connector'
 import standardErrors from '../util/errors'
 
 const pending = {}
 
 function loadSelectedAccountInfo(actionContext) {
-    const {intentParams, selectedPublicKey} = actionContext
+    const {intent, intentParams, selectedPublicKey} = actionContext
     if (!selectedPublicKey) return Promise.resolve(standardErrors.accountNotSelected)
     //check whether we already loading the requested account info
     const pendingPromise = pending[selectedPublicKey]
@@ -18,13 +17,10 @@ function loadSelectedAccountInfo(actionContext) {
         })
         .catch(err => {
             if (err.name === 'NotFoundError') {
-                if (isTestnet(intentParams)) {
-                    requestFriendbotFunding(selectedPublicKey)
-                }
-                return standardErrors.accountDoesNotExist
+                return {error: standardErrors.accountDoesNotExist}
             }
             console.error(err)
-            return standardErrors.unhandledError(err)
+            return {error: standardErrors.unhandledError(err)}
         })
         .finally(() => {
             delete pending[selectedPublicKey]
