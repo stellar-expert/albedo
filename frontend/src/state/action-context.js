@@ -79,6 +79,7 @@ class ActionContext {
      * Directly provided secret key (only for direct input case).
      * @type {String}
      */
+    @observable
     secret = null
 
     @observable
