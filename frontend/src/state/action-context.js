@@ -120,6 +120,11 @@ class ActionContext {
     }
 
     @computed
+    get requiresExistingAlbedoAccount() {
+        return this.intent === 'public_key' && this.intentParams.require_existing
+    }
+
+    @computed
     get hasNoMatchingKey() {
         const {pubkey} = this.intentParams
         return pubkey && !accountManager.accounts.some(acc => acc.publicKey === pubkey)

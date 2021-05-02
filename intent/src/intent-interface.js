@@ -15,6 +15,11 @@ const intentInterface = {
                 description: 'Optional URL callback where Albedo will POST a signed token and public key.',
                 type: 'string',
                 required: false
+            },
+            require_existing:{
+                description: 'Allow existing Albedo accounts only.',
+                type: 'boolean',
+                required: false
             }
         },
         returns: {

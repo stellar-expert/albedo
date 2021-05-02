@@ -1,6 +1,6 @@
 {
   "name": "@albedo-link/intent",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "A lightweight browser wrapper for Albedo API that provides a promise-based interface for all supported intents.",
   "author": "StellarExpertTeam<info@stellar.expert>",
   "license": "MIT",

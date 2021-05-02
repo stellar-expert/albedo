@@ -61,7 +61,11 @@ export interface PublicKeyIntentParams {
     /**
     * Optional URL callback where Albedo will POST a signed token and public key.
     */
-    callback?: string
+    callback?: string,
+    /**
+    * Allow existing Albedo accounts only.
+    */
+    require_existing?: boolean
 }
 
 export interface PublicKeyIntentResult {

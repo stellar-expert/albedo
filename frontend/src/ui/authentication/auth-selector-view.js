@@ -35,7 +35,7 @@ function AuthActionLink({action, children}) {
 }
 
 function AuthSelectorView() {
-    const {intentParams, directKeyInput, hasNoMatchingKey} = actionContext,
+    const {intentParams, directKeyInput, hasNoMatchingKey, requiresExistingAlbedoAccount} = actionContext,
         {pubkey: requestedKey} = intentParams
     let {activeAccount, accounts: allAccounts} = accountManager
     if (requestedKey && hasNoMatchingKey) {
@@ -70,7 +70,7 @@ function AuthSelectorView() {
         title: allAccounts.length ? 'Add one more account' : 'Create Albedo account'
     })
 
-    if (!directKeyInput) {
+    if (!directKeyInput && !requiresExistingAlbedoAccount) {
         dropdownOptions.push({
             value: 'direct-input',
             title: 'Provide secret key directly'

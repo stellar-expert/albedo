@@ -40,13 +40,13 @@ export default function DemoIntentRequestParametersView({intent, inProgress, onC
 
     return <>
         {keys.map(param => {
-            const {required, description} = intentParams[param] || {}
+            const {required, type, description} = intentParams[param] || {}
             if (!description) return null
             let descr = ' - ' + description
             if (!required) {
                 descr = ' (optional)' + descr
             }
-            if (param === 'submit') return <div key={param}>
+            if (param === 'submit' || type === 'boolean') return <div key={param}>
                 <label>
                     <input type="checkbox" checked={allParams[param]} disabled={inProgress}
                            onChange={e => updateParam(param, e.target.checked)}/>{' '}
