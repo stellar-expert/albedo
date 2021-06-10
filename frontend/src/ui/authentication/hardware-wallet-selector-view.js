@@ -5,8 +5,8 @@ import AlbedoSigner from '../../hw-signer/hw-signer'
 import Actions from '../components/actions-block'
 import {ACCOUNT_TYPES} from '../../state/account'
 import appSettings from '../../state/app-settings'
-import './hw-selector.scss'
 import {extractDeviceId} from '../../util/device-id-generator'
+import './hw-selector.scss'
 
 class HardwareWalletSelectorView extends Component {
     state = {

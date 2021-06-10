@@ -1,4 +1,4 @@
-import {observable, action} from 'mobx'
+import {observable, action, makeObservable} from 'mobx'
 import {StrKey} from 'stellar-sdk'
 import Account, {ACCOUNT_TYPES} from './account'
 import {
@@ -16,22 +16,30 @@ class AccountManager {
      * Whether account selector menu is open or not.
      * @type {boolean}
      */
-    @observable
     selectorVisible = false
 
     /**
      * Currently selected account.
      * @type {Account}
      */
-    @observable
     activeAccount = null
 
     /**
      * All accounts saved to browser localStorage.
      * @type {Account[]}
      */
-    @observable.shallow
     accounts = []
+
+    constructor() {
+        makeObservable(this, {
+            selectorVisible: observable,
+            activeAccount: observable,
+            accounts: observable.shallow,
+            setActiveAccount: action,
+            loadAvailableAccounts: action,
+            addAccount: action
+        })
+    }
 
     /**
      * Find account persisted in browser storage by an id
@@ -41,12 +49,11 @@ class AccountManager {
     get(id) {
         if (!id) return null
         const filterCallback = StrKey.isValidEd25519PublicKey(id) ?
-                a => a.publicKey === id :
-                a => a.id === id
+            a => a.publicKey === id :
+            a => a.id === id
         return this.accounts.find(filterCallback)
     }
 
-    @action
     async setActiveAccount(account) {
         this.activeAccount = account
         await updateRecentAccount(account)
@@ -56,7 +63,6 @@ class AccountManager {
     /**
      * Load all accounts saved in browser localStorage.
      */
-    @action
     async loadAvailableAccounts() {
         const accounts = await enumerateStoredAccounts()
 
@@ -69,7 +75,6 @@ class AccountManager {
         }
     }
 
-    @action
     addAccount(account) {
         if (!(account instanceof Account)) throw new Error('Invalid account provided.')
         if (!this.accounts.some(a => a.id === account.id)) {

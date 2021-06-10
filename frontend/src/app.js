@@ -1,6 +1,5 @@
 import React from 'react'
 import {render} from 'react-dom'
-import 'mobx-react-lite/batchingForReactDom'
 import Nav from './ui/navigation'
 import Router from './ui/app-router'
 import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage'

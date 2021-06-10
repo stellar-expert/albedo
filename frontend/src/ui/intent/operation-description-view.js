@@ -9,10 +9,10 @@ function formatBalanceId(balance) {
     return `${balance.substr(8, 4)}…${balance.substr(-4)}`
 }
 
-function OperationDescriptionView({op, source}) {
+export default function OperationDescriptionView({op, source}) {
     function SourceAccount() {
         if (!op.source) return null
-        return <>on behalf of account <Address account={op.source || source}/></>
+        return <> on behalf of account <Address account={op.source || source}/></>
     }
 
     let asset
@@ -124,7 +124,7 @@ function OperationDescriptionView({op, source}) {
             if (parseFloat(op.limit) > 0)
                 return <>
                     <b>Create trustline</b> to <AssetName asset={op.line}/> with
-                    limit <Amount amount={op.limit} asset={{code: op.line.code}}/>
+                    limit <Amount amount={op.limit} asset={op.line}/>
                     <SourceAccount/>
                 </>
             return <>
@@ -212,6 +212,20 @@ function OperationDescriptionView({op, source}) {
                 <b>Revoke sponsorship</b> on signer <Address account={op.signer}/> for
                 account <Address account={op.accountId}/><SourceAccount/>
             </>
+        case 'clawback':
+            return <>
+                <b>Clawback</b> <Amount amount={op.amount} asset={op.asset}/> from <Address account={op.from}/>
+                <SourceAccount/>
+            </>
+        case 'clawbackClaimableBalance':
+            return <>
+                <b>Clawback claimable balance</b> {formatBalanceId(op.balanceId)}<SourceAccount/>
+            </>
+        case 'setTrustLineFlags':
+            return <>
+                <b>Set trustline flags</b> {op.setFlags}, clear flags {op.clearFlags} for asset{' '}
+                <AssetName asset={op.asset}/> of account <Address account={op.trustor}/><SourceAccount/>
+            </>
     }
     throw new Error(`Not supported operation type: ${op.type}.`)
 }
@@ -220,5 +234,3 @@ OperationDescriptionView.propTypes = {
     op: PropTypes.object.isRequired,
     source: PropTypes.string.isRequired
 }
-
-export default OperationDescriptionView

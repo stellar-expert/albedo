@@ -1,4 +1,4 @@
-import {observable, action, runInAction, computed} from 'mobx'
+import {observable, action, runInAction, computed, makeObservable} from 'mobx'
 import {Transaction, Keypair, TransactionBuilder} from 'stellar-sdk'
 import {intentInterface} from '@albedo-link/intent'
 import accountManager from './account-manager'
@@ -6,7 +6,6 @@ import responder from '../actions/responder'
 import {dispatchIntentResponse, handleIntentResponseError} from '../actions/callback-dispatcher'
 import errors from '../util/errors'
 import TxContext from './tx-context'
-import {whitelist} from '../../implicit-flow-whitelist'
 import {resolveNetworkParams} from '../util/network-resolver'
 import {restoreImplicitSession} from '../storage/implicit-session-storage'
 import {isImplicitIntentRequested} from '../ui/intent/implicit-intent-detector'
@@ -22,70 +21,58 @@ class ActionContext {
      * Requested intent.
      * @type {String}
      */
-    @observable
     intent = null
 
     /**
      * Request params.
      * @type {Object}
      */
-    @observable.shallow
     intentParams = null
 
-    @observable
     networkName = 'public'
 
     /**
      * Requested transaction context.
      * @type {TxContext}
      */
-    @observable
     txContext = null
 
     /**
      * Intent confirmation status.
      * @type {boolean}
      */
-    @observable
     confirmed = false
 
     /**
      * Whether action processed or not.
      * @type {Boolean}
      */
-    @observable
     processed = false
 
     /**
      * Errors found during intent validation or execution.
      * @type {String}
      */
-    @observable
     intentErrors = null
 
     /**
      * Temporary runtime error (non-blocking).
      * @type {String}
      */
-    @observable
     runtimeErrors = null
 
     response = null
 
-    @observable
     directKeyInput = false
 
     /**
      * Directly provided secret key (only for direct input case).
      * @type {String}
      */
-    @observable
     secret = null
 
-    @observable
     selectedAccountInfo = null
 
-    @observable
     dispatchingResponse = false
 
     /**
@@ -93,6 +80,34 @@ class ActionContext {
      * @type {Object}
      */
     implicitSession = null
+
+    constructor() {
+        makeObservable(this, {
+            intent: observable,
+            intentParams: observable.shallow,
+            networkName: observable,
+            txContext: observable,
+            confirmed: observable,
+            processed: observable,
+            intentErrors: observable,
+            runtimeErrors: observable,
+            directKeyInput: observable,
+            secret: observable,
+            selectedAccountInfo: observable,
+            dispatchingResponse: observable,
+            selectedPublicKey: computed,
+            requiresExistingAlbedoAccount: computed,
+            hasNoMatchingKey: computed,
+            autoSubmitToHorizon: computed,
+            reset: action,
+            setContext: action,
+            confirmRequest: action,
+            finalize: action,
+            cancelAction: action,
+            setTxContext: action,
+            loadSelectedAccountInfo: action
+        })
+    }
 
     /**
      * An implicit intent mode has been requested if true
@@ -106,7 +121,6 @@ class ActionContext {
         return !['public_key', 'sign_message', 'implicit_flow', 'tx'].includes(this.intent)
     }
 
-    @computed
     get selectedPublicKey() {
         try {
             if (this.directKeyInput) {
@@ -119,23 +133,19 @@ class ActionContext {
         }
     }
 
-    @computed
     get requiresExistingAlbedoAccount() {
         return this.intent === 'public_key' && this.intentParams.require_existing
     }
 
-    @computed
     get hasNoMatchingKey() {
         const {pubkey} = this.intentParams
         return pubkey && !accountManager.accounts.some(acc => acc.publicKey === pubkey)
     }
 
-    @computed
     get autoSubmitToHorizon() {
         return this?.intentParams?.submit || false
     }
 
-    @action
     reset() {
         Object.assign(this, {
             intent: null,
@@ -157,7 +167,6 @@ class ActionContext {
      * Set current context based on the request params.
      * @param {object} params - Intent request parameters.
      */
-    @action
     async setContext(params) {
         this.reset()
         const {intent, ...intentParams} = params
@@ -220,7 +229,7 @@ class ActionContext {
         //validate implicit flow request preconditions
         if (intent === 'implicit_flow') {
             let {intents = [], app_origin} = intentParams
-            if (app_origin !== window.origin && whitelist.length && !whitelist.includes(app_origin)) {
+            if (app_origin !== window.origin) {
                 this.intentErrors = `Origin "${app_origin}" is not allowed to request implicit flow permissions.`
                 return this.rejectRequest()
             }
@@ -261,7 +270,6 @@ class ActionContext {
     /**
      * Confirm the intent request.
      */
-    @action
     async confirmRequest() {
         if (!this.selectedPublicKey || this.hasNoMatchingKey) {
             this.runtimeErrors = errors.accountNotSelected
@@ -289,7 +297,6 @@ class ActionContext {
      * Send response back to the caller window and reset action context state - only for interactive flow.
      * @return {Promise<Object>}
      */
-    @action
     async finalize() {
         if (!this.intent) return //likely it was called after the response has been submitted
         try {
@@ -337,7 +344,6 @@ class ActionContext {
     /**
      * Cancel current action.
      */
-    @action
     cancelAction() {
         //TODO: implement contextual action and nav path here
         __history.push('/')
@@ -348,7 +354,6 @@ class ActionContext {
      * @param {Transaction} transaction
      * @return {Promise<TxContext>}
      */
-    @action
     async setTxContext(transaction) {
         //set tx context, retrieve network params from intent params
         const txContext = new TxContext(transaction, this.intentParams)
@@ -369,7 +374,6 @@ class ActionContext {
         return txContext
     }
 
-    @action
     loadSelectedAccountInfo() {
         return loadSelectedAccountInfo(this)
             .then(info => runInAction(() => {

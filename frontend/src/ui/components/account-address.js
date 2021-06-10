@@ -8,7 +8,7 @@ const defaultStyle = {
     maxWidth: '100%'
 }
 
-function AccountAddress({account, chars = 12, name, link, style, className, copyToClipboard}) {
+function AccountAddress({account, chars = 8, name, link, style, className, copyToClipboard}) {
     if (!account) return null
 
     let innerStyle = style ? undefined : Object.assign({}, defaultStyle, style),

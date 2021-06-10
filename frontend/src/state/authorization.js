@@ -1,10 +1,16 @@
 import {getCredentialsFromExtensionStorage, saveCredentialsInExtensionStorage} from '../storage/extension-auth-storage-interface'
 import Credentials from './credentials'
 import standardErrors from '../util/errors'
-import {observable, action, runInAction} from 'mobx'
+import { observable, action, runInAction, makeObservable } from 'mobx';
 
 class AuthorizationService {
     constructor() {
+        makeObservable(this, {
+            dialogOpen: observable,
+            reset: action,
+            requestAuthorization: action
+        });
+
         setTimeout(() => { //TODO: address the loading sequence problem and rewrite this dirty hack
             __history.listen((location, action) => {
                 this.dialogOpen = false // hide auth dialog when navigation occurred
@@ -12,14 +18,12 @@ class AuthorizationService {
         }, 200)
     }
 
-    @observable
-    dialogOpen = false
+    dialogOpen = false;
 
     account = null
 
     credentialsRequestCallback = null
 
-    @action
     reset() {
         this.dialogOpen = false
         this.account = null
@@ -31,7 +35,6 @@ class AuthorizationService {
      * @param {Account} account
      * @return {Promise<Credentials>}
      */
-    @action
     requestAuthorization(account) {
         return getCredentialsFromExtensionStorage(account.id)
             .catch(e => {

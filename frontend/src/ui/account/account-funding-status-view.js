@@ -6,7 +6,7 @@ import AccountAddress from '../components/account-address'
 import standardErrors from '../../util/errors'
 import {requestFriendbotFunding} from '../../util/horizon-connector'
 
-function AccountFundingStatusView() {
+export default observer(function AccountFundingStatusView() {
     const {selectedPublicKey, selectedAccountInfo, intent, intentParams, requiresExistingAccount} = actionContext,
         [fundingInProgress, setFundingInProgress] = useState(false)
     if (!requiresExistingAccount) return null
@@ -51,6 +51,4 @@ function AccountFundingStatusView() {
         </div>}
     </div>
     return null
-}
-
-export default observer(AccountFundingStatusView)
+})

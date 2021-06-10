@@ -62,10 +62,10 @@ function AccountSettingsView() {
             <div className="text-small dimmed">
                 <p>
                     The secret key is used internally to sign Stellar transactions and authenticate account identity on
-                    third-party services. Corresponding 24-word recovery passpharase is the backup of your secret key.
+                    third-party services. Corresponding 24-word recovery passphrase is the backup of your secret key.
                 </p>
                 <p>
-                    <i className="fa fa-warning"/> Do not share your secret key or passpharase.
+                    <i className="fa fa-warning"/> Do not share your secret key or passphrase.
                     Do not trust any person or website asking it.
                     Avoid storing it in unsafe places, your phone, or computer in the plaintext.
                     Anyone with this key will have access to funds stored on your account.

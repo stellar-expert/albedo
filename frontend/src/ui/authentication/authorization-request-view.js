@@ -1,5 +1,4 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, {useState, useEffect} from 'react'
 import {observer} from 'mobx-react'
 import errors from '../../util/errors'
 import accountManager from '../../state/account-manager'
@@ -8,55 +7,39 @@ import Credentials from '../../state/credentials'
 import CredentialsRequest from './credentials-request-view'
 import authorizationService from '../../state/authorization'
 
-@observer
-class AuthorizationRequestView extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = this.defaultState
-    }
+export default observer(function AuthorizationRequestView() {
+    const [account, setAccount] = useState(null),
+        [inProgress, setInProgress] = useState(false),
+        [error, setError] = useState(null)
 
-    get defaultState() {
-        return {
-            account: null,
-            inProgress: false,
-            noHW: false,
-            error: null
+    useEffect(() => {
+        const selectedAccount = authorizationService.account
+        setAccount(selectedAccount)
+        return () => {
+            window.requestAuthorization = undefined
         }
-    }
+    })
 
-    componentDidMount() {
-        this.requestAuthorization()
-    }
-
-    requestAuthorization() {
-        const {account} = authorizationService,
-            newState = {
-                noHW: !account.isHWAccount,
-                account
-            }
-        this.setState(newState)
-    }
-
-    componentWillUnmount() {
-        window.requestAuthorization = undefined
-    }
-
-    async submit(data) {
-        this.setState({inProgress: true, error: null})
+    async function submit(data) {
+        setInProgress(true)
+        setError(null)
         const {id, password} = data,
-            account = this.state.account || accountManager.get(id) || new Account({id}),
-            credentials = await Credentials.create({account, password})
+            selectedAccount = account || accountManager.get(id) || new Account({id}),
+            credentials = await Credentials.create({account: selectedAccount, password})
 
         if (!credentials.checkPasswordCorrect()) {
-            this.setState({inProgress: false, error: 'Invalid password'})
+            setInProgress(false)
+            setError('Invalid password')
             return
         }
         try {
             authorizationService.credentialsRequestCallback.resolve(credentials)
             //restore default state
-            this.setState(this.defaultState)
+            setAccount(null)
+            setInProgress(false)
+            setError(null)
         } catch (e) {
-            this.setState({inProgress: false})
+            setInProgress(false)
             console.error(e)
             //unhandled
             if (!e.status) {
@@ -70,7 +53,7 @@ class AuthorizationRequestView extends React.Component {
         }
     }
 
-    cancel() {
+    function cancel() {
         if (authorizationService.credentialsRequestCallback) {
             authorizationService.credentialsRequestCallback.reject(errors.actionRejectedByUser)
         } else {
@@ -78,19 +61,14 @@ class AuthorizationRequestView extends React.Component {
         }
     }
 
-    render() {
-        if (!authorizationService.dialogOpen) return null
-        const {account} = this.state
-        if (!account) return null
-        return <div>
-            <h2>Authorization for {account.friendlyName}</h2>
-            <div className="space text-small dimmed">
-                Please provide your password
-            </div>
-            <CredentialsRequest confirmText="Confirm" noRegistrationLink {...this.state}
-                                onConfirm={data => this.submit(data)} onCancel={() => this.cancel()}/>
+    if (!authorizationService.dialogOpen) return null
+    if (!account) return null
+    return <div>
+        <h2>Authorization for {account.friendlyName}</h2>
+        <div className="space text-small dimmed">
+            Please provide your password
         </div>
-    }
-}
-
-export default AuthorizationRequestView
+        <CredentialsRequest confirmText="Confirm" noRegistrationLink {...{inProgress, error}} onConfirm={submit}
+                            onCancel={cancel}/>
+    </div>
+})

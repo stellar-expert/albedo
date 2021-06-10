@@ -1,4 +1,4 @@
-import {observable, action, computed} from 'mobx'
+import {observable, action, computed, makeObservable} from 'mobx'
 import {Keypair, StrKey} from 'stellar-sdk'
 import errors from '../util/errors'
 import {encryptAccountSecret, decryptAccountSecret, persistAccountInBrowser} from '../storage/account-storage'
@@ -25,6 +25,13 @@ class Account {
      * @param {Object} params - An object containing account properties.
      */
     constructor(params) {
+        makeObservable(this, {
+            friendlyName: observable,
+            displayName: computed,
+            shortDisplayName: computed,
+            requestAccountSecret: action
+        })
+
         Object.assign(this, params)
     }
 
@@ -40,7 +47,6 @@ class Account {
      * User-defined friendly name.
      * @type {String}
      */
-    @observable
     friendlyName = null
 
     /**
@@ -65,13 +71,11 @@ class Account {
      * Title to display in UI.
      * @returns {String}
      */
-    @computed
     get displayName() {
         if (this.accountType && !this.accountType) return this.shortDisplayName
         return `${this.shortDisplayName} (${formatAddress(this.publicKey, 8)})`
     }
 
-    @computed
     get shortDisplayName() {
         if (this.friendlyName) return this.friendlyName
         switch (this.accountType) {
@@ -122,7 +126,6 @@ class Account {
      * Request temporary access to the sensitive account data.
      * @returns {String}
      */
-    @action
     requestAccountSecret(credentials) {
         this.verifyCredentials(credentials)
         const secret = decryptAccountSecret(credentials)

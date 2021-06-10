@@ -1,19 +1,27 @@
-import {observable, action} from 'mobx'
+import {observable, action, makeObservable} from 'mobx'
 
 class NotificationService {
-    @observable notification = {
+    notification = {
         show: false,
         body: null
     }
 
-    @action showNotification(body) {
-        this.notification.show = true;
-        this.notification.body = body;
+    constructor() {
+        makeObservable(this, {
+            notification: observable,
+            showNotification: action,
+            closeNotification: action
+        })
     }
 
-    @action closeNotification() {
-        this.notification.show = false;
-        this.notification.body = null;
+    showNotification(body) {
+        this.notification.show = true
+        this.notification.body = body
+    }
+
+    closeNotification() {
+        this.notification.show = false
+        this.notification.body = null
     }
 }
 

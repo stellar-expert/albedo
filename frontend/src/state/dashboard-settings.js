@@ -1,10 +1,15 @@
-import {observable} from 'mobx'
+import {observable, makeAutoObservable} from 'mobx'
 
 //TODO: move this settings to action context
 
-const dashboardSettings = {
-    @observable
-    currentNetwork: 'testnet'//'public'
+class DashboardSettings {
+    constructor() {
+        makeAutoObservable(this, {currentNetwork: observable})
+        this.currentNetwork = 'testnet'
+    }
+
+    currentNetwork = 'testnet'//'public'
 }
 
+const dashboardSettings = new DashboardSettings()
 export default dashboardSettings

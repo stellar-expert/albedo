@@ -1,4 +1,4 @@
-import {observable, action, runInAction, transaction} from 'mobx'
+import {observable, action, runInAction, transaction, makeObservable} from 'mobx'
 import {createHorizon} from '../util/horizon-connector'
 import {Networks, Transaction, TransactionBuilder} from 'stellar-sdk'
 import Bignumber from 'bignumber.js'
@@ -32,6 +32,16 @@ Object.freeze(defaultThresholds)
  */
 class AccountLedgerData {
     constructor(address, network) {
+        makeObservable(this, {
+            txHistory: observable.shallow,
+            balances: observable.shallow,
+            thresholds: observable,
+            signers: observable.shallow,
+            error: observable,
+            loadHistoryNextPage: action,
+            startHistoryStreaming: action
+        })
+
         this.address = address
         this.network = network
     }
@@ -52,31 +62,26 @@ class AccountLedgerData {
      * Transactions history for current account
      * @type {Array<Transaction>}
      */
-    @observable.shallow
     txHistory = []
 
     /**
      * Current account balances
      * @type {Array<{}>}
      */
-    @observable.shallow
     balances = []
 
     /**
      * Account operation threshold settings
      * @type {{high: number, low: number, med: number}}
      */
-    @observable
     thresholds = defaultThresholds
 
     /**
      * Account signers
      * @type {Array}
      */
-    @observable.shallow
     signers = []
 
-    @observable
     error
 
     nonExisting = false
@@ -146,7 +151,6 @@ class AccountLedgerData {
      * @param {Boolean} [forceRefresh] - Whether to reset current ops history or not
      * @return {Promise}
      */
-    @action
     loadHistoryNextPage(forceRefresh = false) {
         if (!this.#historyLoadingNextPage) {
             const cursor = forceRefresh ? null : this.txHistoryCursor
@@ -185,7 +189,6 @@ class AccountLedgerData {
     /**
      * Stream transactions history from Horizon
      */
-    @action
     startHistoryStreaming() {
         if (this.#finalizeHistoryStream) return
         this.loadHistoryNextPage(true)

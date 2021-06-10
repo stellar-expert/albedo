@@ -72,8 +72,8 @@ function AccountActivityView({ledgerData}) {
     </>
 }
 
+export default observer(AccountActivityView)
+
 AccountActivityView.propTypes = {
     ledgerData: PropTypes.instanceOf(AccountLedgerData).isRequired
 }
-
-export default observer(AccountActivityView)

@@ -1,4 +1,4 @@
-import {observable, action, runInAction, computed} from 'mobx'
+import {observable, action, runInAction, computed, makeObservable} from 'mobx'
 import {Transaction, xdr as xdrTypes, Server} from 'stellar-sdk'
 import Bignumber from 'bignumber.js'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
@@ -15,6 +15,21 @@ export default class TxContext {
      * @param {{[network]: String, [horizon]: String}} intentParams
      */
     constructor(transaction, intentParams) {
+        makeObservable(this, {
+            availableSigners: observable.shallow,
+            signatures: observable.shallow,
+            signatureSchema: observable,
+            setAvailableSigners: action,
+            isFullySigned: computed,
+            isPartiallySigned: computed,
+            setTxSourceAccount: action,
+            setTxSequence: action,
+            removeSignatureByKey: action,
+            removeSignatureByHint: action,
+            updateSignatureSchema: action,
+            sign: action
+        })
+
         this.tx = transaction
         //set up network passphrase and Horizon url
         Object.assign(this, resolveNetworkParams(intentParams))
@@ -46,21 +61,18 @@ export default class TxContext {
      * Signers available for automatic signature.
      * @type {Array<String>}
      */
-    @observable.shallow
     availableSigners
 
     /**
      * Applied signatures.
      * @type {Array<DecoratedSignature>}
      */
-    @observable.shallow
     signatures
 
     /**
      * Auto-discovered signatures schema.
      * @type {SignatureSchema}
      */
-    @observable
     signatureSchema
 
     get sourceAccount() {
@@ -75,14 +87,12 @@ export default class TxContext {
         return this.tx.sequence == '0'
     }
 
-    @action
     setAvailableSigners(availableSigners) {
         this.availableSigners = availableSigners || []
         //reset schema after potential signers update
         this.signatureSchema = null
     }
 
-    @computed
     get isFullySigned() {
         //no signing schema
         if (!this.signatureSchema) return false
@@ -96,7 +106,6 @@ export default class TxContext {
         return this.tx && !this.hasEmptyTxSequence && !this.hasEmptyTxSource
     }
 
-    @computed
     get isPartiallySigned() {
         return this.signatures.length > 0 && !this.isFullySigned
     }
@@ -105,7 +114,6 @@ export default class TxContext {
      * Replace source account if transaction sourceAccount is empty.
      * @param {String} sourceAccountPublicKey
      */
-    @action
     async setTxSourceAccount(sourceAccountPublicKey) {
         substituteSourceAccount(this.tx, sourceAccountPublicKey)
         await this.updateSignatureSchema()
@@ -117,7 +125,6 @@ export default class TxContext {
      * Replace transaction sequence if it wasn't provided in the original transaction.
      * @param {String} [newSequence]
      */
-    @action
     async setTxSequence(newSequence) {
         try {
             if (newSequence === undefined) {
@@ -153,7 +160,6 @@ export default class TxContext {
      * Remove a signature by signer key.
      * @param {String} key - Signer key.
      */
-    @action
     removeSignatureByKey(key) {
         const sig = this.findSignatureByKey(key)
         if (sig) {
@@ -168,7 +174,6 @@ export default class TxContext {
      * Remove a signature by hint.
      * @param hint
      */
-    @action
     removeSignatureByHint(hint) {
         const hintAsHex = hint.toString('hex')
         for (let i = 0; i < this.signatures.length; i++) {
@@ -180,7 +185,6 @@ export default class TxContext {
         }
     }
 
-    @action
     async updateSignatureSchema() {
         this.signatureSchema = null
         if (this.hasEmptyTxSource) return
@@ -198,7 +202,6 @@ export default class TxContext {
      * @param {ActionExecutionContext} executionContext
      * @return {Boolean}
      */
-    @action
     async sign(executionContext) {
         //replace tx source account and sequence number if necessary
         if (this.hasEmptyTxSource) {

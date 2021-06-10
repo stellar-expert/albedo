@@ -11,6 +11,8 @@ module.exports = function (env, argv) {
 
     const isProduction = mode !== 'development'
 
+    const fileNameFormat = '[name]'
+
     const settings = {
         mode,
         entry: {
@@ -20,7 +22,7 @@ module.exports = function (env, argv) {
         },
         output: {
             path: path.join(__dirname, '../distr/extension'),
-            filename: '[name].js',
+            filename: fileNameFormat + '.js',
             publicPath: '/'
         },
         module: {
@@ -55,9 +57,6 @@ module.exports = function (env, argv) {
                 appVersion: JSON.stringify(pkgInfo.version)
             })
         ],
-        node: {
-            fs: 'empty'
-        },
         optimization: {}
     }
 
@@ -73,10 +72,7 @@ module.exports = function (env, argv) {
         const TerserPlugin = require('terser-webpack-plugin')
 
         settings.optimization.minimizer = [new TerserPlugin({
-            parallel: true,
-            sourceMap: false,
             terserOptions: {
-                //warnings: true,
                 toplevel: true
             }
         })]

@@ -6,7 +6,7 @@ import accountManager from '../../state/account-manager'
 import {formatHint} from '../../util/signature-hint-utils'
 import AccountAddress from '../components/account-address'
 
-function TxSignaturesListView() {
+export default observer(function TxSignaturesListView() {
     const {txContext} = actionContext
     //available only for transaction-based intents
     if (!txContext) return null
@@ -29,6 +29,4 @@ function TxSignaturesListView() {
             </div>
         })}
     </div>
-}
-
-export default observer(TxSignaturesListView)
+})

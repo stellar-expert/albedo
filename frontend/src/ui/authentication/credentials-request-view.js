@@ -10,7 +10,7 @@ const defaultState = {
     validationError: null
 }
 
-function CredentialsRequestView({confirmText = 'Confirm', onConfirm, onCancel, requestPasswordConfirmation, inProgress, noRegistrationLink, error}) {
+export default function CredentialsRequestView({confirmText = 'Confirm', onConfirm, onCancel, requestPasswordConfirmation, inProgress, noRegistrationLink, error}) {
     const firstInputRef = useRef(null)
 
     const [{password, confirmation, validationError}, updateState] = useDependantState(() => {
@@ -117,5 +117,3 @@ CredentialsRequestView.propTypes = {
     //error message provided from a top level component
     error: PropTypes.string
 }
-
-export default CredentialsRequestView
