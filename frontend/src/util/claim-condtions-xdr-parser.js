@@ -2,6 +2,7 @@ import {StrKey} from 'stellar-sdk'
 
 function xdrParseAccountAddress(accountId) {
     if (!accountId) return undefined
+    if (StrKey.isValidEd25519PublicKey(accountId)) return accountId
     if (accountId.arm) {
         switch (accountId.arm()) {
             case 'ed25519':
