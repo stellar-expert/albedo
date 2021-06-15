@@ -27,12 +27,8 @@
     "signature"
   ],
   "dependencies": {
-    "base32.js": "^0.1.0",
     "sha.js": ">=2.x",
     "tweetnacl": "^1.0.3"
-  },
-  "peerDependencies": {
-    "stellar-sdk": ">=4.x"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
