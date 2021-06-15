@@ -12,7 +12,11 @@ module.exports = function () {
         output: {
             path: path.join(__dirname, './lib'),
             filename: '[name].js',
-            library: 'albedo',
+            library: {
+                name: 'albedo',
+                type: 'umd',
+                export: 'default'
+            },
             libraryTarget: 'umd',
             globalObject: 'this'
         },

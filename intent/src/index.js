@@ -17,7 +17,8 @@ function AlbedoIntent() {
 
 AlbedoIntent.prototype = {
     frontendUrl: 'https://albedo.link',
-
+    intentInterface,
+    intentErrors,
     /**
      * Initiate external intent request.
      * @param {String} intent - Intent name.
@@ -185,10 +186,8 @@ function normalizeMessageToSign(message) {
     return JSON.stringify(message)
 }
 
-AlbedoIntent.intentInterface = intentInterface
-AlbedoIntent.intentErrors = intentErrors
-
 const albedo = new AlbedoIntent()
+albedo.default = albedo
 
 bindWebStellarLinkHandler(albedo)
 

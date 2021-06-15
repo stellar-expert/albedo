@@ -22,6 +22,7 @@
   "module": "./src/index.js",
   "types": "./src/index.d.ts",
   "keywords": [
+    "albedo",
     "stellar",
     "SSO",
     "signer",
