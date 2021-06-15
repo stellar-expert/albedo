@@ -1,14 +1,14 @@
-import React, {useState} from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import albedo, {intentInterface} from '@albedo-link/intent'
 import {useLocation} from 'react-router'
+import Tabs from '../../components/tabs'
 import DemoIntentRequestParametersView from './demo-intent-request-parameters-view'
 import DemoIntentResultsView from './demo-intent-results-view'
 import DemoIntentExampleView from './demo-intent-example-view'
-import Tabs from '../../components/tabs'
 import {generateInvocation} from '../demo-code-generator'
 import {useDependantState} from '../../../state/state-hooks'
 import {parseQuery} from '../../../util/url-utils'
+import DemoExtraInfoView from '../demo-extra-info-view'
 
 albedo.frontendUrl = location.origin
 
@@ -58,7 +58,7 @@ function getTabs(intent) {
     return res
 }
 
-function DemoIntentBlockView({intent}) {
+export default function DemoIntentBlockView({intent}) {
     const intentDefinition = intentInterface[intent]
     if (!intentDefinition) return <div className="space">
         <div className="text-center error">
@@ -115,7 +115,6 @@ function DemoIntentBlockView({intent}) {
         <Tabs tabs={getTabs(intent)} selectedTab={selectedTab} onChange={tab => selectTab(tab)}/>
         <DemoIntentExampleView {...{intent, allParams, selectedTab, inProgress}} onExec={exec}/>
         <DemoIntentResultsView {...{result, error}}/>
+        <DemoExtraInfoView {...{intent, allParams, result}} />
     </div>
 }
-
-export default DemoIntentBlockView
