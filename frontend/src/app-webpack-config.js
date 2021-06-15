@@ -112,9 +112,9 @@ module.exports = function (env, argv) {
                 util: false,
                 http: false,
                 https: false,
-                stream: false,
                 path: false,
-                fs: false
+                fs: false,
+                stream: require.resolve('stream-browserify')
             }
         }
     }

@@ -52,7 +52,7 @@ albedoSignatureVerification.verifyMessageSignature(
 To create UMD library bundle, run the following NPM script:
 
 ```
-npm run build-app
+npm run build
 ```
 
 Running tests:

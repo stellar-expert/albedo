@@ -337,7 +337,7 @@ console.log(albedo.listImplicitSessions().some(s => s.pubkey === pubkey))
 To create UMD library bundle, run the following NPM script:
 
 ```
-npm run build-app
+npm run build
 ```
 
 It will also automatically update examples and parameters definitions for all
