@@ -229,10 +229,10 @@ class ActionContext {
         //validate implicit flow request preconditions
         if (intent === 'implicit_flow') {
             let {intents = [], app_origin} = intentParams
-            if (app_origin !== window.origin) {
+            /*if (app_origin !== window.origin) { //this check is not needed without the implicit mode whitelist
                 this.intentErrors = `Origin "${app_origin}" is not allowed to request implicit flow permissions.`
                 return this.rejectRequest()
-            }
+            }*/
             if (typeof intents === 'string') {
                 intents = intents.split(',')
             }
