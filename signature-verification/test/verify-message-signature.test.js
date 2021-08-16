@@ -17,6 +17,7 @@ test('filters malformed input', function () {
 
 test('verifies the message', function () {
     expect(verifyMessageSignature(correctData.pubkey, correctData.message, correctData.signature)).toBeTruthy()
+    expect(verifyMessageSignature(correctData.pubkey, correctData.pubkey + ':' + correctData.message, correctData.signature)).toBeTruthy()
     expect(verifyMessageSignature(correctData.pubkey, correctData.message, new Uint8Array(64))).toBeFalsy()
     expect(verifyMessageSignature(correctData.pubkey, correctData.message + '1', correctData.signature)).toBeFalsy()
     expect(verifyMessageSignature('GCM5FP453ZN43I46CRAMU3SQP4KX4YQBMXQQFGIKNTKUK2AOEOWYRWW7', correctData.message, correctData.signature)).toBeFalsy()

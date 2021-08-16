@@ -55,8 +55,11 @@ function verifyMessageSignature(publicKey, message, signature) {
     if (!signature || signature.length !== 64)
         throw new Error('Invalid signature length. ED25519 signature should be exactly 64 bytes in length.')
 
+    if (message.indexOf(publicKey + ':') !== 0) {
+        message = publicKey + ':' + message
+    }
     try {
-        const encodedMessage = shajs('sha256').update(publicKey + ':' + message).digest()
+        const encodedMessage = shajs('sha256').update(message).digest()
         return nacl.sign.detached.verify(encodedMessage, signature, new Uint8Array(decodeBase32(publicKey).slice(1, -2)))
     } catch (e) {
         throw new Error('Unhandled error. The input is malformed. Failed to verify the signature.')
