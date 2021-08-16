@@ -148,7 +148,7 @@ class ActionContext {
     }
 
     get hasNoMatchingKey() {
-        const {pubkey} = this.intentParams
+        const {pubkey} = this.intentParams || {}
         return pubkey && !accountManager.accounts.some(acc => acc.publicKey === pubkey)
     }
 
@@ -333,8 +333,8 @@ class ActionContext {
      * @param {Error} [error] - Rejection reason or validation error.
      */
     rejectRequest(error) {
-        const {intent, intentErrors} = this
-        if (!intent) return
+        if (!this.intent) return Promise.resolve()
+        const {intentErrors} = this
         if (!error && intentErrors) {
             if (intentErrors.code === undefined) {
                 error = errors.invalidIntentRequest(intentErrors)
@@ -343,14 +343,7 @@ class ActionContext {
             }
         }
         return handleIntentResponseError(error, this)
-            .then(res => {
-                this.reset()
-                return res
-            })
-            .catch(e => {
-                this.reset()
-                return e
-            })
+            .finally(() => this.reset())
     }
 
     /**
@@ -396,7 +389,7 @@ class ActionContext {
 
 const actionContext = new ActionContext()
 
-window.addEventListener('unload', function () {
+window.addEventListener('beforeunload', function () {
     actionContext.rejectRequest()
 })
 

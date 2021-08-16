@@ -35,8 +35,9 @@ function AuthActionLink({action, children}) {
 }
 
 function AuthSelectorView() {
-    const {intentParams, directKeyInput, hasNoMatchingKey, requiresExistingAlbedoAccount} = actionContext,
-        {pubkey: requestedKey} = intentParams
+    const {intentParams, directKeyInput, hasNoMatchingKey, requiresExistingAlbedoAccount} = actionContext
+    if (!intentParams) return null
+    const {pubkey: requestedKey} = intentParams
     let {activeAccount, accounts: allAccounts} = accountManager
     if (requestedKey && hasNoMatchingKey) {
         const matchedAccount = accountManager.get(requestedKey)

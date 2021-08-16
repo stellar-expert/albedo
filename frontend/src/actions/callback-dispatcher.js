@@ -103,7 +103,7 @@ export function handleIntentResponseError(error, actionContext) {
     }
     error = errors.prepareErrorDescription(error, actionContext.intentParams)
 
-    const {callback} = actionContext.intentParams
+    const {callback} = actionContext.intentParams || {}
     if (callback) {
         alert(error.message || error)
     } else {
