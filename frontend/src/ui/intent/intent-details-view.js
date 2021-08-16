@@ -35,15 +35,15 @@ function RiskLevelIconView({risk}) {
 }
 
 function IntentDetailsView({expanded}) {
-    const {intentProps, intentErrors, txContext, networkName} = actionContext
+    const {intentProps, intentErrors, txContext, networkName, origin} = actionContext
     if (!intentProps) return null
     const {title, risk, unsafe} = intentProps,
-        {app_origin, pubkey} = actionContext.intentParams
+        {pubkey} = actionContext.intentParams
 
     return <div>
         <h2 style={{marginBottom: 0}}>{title}</h2>
         <div className="dimmed">
-            Requested by <a href={app_origin || '#'} target="_blank">{app_origin || 'Unknown application'}</a>
+            Requested by <a href={origin || '#'} target="_blank">{origin || 'Unknown application'}</a>
         </div>
         <div className="space">
             <IntentContextIconView color="info" main="sitemap"/> Network: <b>{networkName}</b>

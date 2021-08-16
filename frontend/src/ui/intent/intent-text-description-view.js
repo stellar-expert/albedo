@@ -17,14 +17,14 @@ function FormattedAmount({amount, params, prefix = ''}) {
 }
 
 function IntentErrorView() {
-    const {intentParams, intentErrors} = actionContext
+    const {intentErrors, origin} = actionContext
     //TODO: use only unified error objects everywhere in intentErrors to prevent problems with type casting
 
     let text
     if (intentErrors) {
         text = 'Error: ' + intentErrors.message || intentErrors
         if (!intentErrors.code || intentErrors.code === -1) {
-            text += ` It's likely an external application error. Please contact support team of ${intentParams.app_origin}.`
+            text += ` It's likely an external application error. Please contact support team of ${origin}.`
         }
     }
 
@@ -32,7 +32,7 @@ function IntentErrorView() {
 }
 
 export default function IntentTextDescriptionView() {
-    const {intent, intentParams, intentErrors} = actionContext
+    const {intent, intentParams, intentErrors, origin} = actionContext
     if (intentErrors) {
         return <>
             <IntentErrorView/>
@@ -46,7 +46,7 @@ export default function IntentTextDescriptionView() {
             </>
         case 'authenticate':
             return <>
-                The application requested you to login to {intentParams.app_origin}.
+                The application requested you to login to {origin}.
             </>
         case 'sign_message':
             return <>

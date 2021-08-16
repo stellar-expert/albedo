@@ -64,8 +64,7 @@ class Responder {
             res.executed_implicitly = true
         }
         //add extra fields to the response
-        Object.assign(res, {intent: actionContext.intent})
-        return res
+        return  Object.assign({intent: actionContext.intent}, intentParams, res)
     }
 
     getDirectKeyInputExecutionContext(actionContext) {

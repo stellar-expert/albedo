@@ -29,7 +29,16 @@ class ActionContext {
      */
     intentParams = null
 
+    /**
+     * Network identifier.
+     * @type {string}
+     */
     networkName = 'public'
+
+    /**
+     * Origin of the caller app.
+     */
+    origin
 
     /**
      * Requested transaction context.
@@ -84,6 +93,7 @@ class ActionContext {
     constructor() {
         makeObservable(this, {
             intent: observable,
+            origin: observable,
             intentParams: observable.shallow,
             networkName: observable,
             txContext: observable,
@@ -149,6 +159,7 @@ class ActionContext {
     reset() {
         Object.assign(this, {
             intent: null,
+            origin: null,
             intentProps: null,
             intentParams: null,
             secret: null,
@@ -169,10 +180,11 @@ class ActionContext {
      */
     async setContext(params) {
         this.reset()
-        const {intent, ...intentParams} = params
+        const {intent, __albedo_intent_version, app_origin, ...intentParams} = params
 
         Object.assign(this, {
             intentErrors: null,
+            origin: app_origin,
             confirmed: false,
             processed: false,
             intent,
@@ -228,7 +240,7 @@ class ActionContext {
 
         //validate implicit flow request preconditions
         if (intent === 'implicit_flow') {
-            let {intents = [], app_origin} = intentParams
+            let {intents = []} = intentParams
             /*if (app_origin !== window.origin) { //this check is not needed without the implicit mode whitelist
                 this.intentErrors = `Origin "${app_origin}" is not allowed to request implicit flow permissions.`
                 return this.rejectRequest()

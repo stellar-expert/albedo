@@ -8,7 +8,6 @@ export default function (responder) {
 
             return {
                 pubkey: executionContext.publicKey,
-                original_message: message,
                 signed_message: signedMessage.toString('hex'),
                 message_signature: signature.toString('hex')
             }

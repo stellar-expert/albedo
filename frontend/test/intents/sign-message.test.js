@@ -38,8 +38,8 @@ describe('Intent - sign message', () => {
         expect(actionContext.intentErrors).toBeNull()
         expect(fakeWindow.checkIfExpectedResultReturned({
             intent: 'sign_message',
-            message: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2:test message',
-            original_message: 'test message',
+            message: 'test message',
+            signed_message: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2:test message',
             message_signature: '2b074fad920f8594aab84b43f6e548695b7a4b55a871ebb4081e61544f6741906800b543f9629468c5376328ad62f8dca6feb7ae9430d5569d4e72510af8740c'
         })).toBeTruthy()
     })
