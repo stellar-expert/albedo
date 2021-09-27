@@ -1,20 +1,21 @@
 import React from 'react'
 import {render} from 'react-dom'
-import Nav from './ui/navigation'
+import {configure} from 'mobx'
+import {bindClickNavHandler, navigation} from '@stellar-expert/ui-framework'
 import Router from './ui/app-router'
 import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage'
 import {registerMessageListeners} from './util/message-listeners'
-import {createBrowserHistory} from 'history'
 import accountManager from './state/account-manager'
-import './ui/styles.scss'
+
+configure({enforceActions: 'never'})
 
 const appContainer = document.createElement('div')
 
-const nav = new Nav(createBrowserHistory(), appContainer)
+bindClickNavHandler(appContainer)
 
 accountManager.reload()
     .then(() => {
-        render(<Router history={nav.history}/>, appContainer)
+        render(<Router history={navigation.history}/>, appContainer)
 
         document.body.appendChild(appContainer)
         document.body.removeChild(document.getElementById('pre-loader'))

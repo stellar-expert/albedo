@@ -67,7 +67,7 @@ export default function SignupSetPasswordStepView({secret, onSuccess}) {
             browser.
         </div>
         {!secret && <>
-            <hr title="already have account?"/>
+            <hr title="already have account?" className="flare"/>
             <div className="row micro-space">
                 <div className="column column-50">
                     <a href="/login" className="button button-outline button-block">Log in</a>
@@ -76,7 +76,7 @@ export default function SignupSetPasswordStepView({secret, onSuccess}) {
                     <a href="/import" className="button button-outline button-block">Import account</a>
                 </div>
             </div>
-            <hr title="or use hardware wallet"/>
+            <hr title="or use hardware wallet" className="flare"/>
             <HardwareWalletSelectorView requirePublicKey onConfirm={data => saveAccount(data)}/>
         </>}
     </>

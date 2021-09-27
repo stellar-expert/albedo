@@ -1,6 +1,6 @@
 import React from 'react'
+import {Button, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
-import AccountAddress from '../../components/account-address'
 import actionContext from '../../../state/action-context'
 
 export default function AccountForgetView({credentials}) {
@@ -16,7 +16,7 @@ export default function AccountForgetView({credentials}) {
             account.verifyCredentials(credentials)
             accountManager.forget(account)
                 .then(() => {
-                    __history.push(actionContext.intent ? '/confirm' : '/account')
+                    navigation.navigate(actionContext.intent ? '/confirm' : '/account')
                 })
         }
     }
@@ -30,15 +30,13 @@ export default function AccountForgetView({credentials}) {
         </p>
         <div className="row">
             <div className="column column-50 column-offset-25">
-                <button className="button button-outline button-block" onClick={forgetAccount}>
-                    <i className="fa fa-warning"/> Remove account
-                </button>
+                <Button block outline onClick={forgetAccount}><i className="icon-warning"/> Remove account</Button>
             </div>
         </div>
         <p className="dimmed text-small micro-space">
             Please note, removing the account from Albedo will not affect your Stellar account on the ledger.
             You can use <a href="https://stellar.expert/demolisher/public" target="_blank">StellarExpert Demolisher
-            tool</a> to delete Stellar account completely and recover all reserved funds.
+            tool</a> to delete Stellar account completely and reclaim all reserved funds.
         </p>
     </>
 }

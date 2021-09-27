@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import {navigation} from '@stellar-expert/ui-framework'
 import OnBoardingNotesStepView from './onboarding-notes-step-view'
 import SecretBackupStepView from './secret-backup-step-view'
 import SignupSetPasswordStepView from './signup-set-password-step-view'
@@ -43,7 +44,7 @@ function SignupView({secret, skipSecretBackup}) {
                 <SecretBackupStepView credentials={credentials} onSuccess={() => updateCurrentStatus('finished')}/>
             </>
         case 'finished':
-            __history.push(actionContext.intent ? '/confirm' : '/account')
+            navigation.navigate(actionContext.intent ? '/confirm' : '/account')
             return null
         default:
             throw new Error(`Unknown signup status: ${status}`)

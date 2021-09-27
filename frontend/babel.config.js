@@ -8,6 +8,7 @@ module.exports = function (api) {
                 {
                     corejs: 3,
                     useBuiltIns: 'entry',
+                    modules: false,
                     targets: {
                         browsers: [
                             '> 1%',

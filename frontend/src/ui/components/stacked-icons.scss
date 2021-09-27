@@ -3,16 +3,17 @@
   width: 1.5em;
   height: 1.5em;
   position: relative;
-}
+  margin-right: 0.3em;
 
-.stacked-icon .main{
-  font-size: 1.1em;
-}
+  > .main {
+    font-size: 1.1em;
+  }
 
-.stacked-icon .fa.sub {
-  position: absolute;
-  font-size: 0.9em;
-  right: -0.5em;
-  bottom: -0.1em;
-  text-shadow: -2px -2px 0 #fff;
+  > .sub {
+    position: absolute;
+    font-size: 0.9em;
+    right: -0.5em;
+    bottom: -0.2em;
+    text-shadow: -1px -1px 0 #fff;
+  }
 }

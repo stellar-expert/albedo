@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import {navigation} from '@stellar-expert/ui-framework'
 import {parseQuery} from '../../util/url-utils'
 import actionContext from '../../state/action-context'
 import {replaceTokens} from '../../util/tx-replace-utils'
@@ -32,7 +33,7 @@ function WebStellarLinkHandlerView() {
         replaceTokens(params)
         setError(null)
         actionContext.setContext(params)
-        __history.push('/confirm')
+        navigation.navigate('/confirm')
 
     }, [window.location.href])
     if (!error) return <div className="loader"/>

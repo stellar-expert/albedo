@@ -1,21 +1,18 @@
 import React from 'react'
 import {observer} from 'mobx-react'
+import {AccountAddress, Dropdown, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../state/account-manager'
 import actionContext from '../../state/action-context'
 import DirectKeyInputView from './direct-key-input-view'
-import Dropdown from '../components/dropdown'
-import AccountAddress from '../components/account-address'
 import IdenticonView from '../account/account-identicon-view'
-import {CopyToClipboard} from 'react-copy-to-clipboard/lib/Component'
 
 function handleAccountAction(action) {
     switch (action) {
         case 'albedo-account':
             actionContext.directKeyInput = false
             break
-            break
         case 'signup':
-            __history.push('/signup')
+            navigation('/signup')
             break
         case 'direct-input':
             actionContext.directKeyInput = true
@@ -58,13 +55,11 @@ function AuthSelectorView() {
         if (!directKeyInput && account === activeAccount) continue
         dropdownOptions.push({
             value: account.id,
-            title: <>Switch to&emsp;<IdenticonView address={account.publicKey}/> {account.displayName}</>
+            title: <>Switch to&nbsp;<IdenticonView address={account.publicKey}/> {account.displayName}</>
         })
     }
 
-    dropdownOptions.push({
-        value: ''
-    })
+    dropdownOptions.push('-')
 
     dropdownOptions.push({
         value: 'signup',
@@ -79,9 +74,10 @@ function AuthSelectorView() {
     }
 
     return <div className="space">
-        <hr/>
+        <hr className="flare"/>
         <span className="dimmed">Account: </span>
-        <Dropdown className="dimmed" value="title" onChange={handleAccountAction} options={dropdownOptions}/>
+        <Dropdown value="title" onChange={handleAccountAction} options={dropdownOptions}
+                  solo header={<h3 style={{margin: 0}}>Choose account</h3>}/>
         <div className="space"/>
         {directKeyInput ? <DirectKeyInputView/> : <>
             {hasNoMatchingKey && <div className="space">

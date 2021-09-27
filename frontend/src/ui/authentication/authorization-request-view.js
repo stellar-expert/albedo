@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {observer} from 'mobx-react'
+import {navigation} from '@stellar-expert/ui-framework'
 import errors from '../../util/errors'
 import accountManager from '../../state/account-manager'
 import Account from '../../state/account'
@@ -57,7 +58,7 @@ export default observer(function AuthorizationRequestView() {
         if (authorizationService.credentialsRequestCallback) {
             authorizationService.credentialsRequestCallback.reject(errors.actionRejectedByUser)
         } else {
-            __history.push('/')
+            navigation.navigate('/')
         }
     }
 

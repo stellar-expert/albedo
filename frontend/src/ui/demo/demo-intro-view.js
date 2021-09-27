@@ -1,5 +1,5 @@
 import React from 'react'
-import Highlight from '../components/highlight'
+import {CodeBlock} from '@stellar-expert/ui-framework'
 
 function DemoIntroView() {
     return <>
@@ -35,11 +35,11 @@ function DemoIntroView() {
                 <b>Works everywhere</b> – seamless experience on desktops, smartphones, and tablets.
             </li>
         </ul>
-        <hr/>
+        <hr className="flare"/>
         <div>
             <h2>Setup</h2>
             <div>
-                <Highlight>{`import albedo from '@albedo-link/intent'`}</Highlight>
+                <CodeBlock lang="js">{`import albedo from '@albedo-link/intent'`}</CodeBlock>
             </div>
         </div>
     </>

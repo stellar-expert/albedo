@@ -12,7 +12,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: $color-modal-bg;
+    background: var(--color-modal-bg);
     backdrop-filter: blur(2px);
   }
 
@@ -23,11 +23,11 @@
     height: 100%;
 
     > .container {
-      background: $color-bg;
-      border: 1px solid $color-contrast-border;
+      background: var(--color-bg);
+      border: 1px solid var(--color-contrast-border);
       border-radius: $border-radius-input;
-      box-shadow: 0 2px 4px -1px $color-modal-bg;
-      padding-bottom: $space-block;
+      box-shadow: 0 2px 4px -1px var(--color-modal-bg);
+      padding: 0 $space-standard $space-standard;
     }
   }
 }

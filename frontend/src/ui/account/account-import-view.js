@@ -1,5 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {StrKey} from 'stellar-sdk'
+import {Button, navigation} from '@stellar-expert/ui-framework'
 import {mnemonicWordsList, validateMnemonic, mnemonicToSecret} from '../../util/mnemonic'
 import SignupView from '../signup/signup-view'
 
@@ -74,7 +75,7 @@ export default function AccountImportView({onSuccess}) {
                 browser/device.
             </p>
             <p>
-                <i className="fa fa-warning"/>{' '}
+                <i className="icon-warning"/>{' '}
                 Before starting the import process, do not forget to double-check the URL(the domain should
                 be <b>albedo.link</b>) and SSL validity(a small lock icon on the left of the address bar).
             </p>
@@ -92,11 +93,10 @@ export default function AccountImportView({onSuccess}) {
                   }}/>
         <div className="row">
             <div className="column column-50">
-                <button className="button button-block" onClick={() => submit()}>Next</button>
+                <Button block onClick={() => submit()}>Next</Button>
             </div>
             <div className="column column-50">
-                <button className="button button-outline button-block" onClick={() => __history.push('/')}>Cancel
-                </button>
+                <Button block outline onClick={() => navigation.navigate('/')}>Cancel</Button>
             </div>
         </div>
         {error && <div className="space error text-small">

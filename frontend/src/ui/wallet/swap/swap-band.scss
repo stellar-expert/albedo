@@ -1,0 +1,23 @@
+.swap-band {
+  align-items: center;
+  min-height: 1.6em;
+
+  > .text-tiny {
+    width: 45%;
+  }
+
+  .switch {
+    text-align: center;
+    transform: rotate(90deg);
+    font-size: 0.8em;
+    padding: 0.8em;
+
+    a {
+      border: 1px solid;
+      width: 1em;
+      height: 1em;
+      padding: 0.5em;
+      border-radius: 50%;
+    }
+  }
+}

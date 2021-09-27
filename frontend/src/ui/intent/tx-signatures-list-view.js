@@ -1,10 +1,10 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {StrKey} from 'stellar-sdk'
+import {AccountAddress} from '@stellar-expert/ui-framework'
 import actionContext from '../../state/action-context'
 import accountManager from '../../state/account-manager'
 import {formatHint} from '../../util/signature-hint-utils'
-import AccountAddress from '../components/account-address'
 
 export default observer(function TxSignaturesListView() {
     const {txContext} = actionContext
@@ -21,10 +21,10 @@ export default observer(function TxSignaturesListView() {
             const displayName = accountManager.get(s.pubKey)?.displayName || s.pubKey || formatHint(s.hint())
 
             return <div key={s.signature().toString('base64')}>
-                <i className="fa fa-edit"/>&nbsp;
+                <i className="icon-feather"/>&nbsp;
                 {StrKey.isValidEd25519PublicKey(displayName) ?
                     <AccountAddress account={displayName}/> : displayName}&nbsp;
-                {!!s.new && <a href="#" className="fa fa-close" onClick={e => txContext.removeSignatureByHint(hint)}
+                {!!s.new && <a href="#" className="icon-cancel" onClick={e => txContext.removeSignatureByHint(hint)}
                                title="Remove signature"/>}
             </div>
         })}

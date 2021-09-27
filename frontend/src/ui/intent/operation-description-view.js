@@ -1,8 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Address from '../components/account-address'
-import Amount from '../components/amount'
-import AssetName from '../components/asset-name'
+import {AccountAddress, Amount, AssetLink, AssetDescriptor} from '@stellar-expert/ui-framework'
 import {xdrParseClaimant} from '../../util/claim-condtions-xdr-parser'
 
 function formatBalanceId(balance) {
@@ -11,42 +9,42 @@ function formatBalanceId(balance) {
 
 export default function OperationDescriptionView({op, source}) {
     function SourceAccount() {
-        if (!op.source) return null
-        return <> on behalf of account <Address account={op.source || source}/></>
+        if (!op.source || op.source === source) return null
+        return <> on behalf of account <AccountAddress account={op.source || source}/></>
     }
 
     let asset
     switch (op.type) {
         case 'createAccount':
             return <>
-                <b>Create account</b> <Address account={op.destination}/> with starting
+                <b>Create account</b> <AccountAddress account={op.destination}/> with starting
                 balance <Amount amount={op.startingBalance} asset="XLM"/><SourceAccount/>
             </>
         case 'payment':
             return <>
-                <b>Pay</b> <Amount amount={op.amount} asset={op.asset}/> to <Address account={op.destination}/>
+                <b>Pay</b> <Amount amount={op.amount} asset={op.asset}/> to <AccountAddress account={op.destination}/>
                 <SourceAccount/>
             </>
         case 'pathPaymentStrictReceive':
             return <>
-                <b>Path payment</b> max <Amount amount={op.sendMax} asset={op.sendAsset}/>
-                <span className="fa fa-space fa-random"/>
-                {op.path.map((asset, i) => <span key={i}>
-                    <AssetName asset={asset}/>
-                    <span className="fa fa-space fa-random"/>
+                <b>Pay</b> <Amount amount={op.sendMax} asset={op.sendAsset}/>{' '}
+                <span className="icon-shuffle"/>{' '}
+                {op.path.map((asset, i) => <span key={i + '-' + asset.toString()}>
+                    <AssetLink asset={asset}/>{' '}
+                    <span className="icon-shuffle"/>{' '}
                 </span>)}
-                <Amount amount={op.destAmount} asset={op.destAsset}/> to <Address account={op.destination}/>
+                <Amount amount={op.destAmount} asset={op.destAsset}/> to <AccountAddress account={op.destination}/>
                 <SourceAccount/>
             </>
         case 'pathPaymentStrictSend':
             return <>
-                <b>Path payment</b> <Amount amount={op.amount} asset={op.sendAsset}/>
-                <span className="fa fa-space fa-random"/>
-                {op.path.map((asset, i) => <span key={i}>
-                    <AssetName asset={asset}/>
-                    <span className="fa fa-space fa-random"/>
+                <b>Pay</b> <Amount amount={op.sendAmount} asset={op.sendAsset}/>{' '}
+                <span className="icon-shuffle"/>{' '}
+                {op.path.map((asset, i) => <span key={i + '-' + asset.toString()}>
+                    <AssetLink asset={asset}/>{' '}
+                    <span className="icon-shuffle"/>{' '}
                 </span>)}
-                min <Amount amount={op.destAmount} asset={op.destAsset}/> to <Address account={op.destination}/>
+                <Amount amount={op.destMin} asset={op.destAsset}/> to <AccountAddress account={op.destination}/>
                 <SourceAccount/>
             </>
         case 'manageSellOffer':
@@ -66,7 +64,7 @@ export default function OperationDescriptionView({op, source}) {
             } else {
                 return <>
                     <b>{action} {op.offerId > 0 && ('#' + op.offerId)} {direction}</b>{' '}
-                    <Amount amount={op.amount} asset={op.selling}/> for <AssetName asset={op.buying}/>{' '}
+                    <Amount amount={op.amount} asset={op.selling}/> for <AssetLink asset={op.buying}/>{' '}
                     at <b>{op.price}</b> {op.buying.code}/{op.selling.code}<SourceAccount/>
                 </>
             }
@@ -76,7 +74,7 @@ export default function OperationDescriptionView({op, source}) {
             const direction = op.type === 'manageSellOffer' ? 'sell' : 'buy'
             return <>
                 <b>Create passive {direction} offer</b> <Amount amount={op.amount} asset={op.selling}/> for{' '}
-                <AssetName asset={op.buying}/> at <b>{op.price}</b> {op.buying.code}/{op.selling.code}
+                <AssetLink asset={op.buying}/> at <b>{op.price}</b> {op.buying.code}/{op.selling.code}
                 <SourceAccount/>
             </>
         }
@@ -102,7 +100,7 @@ export default function OperationDescriptionView({op, source}) {
                     'not set'}
                 </>}
                 {op.inflationDest !== undefined && <>
-                    <br/>Set inflation destination to <Address account={op.inflationDest}/>
+                    <br/>Set inflation destination to <AccountAddress account={op.inflationDest}/>
                 </>}
                 {op.lowThreshold !== undefined && <>
                     <br/>Set low threshold to {op.lowThreshold}
@@ -113,7 +111,7 @@ export default function OperationDescriptionView({op, source}) {
                 {op.highThreshold !== undefined && <>
                     <br/>Set high threshold to {op.highThreshold}</>}
                 {!!op.signer && <>
-                    <br/>Add new signer <Address account={op.signer.ed25519PublicKey}/> with
+                    <br/>Add new signer <AccountAddress account={op.signer.ed25519PublicKey}/> with
                     weight {op.signer.weight}
                 </>}
                 {op.masterWeight !== undefined && <>
@@ -123,31 +121,31 @@ export default function OperationDescriptionView({op, source}) {
         case 'changeTrust':
             if (parseFloat(op.limit) > 0)
                 return <>
-                    <b>Create trustline</b> to <AssetName asset={op.line}/> with
-                    limit <Amount amount={op.limit} asset={op.line}/>
+                    <b>Create trustline</b> for <AssetLink asset={op.line}/>
+                    {op.limit !== '922337203685.4775807' && <> with limit <Amount amount={op.limit} asset={op.line}/></>}
                     <SourceAccount/>
                 </>
             return <>
-                <b>Remove trustline</b> to <AssetName asset={op.line}/><SourceAccount/>
+                <b>Remove trustline</b> to <AssetLink asset={op.line}/><SourceAccount/>
             </>
         case 'allowTrust':
             asset = {code: op.assetCode, issuer: op.source || source}
             if (op.authorize) return <>
-                <b>Allow trustline</b> <AssetName asset={asset}/> for
-                account <Address account={op.trustor}/><SourceAccount/>
+                <b>Allow trustline</b> <AssetLink asset={asset}/> for
+                account <AccountAddress account={op.trustor}/><SourceAccount/>
             </>
             return <>
-                <b>Disallow trustline</b> <AssetName asset={asset}/> for
-                account <Address account={op.trustor}/><SourceAccount/>
+                <b>Disallow trustline</b> <AssetLink asset={asset}/> for
+                account <AccountAddress account={op.trustor}/><SourceAccount/>
             </>
         case 'accountMerge':
             return <>
-                <b>Merge account</b> <Address account={op.source || source}/> into
-                account <Address account={op.destination}/><SourceAccount/>
+                <b>Merge account</b> <AccountAddress account={op.source || source}/> into
+                account <AccountAddress account={op.destination}/><SourceAccount/>
             </>
         case 'inflation':
             return <>
-                <b>Run inflation</b><SourceAccount/>
+                <b>Initiate inflation</b><SourceAccount/>
             </>
         case 'manageDatum':
         case 'manageData':
@@ -163,9 +161,9 @@ export default function OperationDescriptionView({op, source}) {
             </>
         case 'createClaimableBalance':
             return <>
-                <b>Created claimable balance</b> <Amount amount={op.amount} asset={op.asset}/>{' '}
+                <b>Create claimable balance</b> <Amount amount={op.amount} asset={op.asset}/>{' '}
                 for claimants {op.claimants.map(xdrParseClaimant).map((c, i) => <span key={i}>{i > 0 && ', '}
-                <Address account={c.destination}/> with conditions <code>{JSON.stringify(c.predicate)}</code>
+                <AccountAddress account={c.destination}/> {c.predicate}
                 </span>)}
                 <SourceAccount/>
             </>
@@ -176,7 +174,7 @@ export default function OperationDescriptionView({op, source}) {
             </>
         case 'beginSponsoringFutureReserves':
             return <>
-                <b>Begin sponsoring future reserves</b> for <Address account={op.sponsoredId}/>
+                <b>Begin sponsoring future reserves</b> for <AccountAddress account={op.sponsoredId}/>
                 <SourceAccount/>
             </>
         case 'endSponsoringFutureReserves':
@@ -185,21 +183,21 @@ export default function OperationDescriptionView({op, source}) {
             </>
         case 'revokeAccountSponsorship':
             return <>
-                <b>Revoke sponsorship</b> on account <Address account={op.account}/><SourceAccount/>
+                <b>Revoke sponsorship</b> on account <AccountAddress account={op.account}/><SourceAccount/>
             </>
         case 'revokeTrustlineSponsorship':
             return <>
-                <b>Revoke sponsorship</b> on trustline <AssetName asset={op.asset}/> for
-                account <Address account={op.account}/><SourceAccount/>
+                <b>Revoke sponsorship</b> on trustline <AssetLink asset={op.asset}/> for
+                account <AccountAddress account={op.account}/><SourceAccount/>
             </>
         case 'revokeOfferSponsorship':
             return <>
-                <b>Revoke sponsorship</b> on offer {op.offerId} for account <Address account={op.account}/>
+                <b>Revoke sponsorship</b> on offer {op.offerId} for account <AccountAddress account={op.account}/>
                 <SourceAccount/>
             </>
         case 'revokeDataSponsorship':
             return <>
-                <b>Revoke sponsorship</b> on data entry {op.name} for account <Address account={op.account}/>
+                <b>Revoke sponsorship</b> on data entry {op.name} for account <AccountAddress account={op.account}/>
                 <SourceAccount/>
             </>
         case 'revokeClaimableBalanceSponsorship':
@@ -209,12 +207,12 @@ export default function OperationDescriptionView({op, source}) {
             </>
         case 'revokeSponsorshipSigner':
             return <>
-                <b>Revoke sponsorship</b> on signer <Address account={op.signer}/> for
-                account <Address account={op.accountId}/><SourceAccount/>
+                <b>Revoke sponsorship</b> on signer <AccountAddress account={op.signer}/> for
+                account <AccountAddress account={op.accountId}/><SourceAccount/>
             </>
         case 'clawback':
             return <>
-                <b>Clawback</b> <Amount amount={op.amount} asset={op.asset}/> from <Address account={op.from}/>
+                <b>Clawback</b> <Amount amount={op.amount} asset={op.asset}/> from <AccountAddress account={op.from}/>
                 <SourceAccount/>
             </>
         case 'clawbackClaimableBalance':
@@ -224,7 +222,7 @@ export default function OperationDescriptionView({op, source}) {
         case 'setTrustLineFlags':
             return <>
                 <b>Set trustline flags</b> {op.setFlags}, clear flags {op.clearFlags} for asset{' '}
-                <AssetName asset={op.asset}/> of account <Address account={op.trustor}/><SourceAccount/>
+                <AssetLink asset={op.asset}/> of account <AccountAddress account={op.trustor}/><SourceAccount/>
             </>
     }
     throw new Error(`Not supported operation type: ${op.type}.`)

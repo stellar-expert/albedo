@@ -1,11 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {observer} from 'mobx-react'
+import {Button, useDependantState} from '@stellar-expert/ui-framework'
 import actionContext from '../../state/action-context'
 import accountManager from '../../state/account-manager'
-import ActionsBlock from '../components/actions-block'
 import {formatAddress} from '../../util/formatter'
-import {useDependantState} from '../../state/state-hooks'
 
 function getConfirmationAccountName(alreadySigned) {
     const confirmation = alreadySigned ? 'Already signed by ' : 'Confirm using '
@@ -46,40 +45,34 @@ function IntentActionView() {
         externalSignature = confirmed && activeAccount?.isHWAccount && !txContext?.isFullySigned,
         pendingHorizonSubmission = confirmed && autoSubmitToHorizon && txContext?.isFullySigned && !response
 
-    if (dispatchingResponse) return <ActionsBlock>
+    if (dispatchingResponse) return <div>
         <PendingStatus>Processing response…</PendingStatus>
-    </ActionsBlock>
+    </div>
 
-    if (intentErrors) return <ActionsBlock>
-        <button className="button button-outline button-block" onClick={() => actionContext.rejectRequest()}>
-            Proceed
-        </button>
-    </ActionsBlock>
+    if (intentErrors) return <div>
+        <Button block outline onClick={() => actionContext.rejectRequest()}>Proceed</Button>
+    </div>
 
-    return <ActionsBlock>
+    return <div>
         {externalSignature && <PendingStatus>Confirm the action on the hardware wallet</PendingStatus>}
         {pendingHorizonSubmission && <PendingStatus>Submitting to Horizon…</PendingStatus>}
         {!!runtimeErrors && <div className="space">
             <div className="error text-small">{runtimeErrors}</div>
         </div>}
         {!directKeyInput &&
-        <button className="button button-block" disabled={alreadySigned || accountUnavailable || inProgress}
-                onClick={() => {
-                    setSigningInProgress(true)
-                    actionContext.confirmRequest()
-                }}>
-            {getConfirmationAccountName(alreadySigned)}
-        </button>
+        <Button block disabled={alreadySigned || accountUnavailable || inProgress} onClick={() => {
+            setSigningInProgress(true)
+            actionContext.confirmRequest()
+        }}>{getConfirmationAccountName(alreadySigned)}</Button>
         }
         {!!txContext?.isPartiallySigned &&
-        <button className="button button-outline button-block" onClick={() => actionContext.finalize()}>
+        <Button block outline onClick={() => actionContext.finalize()}>
             Proceed with partially signed tx
-        </button>}
+        </Button>}
         {' '}
-        <button className="button button-outline button-block" disabled={!!dispatchingResponse}
-                onClick={() => actionContext.rejectRequest()}>Reject
-        </button>
-    </ActionsBlock>
+        <Button block outline disabled={!!dispatchingResponse} onClick={() => actionContext.rejectRequest()}>Reject
+        </Button>
+    </div>
 }
 
 //TODO: ensure that pressing "Reject" stops the action being processed right now (or block this button)

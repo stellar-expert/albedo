@@ -1,4 +1,5 @@
-import {version} from '../../package'
+import {navigation} from '@stellar-expert/ui-framework'
+import pkgInfo from '../../package.json'
 import actionContext from '../state/action-context'
 import accountManager from '../state/account-manager'
 import stoplistTracker from '../stoplist/stoplist-tracker'
@@ -21,13 +22,13 @@ async function handleIntentRequest(data, origin) {
     await actionContext.setContext(data)
 
     if (actionContext.intent === 'manage_account') {
-        __history.push('/account')
+        navigation.navigate('/account')
         return
     }
 
     if (!actionContext.isImplicitIntent) {
         //interactive flow
-        window.__history.push('/confirm')
+        navigation.navigate('/confirm')
         return
     }
     try {
@@ -43,7 +44,7 @@ async function handleIntentRequest(data, origin) {
 
 function notifyOpener() {
     setTimeout(() => {
-        (window.opener || window.parent).postMessage({albedo: {version}}, '*')
+        (window.opener || window.parent).postMessage({albedo: {version: pkgInfo.version}}, '*')
     }, 300)
 }
 

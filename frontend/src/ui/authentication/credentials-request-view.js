@@ -1,8 +1,7 @@
 import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
+import {Button, useDependantState} from '@stellar-expert/ui-framework'
 import {ACCOUNT_TYPES} from '../../state/account'
-import Actions from '../components/actions-block'
-import {useDependantState} from '../../state/state-hooks'
 
 const defaultState = {
     password: '',
@@ -77,21 +76,17 @@ export default function CredentialsRequestView({confirmText = 'Confirm', onConfi
                        onKeyDown={e => onKeyDown(e)}/>
             </div>}
         </div>
-        <Actions className="row">
+        <div className="row actions">
             {onConfirm && <div className="column column-50">
-                <button className="button button-block" disabled={!!inProgress} onClick={() => confirm()}>
-                    {confirmText}
-                </button>
+                <Button block disabled={!!inProgress} onClick={confirm}>{confirmText}</Button>
             </div>}
             {onCancel && <div className="column column-50">
-                <button className="button button-outline button-block" onClick={() => onCancel()}>
-                    Cancel
-                </button>
+                <Button block outline onClick={onCancel}>Cancel</Button>
             </div>}
-        </Actions>
+        </div>
         {errorsToShow && <div className="error space text-center text-small">Error: {errorsToShow}</div>}
         {!noRegistrationLink && <>
-            <hr title="Not registered yet?"/>
+            <hr title="Not registered yet?" className="flare"/>
             <div className="row">
                 <div className="column column-50 column-offset-25">
                     <a href="/signup" className="button button-block">Create new account</a>

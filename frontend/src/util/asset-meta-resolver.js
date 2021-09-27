@@ -3,9 +3,9 @@ import {resolveAccountInfo} from './account-info-resolver'
 
 const metaCache = {}
 
-function fetchMeta(asset, networkId) {
+function fetchMeta(asset, network) {
     if (!asset.issuer) return Promise.resolve({icon: '/img/vendor/stellar.svg'})
-    return resolveAccountInfo(asset.issuer, networkId)
+    return resolveAccountInfo(asset.issuer, network)
         .then(issuerAccount => {
             if (!issuerAccount.home_domain) return {}
             return StellarTomlResolver.resolve(issuerAccount.home_domain, {timeout: 3000})
@@ -26,11 +26,11 @@ function fetchMeta(asset, networkId) {
         })
 }
 
-export function resolveAssetMeta(asset, networkId){
-    const key = `${networkId}-${asset.code}-${asset.issuer||''}`
+export function resolveAssetMeta(asset, network){
+    const key = `${network}-${asset.code}-${asset.issuer||''}`
     let meta = metaCache[key]
     if (!meta) {
-        meta = metaCache[key] = fetchMeta(asset, networkId)
+        meta = metaCache[key] = fetchMeta(asset, network)
     }
     return meta
 }

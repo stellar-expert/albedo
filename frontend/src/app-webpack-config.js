@@ -3,7 +3,8 @@ const path = require('path'),
     webpack = require('webpack'),
     CopyPlugin = require('copy-webpack-plugin'),
     MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-    HtmlWebpackPlugin = require('html-webpack-plugin')
+    HtmlWebpackPlugin = require('html-webpack-plugin'),
+    uiFrameworkWebpackUtils = require('@stellar-expert/ui-framework/webpack-utils')
 
 module.exports = function (env, argv) {
     const mode = argv.mode || 'development'
@@ -13,7 +14,7 @@ module.exports = function (env, argv) {
 
     const isProduction = mode !== 'development'
 
-    const fileNameFormat = isProduction ? '[name].[contenthash]' : '[name]'
+    const fileNameFormat = isProduction ? '[name].[contenthash].js' : '[name].js'
 
     const settings = {
         mode,
@@ -25,18 +26,26 @@ module.exports = function (env, argv) {
         },
         output: {
             path: path.join(__dirname, '../distr/app/'),
-            filename: fileNameFormat + '.js',
-            publicPath: '/'
+            filename: pathData => {
+                if (['albedo-intent', 'albedo-intent-button', 'albedo-payment-button'].includes(pathData.chunk.name)) return '[name].js'
+                return fileNameFormat
+            },
+            chunkFilename: pathData=>{
+                return pathData.chunk.id +'.js';
+            },
+            publicPath: '/',
+            clean: true
         },
         module: {
             rules: [
                 {
                     test: /\.js?$/,
                     loader: 'babel-loader',
-                    exclude: /node_modules/
+                    exclude: uiFrameworkWebpackUtils.generateWebpackExcludeExcept()
                 },
                 {
                     test: /\.scss$/,
+                    exclude: uiFrameworkWebpackUtils.generateWebpackExcludeExcept(),
                     use: [
                         {
                             loader: MiniCssExtractPlugin.loader
@@ -53,11 +62,10 @@ module.exports = function (env, argv) {
                             loader: 'sass-loader',
                             options: {
                                 sourceMap: !isProduction,
-                                additionalData: '@import "./src/ui/variables.scss";'
+                                additionalData: '@import "./src/ui/styles.scss";'
                             }
                         }
-                    ],
-                    exclude: /node_modules/
+                    ]
                 },
                 {
                     test: /\.svg$/,
@@ -66,13 +74,11 @@ module.exports = function (env, argv) {
                 },
                 {
                     test: /\.wasm$/,
-                    // tells WebPack that this module should be included as base64-encoded binary file and not as code
                     loader: 'base64-loader',
-                    // disables WebPack's opinion where WebAssembly should be, makes it think that it's not WebAssembly - Error: WebAssembly module is included in initial chunk.
                     type: 'javascript/auto'
                 }
             ],
-            noParse: /\.wasm$/ // Makes WebPack think that we don't need to parse this module, otherwise it tries to recompile it, but fails - Error: Module not found: Error: Can't resolve 'env'
+            noParse: /\.wasm$/
         },
         plugins: [
             new webpack.IgnorePlugin({
@@ -114,30 +120,28 @@ module.exports = function (env, argv) {
                 https: false,
                 path: false,
                 fs: false,
+                url: false,
                 stream: require.resolve('stream-browserify')
-            }
+            },
+            symlinks: false,
+            modules: [path.resolve(__dirname, '../node_modules'), 'node_modules']
         }
     }
 
     if (!isProduction) {
         settings.devtool = 'source-map'
         settings.devServer = {
+            port: 5001,
+            host: '0.0.0.0',
+            allowedHosts: 'all',
+            https: true,
+            compress: true,
+            hot: false,
+            static: {
+                directory: path.join(__dirname, './distr/app')
+            },
             historyApiFallback: {
                 disableDotRule: true
-            },
-            compress: true,
-            disableHostCheck: true,
-            host: '0.0.0.0',
-            port: 5001,
-            contentBase: [path.join(__dirname, './distr/app')],
-            https: true,
-            setup(app) {
-                const bodyParser = require('body-parser')
-                app.use(bodyParser.urlencoded())
-                app.post('*', (req, res) => {
-                    const querystring = require('querystring')
-                    res.redirect(req.originalUrl + '?' + querystring.stringify(req.body))
-                })
             }
         }
     } else {

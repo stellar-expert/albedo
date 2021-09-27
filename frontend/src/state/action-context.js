@@ -1,6 +1,7 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
 import {Transaction, Keypair, TransactionBuilder} from 'stellar-sdk'
 import {intentInterface} from '@albedo-link/intent'
+import {navigation} from '@stellar-expert/ui-framework'
 import accountManager from './account-manager'
 import responder from '../actions/responder'
 import {dispatchIntentResponse, handleIntentResponseError} from '../actions/callback-dispatcher'
@@ -318,7 +319,7 @@ class ActionContext {
             lastActionResult.setResult(this.response)
             this.dispatchingResponse = true
             const res = await dispatchIntentResponse(this.response, this)
-            __history.push('/result')
+            navigation.navigate('/result')
             this.reset()
             return res
         } catch (e) {
@@ -351,7 +352,7 @@ class ActionContext {
      */
     cancelAction() {
         //TODO: implement contextual action and nav path here
-        __history.push('/')
+        navigation.navigate('/')
     }
 
     /**

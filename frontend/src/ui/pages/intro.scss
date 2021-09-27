@@ -7,7 +7,7 @@
   min-height: 20em;
   height: 30vh;
   width: 100%;
-  color: $color-bg;
+  color: var(--color-bg);
 
   @media (max-width: $responsive-mobile-browser-width) {
     padding: 0.5em;
@@ -17,8 +17,7 @@
   &:before {
     content: '';
     display: block;
-    $feature-bg-color: transparentize($color-highlight, 0.2);
-    background: $feature-bg-color;
+    background: var(--color-highlight);
     position: absolute;
     z-index: -1;
     left: 0;
@@ -74,8 +73,8 @@
     }
 
     > * {
-      color: $color-highlight;
-      background-color: $color-bg;
+      color: var(--color-highlight);
+      background-color: var(--color-bg);
       padding: 0 0.25em 0.15em;
       position: relative;
     }
@@ -83,7 +82,7 @@
     &:before {
       content: '';
       display: block;
-      border-left: 1px solid $color-highlight;
+      border-left: 1px solid var(--color-highlight);
       width: 1px;
       position: absolute;
       height: 100%;

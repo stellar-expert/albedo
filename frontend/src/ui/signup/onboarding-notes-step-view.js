@@ -1,4 +1,5 @@
 import React from 'react'
+import {Button} from '@stellar-expert/ui-framework'
 
 export default function OnBoardingNotesStepView({onSuccess}) {
     return <>
@@ -22,9 +23,7 @@ export default function OnBoardingNotesStepView({onSuccess}) {
         </p>
         <div className="row space">
             <div className="column column-50 column-offset-25">
-                <button className="button button-block" onClick={onSuccess}>
-                    Proceed <i className="fa fa-angle-right"/>
-                </button>
+                <Button block onClick={onSuccess}>Proceed <i className="icon-angle-right"/></Button>
             </div>
         </div>
     </>

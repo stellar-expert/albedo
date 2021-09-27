@@ -1,12 +1,10 @@
 import React from 'react'
+import {intentInterface} from '@albedo-link/intent'
+import {AccountAddress, AssetLink, Amount} from '@stellar-expert/ui-framework'
 import actionContext from '../../state/action-context'
 import TxDetailsView from './tx-details-view'
 import {formatAddress} from '../../util/formatter'
-import {intentInterface} from '@albedo-link/intent'
 import {resolveNetworkParams} from '../../util/network-resolver'
-import Amount from '../components/amount'
-import Address from '../components/account-address'
-import AssetName from '../components/asset-name'
 
 function FormattedAmount({amount, params, prefix = ''}) {
     const asset = params[prefix + 'asset_issuer'] ? {
@@ -72,13 +70,13 @@ export default function IntentTextDescriptionView() {
             return <>
                 The application requested a payment <FormattedAmount params={intentParams}
                                                                      amount={intentParams.amount}/>{' '}
-                to <b><Address account={intentParams.destination}/></b>.
+                to <b><AccountAddress account={intentParams.destination}/></b>.
             </>
         case 'exchange':
             return <>
                 The application requested permission to buy {' '}
                 <FormattedAmount params={intentParams} prefix="buy_" amount={intentParams.amount}/>{' '}for{' '}
-                <AssetName asset={{code: intentParams.sell_asset_code, issuer: intentParams.sell_asset_issuer}}/>{' '}
+                <AssetLink asset={{code: intentParams.sell_asset_code, issuer: intentParams.sell_asset_issuer}}/>{' '}
                 at <b>{intentParams.max_price} {intentParams.sell_asset_code || 'XLM'}/{intentParams.buy_asset_code || 'XLM'}</b> or
                 lower.
             </>
@@ -92,7 +90,7 @@ export default function IntentTextDescriptionView() {
                 confirmation dialog.
                 <ul>
                     {intentParams.intents.map(intent => <li key={intent}>
-                        <i className="fa fa-chevron-right"/>
+                        <i className="icon-angle-double-right"/>
                         <b>{intentInterface[intent].title}</b>
                     </li>)}
                 </ul>

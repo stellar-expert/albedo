@@ -1,7 +1,7 @@
 import React from 'react'
 import isEqual from 'react-fast-compare'
 import {intentInterface} from '@albedo-link/intent'
-import {useDependantState} from '../../../state/state-hooks'
+import {useDependantState} from '@stellar-expert/ui-framework'
 import allDemos from '../demo-intent-default-params'
 
 export default function DemoIntentRequestParametersView({intent, inProgress, onChange}) {
@@ -63,7 +63,7 @@ export default function DemoIntentRequestParametersView({intent, inProgress, onC
             </div>
         })}
         {!!implicitFlow && <p className="dimmed text-small space">
-            <i className="fa fa-info-circle"/> This intent can be executed implicitly if{' '}
+            <i className="icon-info"/> This intent can be executed implicitly if{' '}
             <a href="/playground?section=implicit_flow">implicit flow</a>{' '}
             permissions were granted and "pubkey" parameter set.
         </p>}

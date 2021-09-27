@@ -3,7 +3,7 @@ import storageProvider from './storage-provider'
 
 const listeners = [],
     lsKey = 'preferredNetwork'
-let currentNetwork = 'testnet'
+let currentNetwork = 'public'
 
 //load from
 storageProvider.getItem(lsKey)
@@ -26,6 +26,7 @@ function removeListener(callback, newCallback) {
 export function setStellarNetwork(network) {
     if (currentNetwork === network) return
     currentNetwork = network
+    window.explorerNetwork = network
     storageProvider.setItem(lsKey, network)
         .then(() => {
             for (const listener of listeners) {

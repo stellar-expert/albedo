@@ -1,12 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Switch, Router, Route, Redirect} from 'react-router'
+import {DynamicModule} from '@stellar-expert/ui-framework'
 import Layout from './layout/layout-view'
 import CreateAccount from './signup/signup-view'
-import AccountDashboard from './dashboard/account-dashboard-view'
+import AccountDashboard from './account/dashboard/account-dashboard-view'
 import NotFound from './pages/not-found-view'
 import Intent from './intent/intent-view'
-import loadable from './components/loadable'
 import Login from './authentication/login-page-view'
 import ImportAccount from './account/account-import-view'
 import AccountSettings from './account/settings/account-settings-view'
@@ -17,14 +17,17 @@ import TxResultView from './intent/tx-result-view'
 import BlockedPageView from './pages/blocked-page-view'
 import CatcherView from './layout/catcher-view'
 
-function AppRouter({history}) {
+export default function AppRouter({history}) {
     return <Layout>
         <Router history={history}>
             <CatcherView>
                 <Switch>
-                    <Redirect from="/demo" to="/playground"/>
-                    <Route path="/playground"
-                           component={loadable(() => import(/* webpackChunkName: "demo" */ './demo/demo-view'))}/>
+                    <Route path="/playground">
+                        <DynamicModule load={() => import(/* webpackChunkName: "playground" */ './demo/demo-view')}
+                                       moduleKey="playground"/></Route>
+                    <Route path="/wallet">
+                        <DynamicModule load={() => import(/* webpackChunkName: "wallet" */ './wallet/wallet-router')}
+                                       moduleKey="wallet"/></Route>
                     <Route path="/login" component={Login}/>
                     <Route path="/import" component={ImportAccount}/>
                     <Route path="/signup" component={CreateAccount}/>
@@ -47,5 +50,3 @@ function AppRouter({history}) {
 AppRouter.propTypes = {
     history: PropTypes.object.isRequired
 }
-
-export default AppRouter

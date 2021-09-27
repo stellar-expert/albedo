@@ -3,11 +3,15 @@ import {resolveNetworkParams} from './network-resolver'
 
 /**
  * Create and init Horizon server wrapper instance.
- * @param {String} [network]
- * @param {String} [horizon]
+ * @param {String} network
  * @return {Server}
  */
-export function createHorizon({network, horizon}) {
+export function createHorizon(network) {
+    let horizon
+    if (network.network) {
+        horizon = network.horizon
+        network = network.network
+    }
     const {horizon: selectedHorizon} = resolveNetworkParams({network, horizon})
     return new Server(selectedHorizon)
 }

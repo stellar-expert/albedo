@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {TransactionBuilder} from 'stellar-sdk'
 import {observer} from 'mobx-react'
+import {AccountAddress} from '@stellar-expert/ui-framework'
 import OperationDescription from './operation-description-view'
-import AccountAddress from '../components/account-address'
 import {zeroAccount} from '../../util/tx-replace-utils'
 import accountManager from '../../state/account-manager'
 
@@ -50,13 +50,18 @@ function TxDetailsView({xdr, network}) {
     }
 
     if (!tx) return <div>
-        <span className="fa fa-exclamation-circle color-danger"/> Transaction is invalid and cannot be signed.
+        <span className="icon-warning color-danger"/> Transaction is invalid and cannot be signed.
     </div>
     const {activeAccount} = accountManager,
-        isFeeBump = !!tx.innerTransaction
+        isFeeBump = !!tx.innerTransaction,
+        feeSponsor = isFeeBump && tx.feeSource
+    if (isFeeBump) {
+        tx = tx.innerTransaction
+    }
     return <div className="space">
         {isFeeBump && <div>
-            <span className="label">Fee bump transaction</span>
+            <span className="label">Fee sponsor: </span>
+            <AccountAddress account={feeSponsor}/>
         </div>}
         <div>
             <span className="label">Source account: </span>
@@ -84,10 +89,9 @@ function TxDetailsView({xdr, network}) {
             <span className="label">Hash: </span><code className="word-break">{tx.hash().toString('hex')}</code>
         </div>
         <ol className="block-indent">
-            {(isFeeBump ? tx.innerTransaction.operations : tx.operations)
-                .map((op, i) => <li key={i}>
-                    <OperationDescription key={i} op={op} source={tx.source}/>
-                </li>)}
+            {tx.operations.map((op, i) => <li key={i}>
+                <OperationDescription key={i} op={op} source={tx.source}/>
+            </li>)}
         </ol>
     </div>
 }

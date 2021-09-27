@@ -13,7 +13,7 @@ export default function TxResultView() {
         }
     })
     return <div className="text-center">
-        <h2><i className="fa fa-check-circle-o color-success small"/> Success</h2>
+        <h2><i className="icon-ok color-success small"/> Success</h2>
         {result?.result?.successful &&
         <a href={`https://stellar.expert/explorer/${result.network}/tx/${result.result.id}`} target="_blank"
            className="small" onClick={closeWindow}>

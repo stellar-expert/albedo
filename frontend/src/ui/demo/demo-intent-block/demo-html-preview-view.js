@@ -44,11 +44,11 @@ document.getElementById('intent_button').addEventListener('click', function(e){
     updatePreviewContainer()
 
     if (!visible) return <a href="#" className="dimmed text-small" onClick={() => setVisible(true)}>
-        <i className="fa fa-angle-double-down"/> Show {selectedTab} preview
+        <i className="icon-more"/> Show {selectedTab} preview
     </a>
     return <>
         <a href="#" className="dimmed text-small" onClick={() => setVisible(false)}>
-            <i className="fa fa-angle-double-up"/> Hide {selectedTab} preview
+            <i className="icon-less"/> Hide {selectedTab} preview
         </a>
         <iframe src="/button-preview.html" frameBorder="0" style={{border: '1px solid #ddd', width: '100%'}}
                 onLoad={e => injectPreview(e.target.contentDocument.body)}/>

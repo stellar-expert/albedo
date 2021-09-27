@@ -1,14 +1,13 @@
 import React from 'react'
 import albedo, {intentInterface} from '@albedo-link/intent'
+import {Tabs, navigation, useDependantState} from '@stellar-expert/ui-framework'
 import {useLocation} from 'react-router'
-import Tabs from '../../components/tabs'
 import DemoIntentRequestParametersView from './demo-intent-request-parameters-view'
 import DemoIntentResultsView from './demo-intent-results-view'
 import DemoIntentExampleView from './demo-intent-example-view'
-import {generateInvocation} from '../demo-code-generator'
-import {useDependantState} from '../../../state/state-hooks'
-import {parseQuery} from '../../../util/url-utils'
 import DemoExtraInfoView from '../demo-extra-info-view'
+import {generateInvocation} from '../demo-code-generator'
+import {parseQuery} from '../../../util/url-utils'
 
 albedo.frontendUrl = location.origin
 
@@ -18,7 +17,7 @@ function formatOutput(output) {
 
 function CodeExampleInfoView({children}) {
     return <p className="dimmed text-small">
-        <i className="fa fa-info-circle"/> {children}
+        <i className="icon-info"/> {children}
     </p>
 }
 
@@ -82,7 +81,7 @@ export default function DemoIntentBlockView({intent}) {
 
     function selectTab(tab) {
         setSelectedTab(tab)
-        __history.replace(`/playground?section=${intent}&output=${tab}`)
+        navigation.navigate(`/playground?section=${intent}&output=${tab}`)
     }
 
     function exec() {

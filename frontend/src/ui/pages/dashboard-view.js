@@ -2,7 +2,7 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import accountManager from '../../state/account-manager'
 import Intro from './intro-view'
-import AccountDashboardView from '../dashboard/account-dashboard-view'
+import AccountDashboardView from '../account/dashboard/account-dashboard-view'
 
 function DashboardPageView() {
     if (!accountManager.activeAccount) return <Intro/>

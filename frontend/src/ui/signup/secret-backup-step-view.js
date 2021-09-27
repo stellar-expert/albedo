@@ -1,20 +1,21 @@
 import React, {useState, useEffect} from 'react'
 import cn from 'classnames'
 import PropTypes from 'prop-types'
+import {Button} from '@stellar-expert/ui-framework'
+import SecretView from '../account/settings/secret-view'
 import Credentials from '../../state/credentials'
-import {secretToMnemonic} from '../../util/mnemonic'
 
 function Note({yes, no, children}) {
     const className = cn('fa', {
-        'fa-check-circle-o': yes,
+        'icon-ok': yes,
         'color-success': yes,
-        'fa-ban': no,
+        'icon-block': no,
         'color-warning': no
     })
     return <li><i className={className}/> {children}</li>
 }
 
-function SecretBackupStepView({credentials, onSuccess}) {
+export default function SecretBackupStepView({credentials, onSuccess}) {
     const [secret, setSecret] = useState(null)
     useEffect(function () {
         const {account} = credentials
@@ -23,12 +24,13 @@ function SecretBackupStepView({credentials, onSuccess}) {
     }, [credentials.account.id])
     if (!secret) return null
     return <>
-        <div className="text-small">
-            Congratulations! Everything is set. Now you just need to back up your secret key.
+        <div>Congratulations! Everything is set.</div>
+        <div className="micro-space">
+            <SecretView secret={secret} encodeMnemonic revealed>
+                <div className="text-small">Now you just need to back up your secret key.</div>
+            </SecretView>
         </div>
-        <textarea className="space" readOnly value={secretToMnemonic(secret)} onFocus={e => e.target.select()}
-                  style={{height: '5.2em', fontWeight: 'bold'}}/>
-        <div className="text-small">
+        <div className="text-small micro-space">
             <p>
                 This 24-word recovery phrase is the backup of your secret key.
                 It can be used to restore your account anytime and on any device.
@@ -46,8 +48,7 @@ function SecretBackupStepView({credentials, onSuccess}) {
         </div>
         <div className="row space">
             <div className="column column-50 column-offset-25">
-                <button className="button" onClick={onSuccess}>I saved recovery phrase <i className="fa fa-angle-right"/>
-                </button>
+                <Button onClick={onSuccess}>I saved recovery phrase <i className="icon-angle-right"/></Button>
             </div>
         </div>
     </>
@@ -56,5 +57,3 @@ function SecretBackupStepView({credentials, onSuccess}) {
 SecretBackupStepView.propTypes = {
     credentials: PropTypes.instanceOf(Credentials).isRequired
 }
-
-export default SecretBackupStepView

@@ -17,12 +17,12 @@ function cleanBipPath(path) {
 }
 
 /**
- * Encapsulates general account properties and serves as a root container for the associated keypairs.
+ * Encapsulates general account properties and serves as a root container for the associated keypairs
  */
 class Account {
     /**
-     * Create an Account instance from the stored account data.
-     * @param {Object} params - An object containing account properties.
+     * Create an Account instance from the stored account data
+     * @param {Object} params - An object containing account properties
      */
     constructor(params) {
         makeObservable(this, {
@@ -36,7 +36,7 @@ class Account {
     }
 
     /**
-     * Account ID.
+     * Account ID
      * @type {String}
      */
     id = undefined
@@ -44,13 +44,13 @@ class Account {
     accountType = ACCOUNT_TYPES.STORED_ACCOUNT
 
     /**
-     * User-defined friendly name.
+     * User-defined friendly name
      * @type {String}
      */
     friendlyName = null
 
     /**
-     * Public key of the account.
+     * Public key of the account
      * @type {String}
      */
     publicKey = null
@@ -62,13 +62,19 @@ class Account {
     path = null
 
     /**
-     * Sensitive account data encrypted with encryptionKey.
+     * Sensitive account data encrypted with encryptionKey
      * @type {String}
      */
     encryptedSecret = null
 
     /**
-     * Title to display in UI.
+     * Session expiration timeout for consecutive sign requests
+     * @type {Number}
+     */
+    sessionTimeout = null
+
+    /**
+     * Title to display in UI
      * @returns {String}
      */
     get displayName() {
@@ -97,10 +103,10 @@ class Account {
     }
 
     /**
-     * Create new account using provided credentials.
-     * @param {Credentials} credentials - User credentials.
-     * @param {String} [secret] - Stellar account secret.
-     * @param {String} [friendlyName] - Friendly account name to display.
+     * Create new account using provided credentials
+     * @param {Credentials} credentials - User credentials
+     * @param {String} [secret] - Stellar account secret
+     * @param {String} [friendlyName] - Friendly account name to display
      * @return {Promise<Account>}
      */
     static async createNew(credentials, secret, friendlyName) {
@@ -123,7 +129,7 @@ class Account {
     }
 
     /**
-     * Request temporary access to the sensitive account data.
+     * Request temporary access to the sensitive account data
      * @returns {String}
      */
     requestAccountSecret(credentials) {
@@ -140,7 +146,7 @@ class Account {
     }
 
     /**
-     * Prepare account data for serialization.
+     * Prepare account data for serialization
      * @return {Object}
      */
     toJSON() {
@@ -158,6 +164,9 @@ class Account {
         }
         if (this.encryptedSecret) {
             res.encryptedSecret = this.encryptedSecret
+        }
+        if (this.sessionTimeout !== null) {
+            res.sessionTimeout = this.sessionTimeout
         }
         return res
     }

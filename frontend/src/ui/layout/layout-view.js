@@ -1,5 +1,6 @@
 import React from 'react'
 import {observer} from 'mobx-react'
+import {ThemeSelector} from '@stellar-expert/ui-framework'
 import Logo from './logo-view'
 import DialogContainer from './dialog-container-view'
 
@@ -15,15 +16,16 @@ function LayoutView({children}) {
         <div className="dimmed text-center text-small container">
             <div className="space"/>
             <div className="copyright">
-                2020&nbsp;©&nbsp;Albedo <span className="dimmed">v{appVersion}</span>
+                2021&nbsp;©&nbsp;Albedo <span className="dimmed">v{appVersion}</span>
             </div>
-            <div>
-                <a href="mailto:orbit@stellar.expert" target="_blank" className="dimmed">
-                    <i className="fa fa-envelope-o"/> Contact us
+            <div style={{paddingBottom: '1em'}}>
+                <a href="mailto:info@stellar.expert" target="_blank" className="dimmed">
+                    <i className="icon-email"/> Contact us
                 </a>&emsp;
                 <a href="https://github.com/stellar-expert/albedo" target="_blank" className="dimmed">
-                    <i className="fa fa-github"/> Open Source
-                </a>
+                    <i className="icon-github"/> Source code
+                </a>&emsp;
+                <ThemeSelector/>
             </div>
         </div>
     </>

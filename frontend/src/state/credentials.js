@@ -48,10 +48,14 @@ class Credentials {
         return true
     }
 
-    checkPasswordCorrect(){
-        if (!this.account.requestAccountSecret(this)) return false
+    checkPasswordCorrect() {
+        if (!this.requestAccountSecret()) return false
         saveCredentialsInExtensionStorage(this)
-        return  true
+        return true
+    }
+
+    requestAccountSecret() {
+        return this.account.requestAccountSecret(this)
     }
 
     /**

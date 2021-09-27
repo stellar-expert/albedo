@@ -1,18 +1,35 @@
-/* fonts */
-@import "fonts/fonts";
-@import "fonts/font-awesome/font-awesome";
-@import "components/scrollbars";
-/* layouts */
-@import "layout/base";
-@import "layout/context-colors";
-@import "layout/form";
-@import "layout/grid";
-@import "layout/spacing";
-@import "layout/typography";
-@import "layout/lists";
-@import "layout/responsive";
+@import '~@stellar-expert/ui-framework/basic-styles/variables.scss';
+@import '~@stellar-expert/ui-framework/basic-styles/themes.scss';
+
+.container {
+  max-width: 50rem;
+}
+
+.page-container {
+  min-height: calc(100vh - 8rem);
+  display: flex;
+  flex-direction: column;
+
+  > .no-center {
+    margin-bottom: auto;
+  }
+}
+
+.row {
+  @media (min-width: $responsive-mobile-browser-width) {
+    &.wide {
+      margin-left: -20rem;
+      margin-right: -20rem;
+      width: auto;
+      max-width: 100vw;
+    }
+  }
+}
+
+.fa.fa-space {
+  width: 1.8em;
+  text-align: center;
+}
+
 /* components */
-@import "components/link";
-@import "components/button";
-@import "components/active-icon";
 @import "components/stacked-icons";

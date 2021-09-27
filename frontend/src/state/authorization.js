@@ -1,7 +1,13 @@
-import {getCredentialsFromExtensionStorage, saveCredentialsInExtensionStorage} from '../storage/extension-auth-storage-interface'
+import {observable, action, runInAction, makeObservable} from 'mobx'
+import {navigation} from '@stellar-expert/ui-framework'
+import {
+    getCredentialsFromExtensionStorage,
+    saveCredentialsInExtensionStorage
+} from '../storage/extension-auth-storage-interface'
 import Credentials from './credentials'
 import standardErrors from '../util/errors'
-import { observable, action, runInAction, makeObservable } from 'mobx';
+
+const defaultSessionTimeout = 600 // 10 minutes
 
 class AuthorizationService {
     constructor() {
@@ -9,20 +15,31 @@ class AuthorizationService {
             dialogOpen: observable,
             reset: action,
             requestAuthorization: action
-        });
+        })
+        this.sessions = {}
 
         setTimeout(() => { //TODO: address the loading sequence problem and rewrite this dirty hack
-            __history.listen((location, action) => {
+            navigation.history.listen((location, action) => {
                 this.dialogOpen = false // hide auth dialog when navigation occurred
             })
         }, 200)
+
+        setInterval(() => {
+            const now = new Date().getTime()
+            for (let key of Object.keys(this.sessions))
+                if (this.sessions[key].expires < now) {
+                    delete this.sessions[key]
+                }
+        }, 5000)
     }
 
-    dialogOpen = false;
+    dialogOpen = false
 
     account = null
 
     credentialsRequestCallback = null
+
+    sessions
 
     reset() {
         this.dialogOpen = false
@@ -32,10 +49,14 @@ class AuthorizationService {
 
     /**
      * Request action authorization from the user.
-     * @param {Account} account
+     * @param {Account} account - Current account to obtain credentials
+     * @param {Boolean} [forceCredentialsRequest] - Ensures password prompt in security-critical cases
      * @return {Promise<Credentials>}
      */
-    requestAuthorization(account) {
+    requestAuthorization(account, forceCredentialsRequest = false) {
+        const session = this.sessions[account.id]
+        if (session) return Promise.resolve(session.credentials)
+
         return getCredentialsFromExtensionStorage(account.id)
             .catch(e => {
                 e && console.error(e)
@@ -54,6 +75,13 @@ class AuthorizationService {
                         try {
                             credentials.account.requestAccountSecret(credentials)
                             saveCredentialsInExtensionStorage(credentials)
+                            //temporary store session locally
+                            if (account.sessionTimeout !== 0) {
+                                this.sessions[account.id] = {
+                                    credentials,
+                                    expires: new Date().getTime() + (account.sessionTimeout || defaultSessionTimeout) * 1000
+                                }
+                            }
                         } catch (e) {
                             return Promise.reject(standardErrors.invalidPassword)
                         }

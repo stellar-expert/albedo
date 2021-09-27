@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import cn from 'classnames'
+import {Button} from '@stellar-expert/ui-framework'
 import AlbedoSigner from '../../hw-signer/hw-signer'
-import Actions from '../components/actions-block'
 import {ACCOUNT_TYPES} from '../../state/account'
 import appSettings from '../../state/app-settings'
 import {extractDeviceId} from '../../util/device-id-generator'
@@ -58,7 +58,7 @@ class HardwareWalletSelectorView extends Component {
             </label>&emsp;
             {!isDefaultPath && <input type="text" value={path} style={{width: '10em'}}
                                       onChange={e => this.setState({path: e.target.value})}/>}
-            <button className="button" onClick={() => this.connect()}>Connect</button>
+            <Button onClick={() => this.connect()}>Connect</Button>
             <div className="dimmed text-small">
                 Make sure you connected the hardware wallet and follow the instructions on the display of your device.
             </div>
@@ -68,7 +68,7 @@ class HardwareWalletSelectorView extends Component {
     render() {
         const {accountType} = this.state
         return <div className="hw-selector">
-            <Actions className="row">
+            <div className="row">
                 <div className="column column-50 column-offset-25">
                     <a href="#" id="ledger-signup" title="Ledger Nano"
                        className={cn('button button-block keypair-selector-option', {'button-outline': accountType !== ACCOUNT_TYPES.LEDGER_ACCOUNT})}
@@ -83,7 +83,7 @@ class HardwareWalletSelectorView extends Component {
                         <img src="/img/vendor/trezor.svg"/>
                     </a>
                 </div>*/}
-            </Actions>
+            </div>
             {this.renderPathSelector()}
         </div>
     }

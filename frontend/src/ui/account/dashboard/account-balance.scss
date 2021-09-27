@@ -1,0 +1,38 @@
+.account-balance {
+  display: flex;
+  text-align: center;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+  > * {
+    display: block;
+    margin: 0.6em 0;
+    font-size: 0.85em;
+    width: 45%;
+  }
+
+  .asset-icon {
+    width: 2.4em;
+    height: 2.4em;
+    margin-right: 0.5em;
+    background: transparent center center no-repeat;
+    background-size: contain;
+  }
+
+  .asset-issuer {
+    color: var(--color-dimmed);
+    font-size: 0.8em;
+    letter-spacing: 0;
+  }
+
+  .asset-amount {
+    font-size: 1.8em;
+    text-align: right;
+    font-family: $font-face-header;
+  }
+
+  .asset-code {
+    font-size: 1.2em;
+  }
+}

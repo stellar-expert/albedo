@@ -7,7 +7,7 @@
 @keyframes appear {
   from {
     opacity: 0;
-    background: var($color-alt-bg);
+    background: var(--color-alt-bg);
   }
 
   to {

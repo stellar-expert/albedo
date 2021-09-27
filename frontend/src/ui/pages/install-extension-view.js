@@ -24,16 +24,16 @@ export default function InstallExtensionView() {
             </ul>
         </div>
         {isExtensionInstalled() && <div className="dimmed space text-small">
-            <i className="fa fa-info-circle"/> Albedo extension has been already installed in this browser.
+            <i className="icon-info"/> Albedo extension has been already installed in this browser.
         </div>}
         <div className="double-space">
             <a href="https://chrome.google.com/webstore/detail/kbojmmmibkfijmjgnfgfpngmmgkkpncl"
                className="button button-block" target="_blank">
-                <i className="fa fa-chrome"/> Get Chrome extension
+                Get Chrome extension
             </a>
             <a href="https://addons.mozilla.org/en-US/firefox/addon/albedo-signer-for-stellar/"
                className="button button-block" target="_blank">
-                <i className="fa fa-firefox"/> Get Firefox add-on
+                Get Firefox add-on
             </a>
         </div>
     </div>

@@ -1,17 +1,16 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
-import {CopyToClipboard} from 'react-copy-to-clipboard'
+import {AccountAddress, Button, CopyToClipboard, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import authorizationService from '../../../state/authorization'
-import AccountAddress from '../../components/account-address'
-import AccountPassphraseView from './account-passphrase-view'
-import AccountSecretKeyView from './account-secret-key-view'
 import AccountFriendlyNameView from './account-friendly-name-view'
 import AccountForgetView from './account-forget-view'
+import SecretView from './secret-view'
 
 function AccountSettingsView() {
     const {activeAccount} = accountManager
+    if (!activeAccount) window.location.href = '/'
     //account credentials
     const [credentials, setCredentials] = useState(() => {
         authorizationService.requestAuthorization(activeAccount)
@@ -27,11 +26,19 @@ function AccountSettingsView() {
             })
     })
 
+    const [secret, setSecret] = useState('')
+
+    useEffect(() => {
+        if (credentials && !secret) {
+            setSecret(credentials.account.requestAccountSecret(credentials))
+        }
+    }, [credentials])
+
     function finish() {
         if (!actionContext.intent) {
-            __history.push('/account')
+            navigation.navigate('/account')
         } else {
-            __history.push('/confirm')
+            navigation.navigate('/confirm')
         }
     }
 
@@ -46,9 +53,7 @@ function AccountSettingsView() {
             Public key:{' '}
             <span>
                 <AccountAddress account={activeAccount.publicKey}/>
-                <CopyToClipboard text={activeAccount.publicKey}>
-                    <a href="#" className="fa fa-copy active-icon" title="Copy public key to clipboard"/>
-                </CopyToClipboard>
+                <CopyToClipboard text={activeAccount.publicKey} title="Copy public key to clipboard"/>
             </span>
             <p className="text-small dimmed">
                 Identifies the account on the ledger. Think of it as an address which holds your balances
@@ -56,7 +61,7 @@ function AccountSettingsView() {
             </p>
         </div>
         <AccountFriendlyNameView credentials={credentials}/>
-        <hr/>
+        <hr className="flare"/>
         <div className="space">
             <h3>Export secret key</h3>
             <div className="text-small dimmed">
@@ -65,22 +70,26 @@ function AccountSettingsView() {
                     third-party services. Corresponding 24-word recovery passphrase is the backup of your secret key.
                 </p>
                 <p>
-                    <i className="fa fa-warning"/> Do not share your secret key or passphrase.
+                    <i className="icon-warning"/> Do not share your secret key or passphrase.
                     Do not trust any person or website asking it.
                     Avoid storing it in unsafe places, your phone, or computer in the plaintext.
                     Anyone with this key will have access to funds stored on your account.
                 </p>
             </div>
             <div className="space">
-                <AccountPassphraseView credentials={credentials}/>
-                <AccountSecretKeyView credentials={credentials}/>
+                <SecretView encodeMnemonic secret={secret} placeholder="(click here to reveal passphrase)">
+                    Account passphrase</SecretView>
+            </div>
+            <div className="micro-space">
+                <SecretView secret={secret} placeholder="(click here to reveal secret key)">
+                    Secret key</SecretView>
             </div>
         </div>
         <AccountForgetView credentials={credentials}/>
-        <hr className="double-space"/>
+        <hr className="double-space flare"/>
         <div className="space row">
             <div className="column column-50 column-offset-25">
-                <button className="button button-block button-outline" onClick={finish}>Back</button>
+                <Button block outline onClick={finish}>Back</Button>
             </div>
         </div>
     </div>

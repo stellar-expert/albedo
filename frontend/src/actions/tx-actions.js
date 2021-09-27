@@ -2,6 +2,7 @@ import {Asset, Memo, Operation, TransactionBuilder} from 'stellar-sdk'
 import {createHorizon} from '../util/horizon-connector'
 import {resolveNetworkParams} from '../util/network-resolver'
 import standardErrors from '../util/errors'
+import {estimateFee} from '../util/fee-estimator'
 
 /**
  * Normalize memo type to the values accepted by Memo.
@@ -15,10 +16,6 @@ function normalizeMemoType(memoType) {
     return type
 }
 
-function predictOptimalFee({last_ledger_base_fee, max_fee}) {
-    return Math.min(last_ledger_base_fee * 2, parseInt(max_fee.p80))
-}
-
 /**
  * Build a transactions from a given set of operations.
  * @param {ActionContext} actionContext - Current action context.
@@ -27,18 +24,18 @@ function predictOptimalFee({last_ledger_base_fee, max_fee}) {
  */
 async function buildTx(actionContext, publicKey) {
     const {intentParams} = actionContext,
-        {network} = resolveNetworkParams(intentParams),
+        networkParams = resolveNetworkParams(intentParams),
         horizon = createHorizon(intentParams)
 
     //fetch source account sequence and fee stats from Horizon
-    const [source, feeStats] = await Promise.all([
+    const [source, fee] = await Promise.all([
         horizon.loadAccount(publicKey),
-        horizon.feeStats()])
+        estimateFee(networkParams)])
 
     //create builder with unlimited timeout and calculated fee
     const tx = new TransactionBuilder(source, {
-        fee: predictOptimalFee(feeStats),
-        networkPassphrase: resolveNetworkParams(intentParams).network
+        fee,
+        networkPassphrase: networkParams.network
     })
         .setTimeout(10000000)
 
@@ -85,7 +82,14 @@ async function prepareTxOperations(actionContext, source) {
             return [Operation.changeTrust({asset: new Asset(asset_code, asset_issuer), limit})]
         }
         case 'exchange': {
-            const {sell_asset_code, sell_asset_issuer, max_price, buy_asset_code, buy_asset_issuer, amount} = intentParams,
+            const {
+                    sell_asset_code,
+                    sell_asset_issuer,
+                    max_price,
+                    buy_asset_code,
+                    buy_asset_issuer,
+                    amount
+                } = intentParams,
                 destAsset = buy_asset_issuer ? new Asset(buy_asset_code, buy_asset_issuer) : Asset.native(),
                 operations = []
 

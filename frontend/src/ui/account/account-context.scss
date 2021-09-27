@@ -1,0 +1,29 @@
+.navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 0 2em;
+
+  > * {
+    display: block;
+    text-align: center;
+    padding: 0.2em;
+    font-size: 0.85em;
+  }
+
+  i {
+    font-size: 2em;
+    width: 2.2em;
+    height: 2.2em;
+    text-align: center;
+    line-height: 2.2em;
+    margin: auto;
+    border: 0.1px solid var(--color-primary);
+    border-radius: 50%;
+    display: block;
+
+    &:hover {
+      border-color: var(--color-highlight);
+    }
+  }
+}
