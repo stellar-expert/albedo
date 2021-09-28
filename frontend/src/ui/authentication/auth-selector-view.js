@@ -86,7 +86,7 @@ function AuthSelectorView() {
                 provide the requested secret key <AuthActionLink action="direct-input">directly</AuthActionLink>.
             </div>}
             {!activeAccount && <div className="space">
-                <a href="/signup">Create new Albedo account</a> to proceed.
+                <AuthActionLink action="signup">Create new Albedo account</AuthActionLink> to proceed.
             </div>}
             <div className="space"/>
         </>}
