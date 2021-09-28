@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {observer} from 'mobx-react'
-import authorizationService from '../../state/authorization'
+import authorizationService from '../../state/auth/authorization'
 import AuthRequestView from '../authentication/authorization-request-view'
 import './dialog-container.scss'
 

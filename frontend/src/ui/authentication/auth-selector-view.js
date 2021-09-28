@@ -12,7 +12,7 @@ function handleAccountAction(action) {
             actionContext.directKeyInput = false
             break
         case 'signup':
-            navigation('/signup')
+            navigation.navigate('/signup')
             break
         case 'direct-input':
             actionContext.directKeyInput = true

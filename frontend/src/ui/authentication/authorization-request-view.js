@@ -4,9 +4,9 @@ import {navigation} from '@stellar-expert/ui-framework'
 import errors from '../../util/errors'
 import accountManager from '../../state/account-manager'
 import Account from '../../state/account'
-import Credentials from '../../state/credentials'
+import Credentials from '../../state/auth/credentials'
 import CredentialsRequest from './credentials-request-view'
-import authorizationService from '../../state/authorization'
+import authorizationService from '../../state/auth/authorization'
 
 export default observer(function AuthorizationRequestView() {
     const [account, setAccount] = useState(null),

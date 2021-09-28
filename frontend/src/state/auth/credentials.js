@@ -1,5 +1,5 @@
-import {computeArgon2Hash, derivePublicKeyFromSecret} from '../util/crypto-utils'
-import {saveCredentialsInExtensionStorage} from '../storage/extension-auth-storage-interface'
+import {computeArgon2Hash, derivePublicKeyFromSecret} from '../../util/crypto-utils'
+import {saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
 
 /**
  * Contains authorization credentials for a given account.

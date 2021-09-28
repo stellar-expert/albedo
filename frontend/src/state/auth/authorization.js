@@ -3,9 +3,9 @@ import {navigation} from '@stellar-expert/ui-framework'
 import {
     getCredentialsFromExtensionStorage,
     saveCredentialsInExtensionStorage
-} from '../storage/extension-auth-storage-interface'
+} from '../../storage/extension-auth-storage-interface'
 import Credentials from './credentials'
-import standardErrors from '../util/errors'
+import standardErrors from '../../util/errors'
 
 const defaultSessionTimeout = 600 // 10 minutes
 

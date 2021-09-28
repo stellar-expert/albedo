@@ -3,7 +3,7 @@ import cn from 'classnames'
 import PropTypes from 'prop-types'
 import {Button} from '@stellar-expert/ui-framework'
 import SecretView from '../account/settings/secret-view'
-import Credentials from '../../state/credentials'
+import Credentials from '../../state/auth/credentials'
 
 function Note({yes, no, children}) {
     const className = cn('fa', {

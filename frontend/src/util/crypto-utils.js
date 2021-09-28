@@ -1,7 +1,7 @@
 import nacl from 'tweetnacl'
 import AES from 'aes-js'
 import argon2 from 'argon2-browser'
-import storageProvider from '../state/storage-provider'
+import storageProvider from '../state/storage/storage-provider'
 
 function validateNonEmpty(data, key) {
     if (!data) throw new Error(`Invalid argument: ${key}.`)

@@ -2,7 +2,7 @@ import {Account as SdkAccount} from 'stellar-sdk'
 import accountManager from '../../src/state/account-manager'
 import Account from '../../src/state/account'
 import AccountKeypair from '../../src/state/account-keypair'
-import Credentials from '../../src/state/credentials'
+import Credentials from '../../src/state/auth/credentials'
 import {fakeHorizon} from './fake-horizon'
 
 const publicKey = 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2'

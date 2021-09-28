@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react'
-import storageProvider from './storage-provider'
+import storageProvider from './storage/storage-provider'
 
 const listeners = [],
     lsKey = 'preferredNetwork'

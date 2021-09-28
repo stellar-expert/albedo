@@ -9,7 +9,6 @@ import {
     updateRecentAccount,
     retrieveRecentAccount
 } from '../storage/account-storage'
-import {syncLocalStorage} from '../actions/callback-dispatcher'
 
 class AccountManager {
     /**
@@ -57,7 +56,6 @@ class AccountManager {
     async setActiveAccount(account) {
         this.activeAccount = account
         await updateRecentAccount(account)
-        await syncLocalStorage()
     }
 
     /**
@@ -127,7 +125,7 @@ class AccountManager {
 
     async reload() {
         await this.loadAvailableAccounts()
-        this.activeAccount = this.get(await retrieveRecentAccount()) || null
+        this.activeAccount = this.get(await retrieveRecentAccount()) || this.accounts[0] || null
     }
 }
 

@@ -5,7 +5,7 @@ import {
     encodeBase64,
     decodeBase64
 } from '../util/crypto-utils'
-import storageProvider from '../state/storage-provider'
+import storageProvider from '../state/storage/storage-provider'
 
 const sessionPrefix = 'session_'
 

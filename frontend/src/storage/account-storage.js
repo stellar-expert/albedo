@@ -1,6 +1,7 @@
 import {decryptDataAes, encryptDataAes} from '../util/crypto-utils'
 import {currentStorageVersion} from './storage-version'
-import storageProvider from '../state/storage-provider'
+import storageProvider from '../state/storage/storage-provider'
+import {syncLocalStorage} from '../state/storage/local-storage-synchronizer'
 
 const accountKeyPrefix = 'account_'
 
@@ -61,12 +62,14 @@ export function decryptAccountSecret(credentials) {
 export async function persistAccountInBrowser(account) {
     if (!account.id) throw new Error('Account can\'t be stored.')
     await storageProvider.setItem(accountKeyPrefix + account.id, JSON.stringify(account.toJSON()))
+    await syncLocalStorage()
     return account
 }
 
 export async function forgetAccount(account) {
     if (!account.id) throw new Error('Invalid account.')
     await storageProvider.removeItem(accountKeyPrefix + account.id)
+    await syncLocalStorage()
     return account
 }
 
@@ -76,6 +79,7 @@ export async function updateRecentAccount(account) {
     } else if ((await retrieveRecentAccount() || {}).id !== account) {
         await storageProvider.setItem('activeAccount', account.id)
     }
+    await syncLocalStorage()
 }
 
 export async function retrieveRecentAccount() {

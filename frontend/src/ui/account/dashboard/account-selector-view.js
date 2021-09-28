@@ -67,5 +67,5 @@ export default function AccountSelectorView() {
     })
 
     return <Dropdown value="title" onChange={handleAction} options={dropdownOptions} hideSelected
-                     solo header={<h3 style={{margin:0}}>Choose account</h3>}/>
+                     solo header={<h3 style={{margin:0}}>Switch account</h3>}/>
 }
