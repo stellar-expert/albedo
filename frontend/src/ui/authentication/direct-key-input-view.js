@@ -4,10 +4,12 @@ import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {Button} from '@stellar-expert/ui-framework'
 import actionContext from '../../state/action-context'
+import {useAutoFocusRef} from '../components/autofocus-hooks'
 
 function DirectKeyInputView() {
     const [secret, setSecret] = useState(''),
-        isValid = StrKey.isValidEd25519SecretSeed(secret)
+        isValid = StrKey.isValidEd25519SecretSeed(secret),
+        inputRef = useAutoFocusRef()
 
     function setKey(secret) {
         setSecret(secret.replace(/[^a-zA-Z\d]/g, ''))
@@ -28,7 +30,7 @@ function DirectKeyInputView() {
     return <>
         <div className="dimmed text-small">Provide a secret key you'd like to use:</div>
         <div className="micro-space">
-            <input type="text" onChange={e => setKey(e.target.value)}
+            <input type="text" onChange={e => setKey(e.target.value)} ref={inputRef}
                    placeholder="Secret key starting with 'S', like 'SAK4...2PLT'"/>
         </div>
         <div>
