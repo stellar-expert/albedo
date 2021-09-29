@@ -284,9 +284,12 @@ class ActionContext {
      * Confirm the intent request.
      */
     async confirmRequest() {
-        if (!this.selectedPublicKey || this.hasNoMatchingKey) {
+        if (!this.selectedPublicKey || (this.hasNoMatchingKey && !this.directKeyInput)) {
             this.runtimeErrors = errors.accountNotSelected
-            return this.rejectRequest(errors.accountNotSelected)
+            if (this.isImplicitIntent) {
+                return this.rejectRequest(e)
+            }
+            return
         }
         this.confirmed = true
         this.runtimeErrors = null

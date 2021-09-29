@@ -5,6 +5,7 @@ import {Button, useDependantState} from '@stellar-expert/ui-framework'
 import actionContext from '../../state/action-context'
 import accountManager from '../../state/account-manager'
 import {formatAddress} from '../../util/formatter'
+import IntentErrorView from './intent-error-view'
 
 function getConfirmationAccountName(alreadySigned) {
     const confirmation = alreadySigned ? 'Already signed by ' : 'Confirm using '
@@ -57,7 +58,8 @@ function IntentActionView() {
         {externalSignature && <PendingStatus>Confirm the action on the hardware wallet</PendingStatus>}
         {pendingHorizonSubmission && <PendingStatus>Submitting to Horizon…</PendingStatus>}
         {!!runtimeErrors && <div className="space">
-            <div className="error text-small">{runtimeErrors}</div>
+            <IntentErrorView/>
+            <div className="micro-space"/>
         </div>}
         {!directKeyInput &&
         <Button block disabled={alreadySigned || accountUnavailable || inProgress} onClick={() => {

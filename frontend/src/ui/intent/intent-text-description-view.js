@@ -5,6 +5,7 @@ import actionContext from '../../state/action-context'
 import TxDetailsView from './tx-details-view'
 import {formatAddress} from '../../util/formatter'
 import {resolveNetworkParams} from '../../util/network-resolver'
+import IntentErrorView from './intent-error-view'
 
 function FormattedAmount({amount, params, prefix = ''}) {
     const asset = params[prefix + 'asset_issuer'] ? {
@@ -14,20 +15,6 @@ function FormattedAmount({amount, params, prefix = ''}) {
     return <b><Amount amount={amount} asset={asset}/></b>
 }
 
-function IntentErrorView() {
-    const {intentErrors, origin} = actionContext
-    //TODO: use only unified error objects everywhere in intentErrors to prevent problems with type casting
-
-    let text
-    if (intentErrors) {
-        text = 'Error: ' + intentErrors.message || intentErrors
-        if (!intentErrors.code || intentErrors.code === -1) {
-            text += ` It's likely an external application error. Please contact support team of ${origin}.`
-        }
-    }
-
-    if (text) return <div className="error">{text}</div>
-}
 
 export default function IntentTextDescriptionView() {
     const {intent, intentParams, intentErrors, origin} = actionContext

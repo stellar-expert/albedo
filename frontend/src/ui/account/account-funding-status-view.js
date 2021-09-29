@@ -9,8 +9,8 @@ import {requestFriendbotFunding} from '../../util/horizon-connector'
 export default observer(function AccountFundingStatusView() {
     const {selectedPublicKey, selectedAccountInfo, intent, intentParams, requiresExistingAccount} = actionContext,
         [fundingInProgress, setFundingInProgress] = useState(false)
-    if (!requiresExistingAccount) return null
     useEffect(() => {
+        if (!requiresExistingAccount) return
         actionContext.loadSelectedAccountInfo()
         const updateInfoIntervalHandler = setInterval(() => {
             if (actionContext.selectedAccountInfo && !actionContext.selectedAccountInfo.error) {
@@ -19,10 +19,8 @@ export default observer(function AccountFundingStatusView() {
             }
             actionContext.loadSelectedAccountInfo()
         }, 10000) //update info every 10 seconds
-        return () => {
-            clearInterval(updateInfoIntervalHandler)
-        }
-    }, [selectedPublicKey])
+        return () => clearInterval(updateInfoIntervalHandler)
+    }, [selectedPublicKey, requiresExistingAccount])
 
     function createTestnetAccount() {
         setFundingInProgress(true)
@@ -31,6 +29,8 @@ export default observer(function AccountFundingStatusView() {
                 .finally(() => setFundingInProgress(false)))
             .finally(() => setFundingInProgress(false))
     }
+
+    if (!requiresExistingAccount) return null
 
     if (!selectedAccountInfo || fundingInProgress) return <div className="loader"/>
     const {error} = selectedAccountInfo
@@ -42,7 +42,8 @@ export default observer(function AccountFundingStatusView() {
                     <a href="#" onClick={createTestnetAccount}>Create it now?</a>
                 </> :
                 <>
-                    The account does not exist on the ledger. You need to create it before usage – send at least 2 XLM to
+                    The account does not exist on the ledger. You need to create it before usage – send at least 2 XLM
+                    to
                     the address{' '}
                     <AccountAddress account={selectedPublicKey} chars={56} className="word-break condensed"
                                     copyToClipboard/>
