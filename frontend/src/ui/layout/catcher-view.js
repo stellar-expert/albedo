@@ -15,6 +15,7 @@ class CatcherView extends React.Component {
     }
 
     componentDidCatch(e, errorInfo) {
+        e.componentStack = errorInfo?.componentStack
         console.error(e)
         this.setState({lastError: e})
     }
@@ -22,10 +23,11 @@ class CatcherView extends React.Component {
     render() {
         const {lastError} = this.state
         if (lastError) {
-            const {message, stack} = lastError,
+            const {message, stack, componentStack} = lastError,
                 compiledText = `Error details:
 "${message}" at ${window.location.href}
 ${stack}
+${componentStack ? 'Components stack: ' + componentStack : ''}
 ${navigator.userAgent}`
 
             return <div className="container">
