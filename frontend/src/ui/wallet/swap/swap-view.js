@@ -12,7 +12,7 @@ import TransferValidationView from '../transfer/transfer-validation-view'
 
 function SwapView() {
     const network = useStellarNetwork(),
-        [valid, setValid] = useState(true),
+        [valid, setValid] = useState(false),
         [swap] = useDependantState(() => new TransferSettings(network, 'convert'), [network]),
         {balances} = accountLedgerData,
         predefinedAssets = accountLedgerData.getBalancesWithPriority().map(t => t.id)
@@ -25,9 +25,9 @@ function SwapView() {
 
     const updateSlippage = v => swap.setSlippage(v)
 
-    return <WalletOperationsWrapperView title="Swap tokens" action="Swap"
+    return <WalletOperationsWrapperView title="Swap tokens" action="Swap" disabled={!valid || !swap.conversionFeasible}
                                         prepareTransaction={() => swap.prepareTransaction()}
-                                        disabled={!valid || !swap.conversionFeasible}>
+                                        onConfirm={() => swap.resetOperationAmount()}>
         <div className="swap">
             <div className="params">
                 <TransferAmountView settings={swap} prefix="source" assets={predefinedAssets} restricted/>

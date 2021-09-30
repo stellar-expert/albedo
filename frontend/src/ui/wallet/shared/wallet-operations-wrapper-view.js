@@ -10,13 +10,14 @@ import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import './wallet.scss'
 
-export default function WalletOperationsWrapperView({title, action, disabled, prepareTransaction, children}) {
+export default function WalletOperationsWrapperView({title, action, disabled, prepareTransaction, onConfirm, children}) {
     const network = useStellarNetwork()
     async function confirm() {
         try {
             const tx = await prepareTransaction()
             if (!tx) return
             await confirmTransaction(network, tx)
+            onConfirm()
         } catch (e) {
             console.error('Failed to prepare transaction', e)
         }

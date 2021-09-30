@@ -1,9 +1,9 @@
 import React, {useState} from 'react'
-import {throttle} from 'throttle-debounce'
+import {debounce} from 'throttle-debounce'
 import {InfoTooltip} from '@stellar-expert/ui-framework'
 import './swap-slippage.scss'
 
-const throttledUpdateSlippage = throttle(1000, (callback, value) => callback(value))
+const throttledUpdateSlippage = debounce(400, (callback, value) => callback(value))
 
 export default function SwapSlippageView({defaultValue = 0.5, onChange}) {
     const [slippage, setSlippage] = useState(defaultValue)
@@ -12,8 +12,8 @@ export default function SwapSlippageView({defaultValue = 0.5, onChange}) {
         let v = e.target.value
         if (typeof v === 'string') {
             v = parseFloat(v.replace(/[^\d.]/g, '')) || 0
-            if (v >= 100) {
-                v = 1
+            if (v >= 99) {
+                v = 99
             }
         }
         setSlippage(v)

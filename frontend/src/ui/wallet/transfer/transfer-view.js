@@ -43,7 +43,8 @@ function TransferView() {
     }, [network, accountLedgerData.address, transfer.mode])
 
     return <WalletOperationsWrapperView title={<TransferTitleView transfer={transfer}/>} action="Transfer"
-                                        disabled={disabled} prepareTransaction={() => transfer.prepareTransaction()}>
+                                        disabled={disabled} prepareTransaction={() => transfer.prepareTransaction()}
+                                        onConfirm={() => transfer.resetOperationAmount()}>
         <div className="transfer space">
             <div className="params">
                 <TransferDestinationView address={transfer.destination}

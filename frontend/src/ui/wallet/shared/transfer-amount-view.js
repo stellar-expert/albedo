@@ -6,7 +6,10 @@ import AssetSelector from './asset-selector-view'
 
 export default function TransferAmountView({settings, prefix, assets, restricted, placeholder, error}) {
     const amount = settings[prefix + 'Amount'],
-        [inputAmount, setInputAmount] = useDependantState(() => amount || '', [amount])
+        [inputAmount, setInputAmount] = useDependantState(() => {
+            if (!amount || amount === '0') return ''
+            return amount
+        }, [amount])
 
     function change(e) {
         const v = e.target.value.replace(/[^\d.]/g, '')
@@ -14,9 +17,10 @@ export default function TransferAmountView({settings, prefix, assets, restricted
         try {
             const parsed = new BigNumber(v)
             if (parsed.isNegative() || parsed.isNaN()) throw new Error(`Invalid amount: ${v}`)
-            settings.setAmount(parsed.toFixed(7, BigNumber.ROUND_DOWN).replace(/\.?0+$/, ''), prefix)
+            const amt = parsed.toFixed(7, BigNumber.ROUND_DOWN).replace(/\.?0+$/, '')
+            settings.setAmount(amt, prefix)
         } catch (e) {
-            settings.setAmount('0')
+            settings.setAmount('0', prefix)
         }
     }
 

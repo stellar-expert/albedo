@@ -43,6 +43,7 @@ function TransferMemoView({transfer}) {
                 try {
                     transfer.memo = new Memo(type, value.trim())
                 } catch (e) {
+                    transfer.memo = {invalid: true}
                     setInvalid(true)
                 }
             }
@@ -55,9 +56,6 @@ function TransferMemoView({transfer}) {
         <span className="dimmed"> (optional)</span>
         {type !== 'none' && <div>
             <input type="text" value={value} onChange={setMemoValue} placeholder={getPlaceholder(type)}/>
-            {!!invalid && <div className="warning text-small micro-space">
-                <i className="icon-warning"/> Invalid memo format. Please check the value.
-            </div>}
         </div>}
     </div>
 }

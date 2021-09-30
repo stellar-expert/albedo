@@ -1,5 +1,6 @@
 import {autorun, runInAction, makeAutoObservable} from 'mobx'
 import {Asset, Memo} from 'stellar-sdk'
+import {debounce} from 'throttle-debounce'
 import BigNumber from 'bignumber.js'
 import {streamLedgers} from '../../../util/ledger-stream'
 import {wrapAsset} from '../../../util/wrap-asset'
@@ -31,6 +32,8 @@ class TransferSettings {
             } = this
             this.recalculateSwap()
         })
+
+        this.findConversionPath = debounce(400, false, this.findConversionPath.bind(this))
     }
 
     network
@@ -227,10 +230,10 @@ class TransferSettings {
         const horizon = createHorizon(this.network)
         let endpoint
         if (this.conversionDirection === 'source') {
-            if (!this.sourceAmount) return
+            if (!parseFloat(this.sourceAmount)) return
             endpoint = horizon.strictSendPaths(wrapAsset(this.sourceAsset), this.sourceAmount, [wrapAsset(this.destAsset)])
         } else {
-            if (!this.destAmount) return
+            if (!parseFloat(this.destAmount)) return
             endpoint = horizon.strictReceivePaths([wrapAsset(this.sourceAsset)], wrapAsset(this.destAsset), this.destAmount)
         }
         return endpoint.call()
@@ -271,6 +274,10 @@ class TransferSettings {
 
     prepareTransaction() {
         return prepareTransferTx(this)
+    }
+
+    resetOperationAmount() {
+        this.setAmount(undefined, 'source')
     }
 }
 

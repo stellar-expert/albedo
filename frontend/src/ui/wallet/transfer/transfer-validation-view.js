@@ -16,7 +16,11 @@ function validate(network, destination, transfer, directoryInfo) {
         Please check whether you copied it correctly.
     </>
 
-    if (!destination || transfer.mode === 'claimable' || !transfer.destAsset) return null
+    if (!destination || !transfer.destAsset || !parseFloat(transfer.sourceAmount) || !parseFloat(transfer.destAmount)) return false
+
+    if (transfer.memo?.invalid) return <>
+        Invalid memo format. Please check the value.
+    </>
 
     const assetCode = transfer.destAsset.split('-')[0]
 
@@ -42,6 +46,8 @@ function validate(network, destination, transfer, directoryInfo) {
     if (!transfer.hasSufficientBalance) return <>
         Insufficient balance on your account. Please adjust the amount of tokens to send.
     </>
+
+    if (transfer.mode === 'claimable') return null
 
     if (transfer.source !== transfer.destination) { //external payment
         if (transfer.destAsset !== 'XLM') {
@@ -85,7 +91,7 @@ function TransferValidationView({destination, transfer, directoryInfo, onValidat
     const _ = {...transfer},
         network = useStellarNetwork(),
         validationResult = validate(network, destination, transfer, directoryInfo)
-    setTimeout(() => onValidate(!validationResult), 100)
+    setTimeout(() => onValidate(validationResult === null), 100)
     if (!validationResult) return null
     return <p className="warning text-small micro-space">
         <i className="icon-warning"/> {validationResult}
