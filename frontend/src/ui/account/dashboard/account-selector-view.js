@@ -1,7 +1,6 @@
 import React, {useState} from 'react'
-import {Dropdown, formatExplorerLink, navigation} from '@stellar-expert/ui-framework'
+import {Dropdown, AccountIdenticon, formatExplorerLink, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
-import IdenticonView from '../account-identicon-view'
 
 export default function AccountSelectorView() {
     const [current, setCurrentAccount] = useState(() => accountManager.activeAccount)
@@ -37,13 +36,13 @@ export default function AccountSelectorView() {
     }
     const dropdownOptions = [{
         value: 'title',
-        title: <><IdenticonView address={current.publicKey} large/> {current.shortDisplayName}</>
+        title: <><AccountIdenticon address={current.publicKey}/> {current.shortDisplayName}</>
     }]
     for (let account of allAccounts)
         if (account !== current) {
             dropdownOptions.push({
                 value: account.id,
-                title: <>Switch to&nbsp;<IdenticonView address={account.publicKey}/> {account.displayName}</>
+                title: <>Switch to&nbsp;<AccountIdenticon address={account.publicKey}/> {account.displayName}</>
             })
         }
 

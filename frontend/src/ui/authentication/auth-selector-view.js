@@ -1,10 +1,9 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import {AccountAddress, Dropdown, navigation} from '@stellar-expert/ui-framework'
+import {AccountAddress, Dropdown, AccountIdenticon, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../state/account-manager'
 import actionContext from '../../state/action-context'
 import DirectKeyInputView from './direct-key-input-view'
-import IdenticonView from '../account/account-identicon-view'
 
 function handleAccountAction(action) {
     switch (action) {
@@ -47,7 +46,7 @@ function AuthSelectorView() {
         title: directKeyInput ?
             'Direct secret key input' :
             activeAccount ?
-                <><IdenticonView address={activeAccount.publicKey}/> {activeAccount.displayName}</> :
+                <><AccountIdenticon address={activeAccount.publicKey}/> {activeAccount.displayName}</> :
                 'Albedo account'
     }]
 
@@ -55,7 +54,7 @@ function AuthSelectorView() {
         if (!directKeyInput && account === activeAccount) continue
         dropdownOptions.push({
             value: account.id,
-            title: <>Switch to&nbsp;<IdenticonView address={account.publicKey}/> {account.displayName}</>
+            title: <>Switch to&nbsp;<AccountIdenticon address={account.publicKey}/> {account.displayName}</>
         })
     }
 
