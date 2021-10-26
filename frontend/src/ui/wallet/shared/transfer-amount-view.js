@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import {useDependantState} from '@stellar-expert/ui-framework'
 import AssetSelector from './asset-selector-view'
 
-export default function TransferAmountView({settings, prefix, assets, restricted, placeholder, error}) {
-    const amount = settings[prefix + 'Amount'],
+export default function TransferAmountView({settings, index, predefinedAssets, restricted, placeholder, error}) {
+    const amount = settings.amount[index],
         [inputAmount, setInputAmount] = useDependantState(() => {
             if (!amount || amount === '0') return ''
             return amount
@@ -18,14 +18,14 @@ export default function TransferAmountView({settings, prefix, assets, restricted
             const parsed = new BigNumber(v)
             if (parsed.isNegative() || parsed.isNaN()) throw new Error(`Invalid amount: ${v}`)
             const amt = parsed.toFixed(7, BigNumber.ROUND_DOWN).replace(/\.?0+$/, '')
-            settings.setAmount(amt, prefix)
+            settings.setAmount(amt, index)
         } catch (e) {
-            settings.setAmount('0', prefix)
+            settings.setAmount('0', index)
         }
     }
 
     function onAssetChange(asset) {
-        settings.setAsset(asset, prefix)
+        settings.setAsset(asset, index)
     }
 
     const style = {}
@@ -36,20 +36,18 @@ export default function TransferAmountView({settings, prefix, assets, restricted
     return <div className="relative">
         <input type="text" value={inputAmount} onChange={change} placeholder={placeholder || '0'} style={style}
                data-lpignore="true"/>
-        <AssetSelector value={settings[prefix + 'Asset']} onChange={onAssetChange} predefinedAssets={assets}
+        <AssetSelector value={settings.asset[index]} onChange={onAssetChange} predefinedAssets={predefinedAssets}
                        restricted={restricted}/>
     </div>
 }
 
 TransferAmountView.propTypes = {
     settings: PropTypes.shape({
-        sourceAsset: PropTypes.string,
-        destAsset: PropTypes.string,
-        sourceAmount: PropTypes.string,
-        destAmount: PropTypes.string
+        asset: PropTypes.arrayOf(PropTypes.string),
+        amount: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
-    prefix: PropTypes.oneOf(['source', 'dest']).isRequired,
-    assets: PropTypes.arrayOf(PropTypes.string),
+    index: PropTypes.number.isRequired,
+    predefinedAssets: PropTypes.arrayOf(PropTypes.string),
     restricted: PropTypes.bool,
     error: PropTypes.bool
 }

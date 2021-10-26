@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {observable, makeObservable, action, runInAction} from 'mobx'
+import {observable, makeObservable, action, computed, runInAction} from 'mobx'
 import BigNumber from 'bignumber.js'
 import {parseAssetFromObject} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../util/horizon-connector'
@@ -23,7 +23,8 @@ class AccountLedgerData {
             init: action,
             reset: action,
             error: observable,
-            loaded: observable
+            loaded: observable,
+            balancesWithPriority: computed
         })
         this.pendingLiabilities = {}
         this.balances = {}
@@ -99,21 +100,19 @@ class AccountLedgerData {
      */
     loadAccountInfo() {
         fetchAccountHorizonData(this.network, this.address)
-            .then(accountData => {
-                runInAction(() => {
-                    if (accountData.error) {
-                        this.reset()
-                        this.error = accountData.error
-                        this.nonExisting = accountData.nonExisting
-                    } else {
-                        this.accountData = accountData
-                        this.balances = accountData.balancesMap
-                        this.pendingLiabilities = {} //reset after each account info update
-                        this.nonExisting = false
-                    }
-                    this.loaded = true
-                })
-            })
+            .then(accountData => runInAction(() => {
+                if (accountData.error) {
+                    this.reset()
+                    this.error = accountData.error
+                    this.nonExisting = accountData.nonExisting
+                } else {
+                    this.accountData = accountData
+                    this.balances = accountData.balancesMap
+                    this.pendingLiabilities = {} //reset after each account info update
+                    this.nonExisting = false
+                }
+                this.loaded = true
+            }))
     }
 
     /**
@@ -131,7 +130,7 @@ class AccountLedgerData {
         return available.toString()
     }
 
-    getBalancesWithPriority() {
+    get balancesWithPriority() {
         const res = [...Object.values(this.balances)]
         res.sort((a, b) => {
             if (a.asset_type === 'native') return -1

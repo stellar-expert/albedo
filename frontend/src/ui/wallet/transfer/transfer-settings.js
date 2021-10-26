@@ -15,18 +15,17 @@ class TransferSettings {
         this.mode = mode
         makeAutoObservable(this)
 
-        this.sourceAsset = this.destAsset = 'XLM'
+        this.asset = ['XLM', 'XLM']
+        this.amount = ['0', '0']
         this.conversionSlippage = 0.5
 
         autorun(() => {
             const {
                 destination,
                 mode,
-                sourceAsset,
-                destAsset,
+                asset,
+                amount,
                 conversionDirection,
-                sourceAmount,
-                destAmount,
                 conversionSlippage,
                 currentLedgerSequence
             } = this
@@ -66,25 +65,17 @@ class TransferSettings {
      */
     memo
     /**
-     * @type {String}
+     * @type {[String]}
      */
-    sourceAsset
+    asset
     /**
-     * @type {String}
+     * @type {[String]}
      */
-    sourceAmount
-    /**
-     * @type {String}
-     */
-    destAsset
+    amount
     /**
      * @type {Boolean}
      */
     createTrustline
-    /**
-     * @type {String}
-     */
-    destAmount
     /**
      * @type {'source'|'dest'}
      */
@@ -119,8 +110,8 @@ class TransferSettings {
     }
 
     get hasSufficientBalance() {
-        return new BigNumber(accountLedgerData.getAvailableBalance(this.sourceAsset))
-            .greaterThanOrEqualTo(this.sourceAmount || 0)
+        return new BigNumber(accountLedgerData.getAvailableBalance(this.asset[0]))
+            .greaterThanOrEqualTo(this.amount[0] || 0)
     }
 
     /**
@@ -133,7 +124,7 @@ class TransferSettings {
             this.createDestination = false
             this.createTrustline = false
         }
-        this.destAsset = this.sourceAsset
+        this.asset[1] = this.asset[0]
         this.conversionDirection = 'source'
     }
 
@@ -152,19 +143,15 @@ class TransferSettings {
     /**
      *
      * @param {String} amount
-     * @param {'source'|'dest'} direction
+     * @param {Number} index
      */
-    setAmount(amount, direction) {
-        this.conversionDirection = direction
+    setAmount(amount, index) {
+        this.conversionDirection = index === 0 ? 'source' : 'dest'
         this.conversionPathLoaded = false
-        if (this.sourceAsset === this.destAsset) {
-            this.sourceAmount = this.destAmount = amount
+        if (this.asset[0] === this.asset[1]) {
+            this.amount = [amount, amount]
         } else {
-            if (direction === 'source') {
-                this.sourceAmount = amount
-            } else {
-                this.destAmount = amount
-            }
+            this.amount[index] = amount
         }
     }
 
@@ -177,20 +164,20 @@ class TransferSettings {
         this.conversionPathLoaded = false
         this.createTrustline = false
         if (this.mode !== 'convert') {
-            this.sourceAsset = this.destAsset = asset
+            this.asset = [asset, asset]
             this.createDestination = false
-            this.destAmount = this.sourceAmount
+            this.amount[1] = this.amount[0]
         } else {
             switch (direction) {
                 case 'source':
-                    this.sourceAsset = asset
+                    this.asset[0] = asset
                     break
                 case 'dest':
-                    this.destAsset = asset
+                    this.asset[1] = asset
                     break
             }
-            if (this.sourceAsset === this.destAsset) {
-                this.destAmount = this.sourceAmount
+            if (this.asset[0] === this.asset[1]) {
+                this.amount[1] = this.amount[0]
             }
         }
     }
@@ -199,42 +186,27 @@ class TransferSettings {
         if (this.conversionPathLoaded || this.mode !== 'convert') return
         this.path = undefined
         this.conversionPrice = undefined
-        if (this.sourceAsset === this.destAsset) {
+        if (this.asset[0] === this.asset[1]) {
             this.conversionFeasible = true
             this.conversionPathLoaded = true
             return
         }
         this.conversionFeasible = false
-        if (this.conversionDirection === 'source') {
-            this.destAmount = ''
-        } else {
-            this.sourceAmount = ''
-        }
+        this.amount[this.conversionDirection === 'source' ? 1 : 0] = ''
 
-        if (!this.sourceAsset || !this.destAsset || !this.conversionDirection) return
+        if (!this.amount[0] || !this.amount[1] || !this.conversionDirection) return
         this.findConversionPath()
-    }
-
-    reverseSwap(resetSourceAsset = false) {
-        const {sourceAsset, sourceAmount, destAsset, destAmount, conversionDirection} = this
-        this.destAsset = sourceAsset
-        this.sourceAsset = resetSourceAsset ? 'XLM' : destAsset
-        if (conversionDirection === 'dest') {
-            this.setAmount(destAmount, 'source')
-        } else {
-            this.setAmount(sourceAmount, 'dest')
-        }
     }
 
     findConversionPath() {
         const horizon = createHorizon(this.network)
         let endpoint
         if (this.conversionDirection === 'source') {
-            if (!parseFloat(this.sourceAmount)) return
-            endpoint = horizon.strictSendPaths(wrapAsset(this.sourceAsset), this.sourceAmount, [wrapAsset(this.destAsset)])
+            if (!parseFloat(this.amount[0])) return
+            endpoint = horizon.strictSendPaths(wrapAsset(this.asset[0]), this.amount[0], [wrapAsset(this.asset[1])])
         } else {
-            if (!parseFloat(this.destAmount)) return
-            endpoint = horizon.strictReceivePaths([wrapAsset(this.sourceAsset)], wrapAsset(this.destAsset), this.destAmount)
+            if (!parseFloat(this.amount[1])) return
+            endpoint = horizon.strictReceivePaths([wrapAsset(this.asset[0])], wrapAsset(this.asset[1]), this.amount[1])
         }
         return endpoint.call()
             .then(({records}) => {
@@ -242,9 +214,9 @@ class TransferSettings {
                     const [result] = records
                     runInAction(() => {
                         if (this.conversionDirection === 'source') {
-                            this.destAmount = adjustWithSlippage(result.destination_amount, -1, this.conversionSlippage)
+                            this.amount[1] = adjustWithSlippage(result.destination_amount, -1, this.conversionSlippage)
                         } else {
-                            this.sourceAmount = adjustWithSlippage(result.source_amount, 1, this.conversionSlippage)
+                            this.amount[0] = adjustWithSlippage(result.source_amount, 1, this.conversionSlippage)
                         }
                         this.conversionPrice = result.destination_amount / result.source_amount
                         this.conversionPath = (result.path || []).map(a => a.asset_type === 'native' ? Asset.native() : new Asset(a.asset_code, a.asset_issuer))
@@ -277,7 +249,7 @@ class TransferSettings {
     }
 
     resetOperationAmount() {
-        this.setAmount(undefined, 'source')
+        this.setAmount(undefined, 0)
     }
 }
 

@@ -8,10 +8,11 @@ import TransferSettings from './transfer-settings'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import TransferDestinationView from './transfer-destination-view'
 import TransferAmountView from '../shared/transfer-amount-view'
-import SwapSlippageView from '../swap/swap-slippage-view'
+import SwapSlippageView from '../shared/slippage-view'
 import SwapBandView from '../swap/swap-band-view'
 import TransferValidationView from './transfer-validation-view'
 import TransferMemoView from './transfer-memo-view'
+import AvailableAmountLink from '../shared/available-amount-link-ivew'
 
 const TransferTitleView = observer(function TransferTitleView({transfer}) {
     const options = [
@@ -34,7 +35,7 @@ function TransferView() {
         destinationAccountLedgerData = useDestinationAccountLedgerData(transfer.destination),
         destinationDirectoryInfo = useDirectory(transfer.destination),
         disabled = !destinationAccountLedgerData || !valid || parseFloat(transfer.sourceAmount) <= 0,
-        predefinedAssets = accountLedgerData.getBalancesWithPriority().map(t => t.id)
+        predefinedAssets = accountLedgerData.balancesWithPriority.map(t => t.id)
     useEffect(() => {
         if (transfer.mode === 'convert') {
             transfer.startLedgerStreaming()
@@ -51,14 +52,15 @@ function TransferView() {
                                          onChange={transfer.setDestination.bind(transfer)}
                                          federationAddress={transfer.destinationFederationAddress}/>
                 <div className="space"/>
-                <TransferAmountView settings={transfer} prefix="source" assets={predefinedAssets} restricted
+                <TransferAmountView settings={transfer} index={0} predefinedAssets={predefinedAssets} restricted
                                     placeholder="Amount to send"/>
-                <SwapBandView settings={transfer}/>
+                <AvailableAmountLink settings={transfer} index={0}/>
                 {transfer.mode === 'convert' &&
-                <TransferAmountView settings={transfer} prefix="dest" assets={predefinedAssets}
+                <TransferAmountView settings={transfer} index={1} predefinedAssets={predefinedAssets}
                                     placeholder="Amount received"/>}
             </div>
-            {transfer.mode === 'convert' && <SwapSlippageView onChange={v => transfer.setSlippage(v)}/>}
+            {transfer.mode === 'convert' &&
+            <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
             <TransferMemoView transfer={transfer}/>
             {transfer.createDestination && <p className="success text-small micro-space">
                 <i className="icon-info"/> The recipient account will be created automatically.{' '}

@@ -5,7 +5,7 @@ import {useStellarNetwork} from '../../../state/network-selector'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import TransferAmountView from '../shared/transfer-amount-view'
-import SwapSlippageView from './swap-slippage-view'
+import SwapSlippageView from '../shared/slippage-view'
 import TransferSettings from '../transfer/transfer-settings'
 import SwapBandView from './swap-band-view'
 import TransferValidationView from '../transfer/transfer-validation-view'
@@ -15,7 +15,7 @@ function SwapView() {
         [valid, setValid] = useState(false),
         [swap] = useDependantState(() => new TransferSettings(network, 'convert'), [network]),
         {balances} = accountLedgerData,
-        predefinedAssets = accountLedgerData.getBalancesWithPriority().map(t => t.id)
+        predefinedAssets = accountLedgerData.balancesWithPriority.map(t => t.id)
 
     useEffect(() => {
         swap.setDestination(accountLedgerData.address)
@@ -30,11 +30,11 @@ function SwapView() {
                                         onConfirm={() => swap.resetOperationAmount()}>
         <div className="swap">
             <div className="params">
-                <TransferAmountView settings={swap} prefix="source" assets={predefinedAssets} restricted/>
+                <TransferAmountView settings={swap} index={0} predefinedAssets={predefinedAssets} restricted/>
                 <SwapBandView settings={swap}/>
-                <TransferAmountView settings={swap} prefix="dest" assets={predefinedAssets}/>
+                <TransferAmountView settings={swap} index={1} predefinedAssets={predefinedAssets}/>
             </div>
-            <SwapSlippageView onChange={updateSlippage}/>
+            <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={updateSlippage}/>
             <TransferValidationView transfer={swap} destination={accountLedgerData} onValidate={setValid}/>
         </div>
     </WalletOperationsWrapperView>

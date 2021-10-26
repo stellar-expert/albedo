@@ -1,12 +1,5 @@
-.swap-band {
-  align-items: center;
-  min-height: 1.6em;
-
-  > .text-tiny {
-    width: 45%;
-  }
-
-  .switch {
+.lp-deposit {
+  .pool-add {
     text-align: center;
     font-size: 0.8em;
     padding: 0.8em;
@@ -19,7 +12,6 @@
       padding: 0;
       line-height: 1.95em;
       border-radius: 50%;
-      transform: rotate(90deg);
     }
   }
 }

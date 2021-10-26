@@ -9,7 +9,7 @@ function extractCode(asset) {
 }
 
 function SwapBandView({settings}) {
-    const availableSourceBalance = accountLedgerData.getAvailableBalance(settings.sourceAsset)
+    const availableSourceBalance = accountLedgerData.getAvailableBalance(settings.asset[0])
 
     /*function revert() {
         transfer.reverse(!predefinedAssets.includes(transfer.destAsset))
@@ -19,18 +19,13 @@ function SwapBandView({settings}) {
         {settings.mode === 'convert' ? <>
             <div className="dimmed text-tiny condensed">
                 {settings.conversionPathLoaded && !settings.conversionFeasible && <><i className="icon-block"/>not available</>}
-                {!!settings.conversionPrice && `~${formatWithAutoPrecision(settings.conversionPrice)} ${extractCode(settings.destAsset)}/${extractCode(settings.sourceAsset)}`}
+                {!!settings.conversionPrice && `~${formatWithAutoPrecision(settings.conversionPrice)} ${extractCode(settings.asset[1])}/${extractCode(settings.asset[1])}`}
             </div>
             <div className="switch">
                 <a href="#" className="icon-shuffle"/>
             </div>
         </> : <div/>}
-        <div className="dimmed text-tiny condensed text-right">
-            <a className="dimmed" href="#"
-               onClick={e => settings.setAmount(availableSourceBalance, 'source')}>
-                {availableSourceBalance} {extractCode(settings.sourceAsset)} available
-            </a>
-        </div>
+        <SwapBandView settings={settings}/>
     </div>
 }
 
