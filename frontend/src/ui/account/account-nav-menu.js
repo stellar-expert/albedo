@@ -16,7 +16,7 @@ export default function AccountNavMenu() {
     const links = [
         {link: '/wallet/transfer', icon: 'icon-flash', title: 'Transfer'},
         {link: '/wallet/swap', icon: 'icon-switch', title: 'Swap'},
-        network === 'testnet' && {link: '/wallet/liquidity-pool', icon: 'icon-liquidity-pool', title: 'Liquidity'},
+        {link: '/wallet/liquidity-pool', icon: 'icon-liquidity-pool', title: 'Liquidity'},
         {link: '/account', icon: 'icon-key', title: 'Balance'},
         {link: '/account-settings', icon: 'icon-settings', title: 'Settings'}
     ]
