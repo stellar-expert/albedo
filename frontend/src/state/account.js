@@ -1,8 +1,8 @@
 import {observable, action, computed, makeObservable} from 'mobx'
 import {Keypair, StrKey} from 'stellar-sdk'
+import {formatLongHex} from '@stellar-expert/ui-framework'
 import errors from '../util/errors'
 import {encryptAccountSecret, decryptAccountSecret, persistAccountInBrowser} from '../storage/account-storage'
-import {formatAddress} from '../util/formatter'
 import {extractDeviceId} from '../util/device-id-generator'
 import {currentStorageVersion} from '../storage/storage-version'
 
@@ -79,14 +79,14 @@ class Account {
      */
     get displayName() {
         if (this.accountType && !this.accountType) return this.shortDisplayName
-        return `${this.shortDisplayName} (${formatAddress(this.publicKey, 8)})`
+        return `${this.shortDisplayName} (${formatLongHex(this.publicKey, 8)})`
     }
 
     get shortDisplayName() {
         if (this.friendlyName) return this.friendlyName
         switch (this.accountType) {
             case ACCOUNT_TYPES.STORED_ACCOUNT:
-                return formatAddress(this.publicKey, 12)
+                return formatLongHex(this.publicKey, 12)
             case ACCOUNT_TYPES.LEDGER_ACCOUNT:
                 return `Ledger ${cleanBipPath(this.path)}`
             case ACCOUNT_TYPES.TREZOR_ACCOUNT:

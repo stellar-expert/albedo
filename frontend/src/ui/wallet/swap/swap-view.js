@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
-import {InfoTooltip, useDependantState} from '@stellar-expert/ui-framework'
-import {useStellarNetwork} from '../../../state/network-selector'
+import {InfoTooltip, useDependantState, useStellarNetwork} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import TransferAmountView from '../shared/transfer-amount-view'
@@ -14,8 +13,7 @@ function SwapView() {
     const network = useStellarNetwork(),
         [valid, setValid] = useState(false),
         [swap] = useDependantState(() => new TransferSettings(network, 'convert'), [network]),
-        {balances} = accountLedgerData,
-        predefinedAssets = accountLedgerData.balancesWithPriority.map(t => t.id)
+        balances = accountLedgerData.balancesWithPriority
 
     useEffect(() => {
         swap.setDestination(accountLedgerData.address)
@@ -28,11 +26,11 @@ function SwapView() {
     return <WalletOperationsWrapperView title="Swap tokens" action="Swap" disabled={!valid || !swap.conversionFeasible}
                                         prepareTransaction={() => swap.prepareTransaction()}
                                         onConfirm={() => swap.resetOperationAmount()}>
-        <div className="swap">
+        <div className="swap space">
             <div className="params">
-                <TransferAmountView settings={swap} index={0} predefinedAssets={predefinedAssets} restricted/>
+                <TransferAmountView settings={swap} index={0} balances={balances} restricted/>
                 <SwapBandView settings={swap}/>
-                <TransferAmountView settings={swap} index={1} predefinedAssets={predefinedAssets}/>
+                <TransferAmountView settings={swap} index={1} balances={balances}/>
             </div>
             <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={updateSlippage}/>
             <TransferValidationView transfer={swap} destination={accountLedgerData} onValidate={setValid}/>

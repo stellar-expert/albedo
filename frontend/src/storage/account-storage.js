@@ -1,7 +1,7 @@
 import {decryptDataAes, encryptDataAes} from '../util/crypto-utils'
 import {currentStorageVersion} from './storage-version'
-import storageProvider from '../state/storage/storage-provider'
-import {syncLocalStorage} from '../state/storage/local-storage-synchronizer'
+import storageProvider from './storage-provider'
+import {syncLocalStorage} from './local-storage-synchronizer'
 
 const accountKeyPrefix = 'account_'
 

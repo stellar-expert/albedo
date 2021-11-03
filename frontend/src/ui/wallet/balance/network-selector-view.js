@@ -1,6 +1,5 @@
 import React from 'react'
-import {Dropdown} from '@stellar-expert/ui-framework'
-import {setStellarNetwork, useStellarNetwork} from '../../../state/network-selector'
+import {Dropdown, setStellarNetwork, useStellarNetwork} from '@stellar-expert/ui-framework'
 
 export default function NetworkSelectorView() {
     const network = useStellarNetwork()

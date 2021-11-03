@@ -1,7 +1,7 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
 import {Transaction, Keypair, TransactionBuilder} from 'stellar-sdk'
 import {intentInterface} from '@albedo-link/intent'
-import {navigation} from '@stellar-expert/ui-framework'
+import {navigation, setStellarNetwork} from '@stellar-expert/ui-framework'
 import accountManager from './account-manager'
 import responder from '../actions/responder'
 import {dispatchIntentResponse, handleIntentResponseError} from '../actions/callback-dispatcher'
@@ -12,7 +12,6 @@ import {restoreImplicitSession} from '../storage/implicit-session-storage'
 import {isImplicitIntentRequested} from '../ui/intent/implicit-intent-detector'
 import {loadSelectedAccountInfo} from '../actions/account-info-loader'
 import lastActionResult from './last-action-result'
-import {setStellarNetwork} from './network-selector'
 
 /**
  * Provides context for initiated action.
@@ -275,6 +274,7 @@ class ActionContext {
             if (!acc) return this.rejectRequest()
             await accountManager.setActiveAccount(acc)
             if (intentParams.network) {
+                //TODO: consider setting the network temporary, without overriding the last selected network
                 setStellarNetwork(networkName)
             }
         }

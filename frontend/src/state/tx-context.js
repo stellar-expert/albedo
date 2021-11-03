@@ -206,9 +206,9 @@ export default class TxContext {
         //replace tx source account and sequence number if necessary
         if (this.hasEmptyTxSource) {
             await this.setTxSourceAccount(executionContext.publicKey)
-        } else if (this.hasEmptyTxSequence) {
+        } /*else if (this.hasEmptyTxSequence) {
             await this.setTxSequence()
-        }
+        }*/
         const newSignature = await executionContext.signTransaction(this.tx)
         if (!newSignature) return false
         //add full pubkey to the decorated signature for the fast lookup

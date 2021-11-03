@@ -1,10 +1,8 @@
 import {useEffect, useState} from 'react'
 import {observable, makeObservable, action, computed, runInAction} from 'mobx'
-import BigNumber from 'bignumber.js'
-import {parseAssetFromObject} from '@stellar-expert/ui-framework'
+import {parseAssetFromObject, calculateAvailableBalance, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../util/horizon-connector'
 import AccountTransactionHistory from './account-transactions-history'
-import {useStellarNetwork} from '../network-selector'
 
 const defaultThresholds = {low: 1, med: 1, high: 1}
 Object.freeze(defaultThresholds)
@@ -118,16 +116,13 @@ class AccountLedgerData {
     /**
      * Get asset amount available for trade/transfer with respect to liabilities and reserves
      * @param {String} asset - Asset identifier
+     * @param {Number} [additionalReserves] - Additional reserves required for the wallet operation
      * @return {string}
      */
-    getAvailableBalance(asset) {
+    getAvailableBalance(asset, additionalReserves = 0) {
         const trustline = this.balances[asset]
         if (!trustline) return '0'
-        let available = new BigNumber(trustline.balance).minus(trustline.selling_liabilities)
-        if (asset === 'XLM') {
-            available = available.minus((this.accountData.subentry_count + 2) * 0.5 + 0.1) //TODO: fetch base_reserve from the Horizon
-        }
-        return available.toString()
+        return calculateAvailableBalance(this.accountData, trustline, additionalReserves)
     }
 
     get balancesWithPriority() {

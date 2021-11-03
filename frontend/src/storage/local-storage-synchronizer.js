@@ -1,4 +1,4 @@
-import {isInsideFrame} from '../../util/frame-utils'
+import {isInsideFrame} from '../util/frame-utils'
 import storageProvider from './storage-provider'
 
 /**

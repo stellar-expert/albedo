@@ -36,7 +36,7 @@ export function replaceTokens(intentParams) {
     for (let pair of replacementParts) {
         if (pair[0] !== 'sourceAccount') continue
         substituteSourceAccount(parsedTx, zeroAccount) //replace with zero account for further processing
-        substituteSourceSequence(parsedTx, '0')
+        //substituteSourceSequence(parsedTx, '0')
     }
 
     intentParams.xdr = parsedTx.toXDR()

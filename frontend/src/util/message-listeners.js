@@ -4,7 +4,7 @@ import actionContext from '../state/action-context'
 import accountManager from '../state/account-manager'
 import stoplistTracker from '../stoplist/stoplist-tracker'
 import {isInsideFrame} from './frame-utils'
-import storageProvider from '../state/storage/storage-provider'
+import storageProvider from '../storage/storage-provider'
 
 async function handleInternalCommand(data, origin) {
     if (data.sync) {

@@ -1,15 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
-import {Dropdown, InfoTooltip, useDependantState, useDirectory} from '@stellar-expert/ui-framework'
+import {Dropdown, InfoTooltip, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
-import {useStellarNetwork} from '../../../state/network-selector'
 import TransferSettings from './transfer-settings'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import TransferDestinationView from './transfer-destination-view'
 import TransferAmountView from '../shared/transfer-amount-view'
 import SwapSlippageView from '../shared/slippage-view'
-import SwapBandView from '../swap/swap-band-view'
 import TransferValidationView from './transfer-validation-view'
 import TransferMemoView from './transfer-memo-view'
 import AvailableAmountLink from '../shared/available-amount-link-ivew'
@@ -35,7 +33,7 @@ function TransferView() {
         destinationAccountLedgerData = useDestinationAccountLedgerData(transfer.destination),
         destinationDirectoryInfo = useDirectory(transfer.destination),
         disabled = !destinationAccountLedgerData || !valid || parseFloat(transfer.sourceAmount) <= 0,
-        predefinedAssets = accountLedgerData.balancesWithPriority.map(t => t.id)
+        balances = accountLedgerData.balancesWithPriority
     useEffect(() => {
         if (transfer.mode === 'convert') {
             transfer.startLedgerStreaming()
@@ -52,11 +50,11 @@ function TransferView() {
                                          onChange={transfer.setDestination.bind(transfer)}
                                          federationAddress={transfer.destinationFederationAddress}/>
                 <div className="space"/>
-                <TransferAmountView settings={transfer} index={0} predefinedAssets={predefinedAssets} restricted
+                <TransferAmountView settings={transfer} index={0} balances={balances} restricted
                                     placeholder="Amount to send"/>
                 <AvailableAmountLink settings={transfer} index={0}/>
                 {transfer.mode === 'convert' &&
-                <TransferAmountView settings={transfer} index={1} predefinedAssets={predefinedAssets}
+                <TransferAmountView settings={transfer} index={1} balances={balances}
                                     placeholder="Amount received"/>}
             </div>
             {transfer.mode === 'convert' &&

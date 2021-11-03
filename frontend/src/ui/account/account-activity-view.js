@@ -5,6 +5,7 @@ import cn from 'classnames'
 import {ElapsedTime, TxLink, InlineProgress} from '@stellar-expert/ui-framework'
 import OperationDescriptionView from '../intent/operation-description-view'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
+import {xdrParseClaimant} from '../../util/claim-condtions-xdr-parser'
 
 function shortenBinaryString(src) {
     if (src.length <= 18) return src
@@ -27,7 +28,7 @@ function AccountActivityView() {
         }
     }
 
-    const {loaded, nonExisting, history} = accountLedgerData
+    const {loaded, nonExisting, history, address} = accountLedgerData
 
     if (!loaded || !nonExisting && !history.records.length) return <div className="loader"/>
     return <ul style={{minHeight: '20vmin', overflowY: 'auto', overflowX: 'hidden'}} className="text-small"
@@ -46,15 +47,23 @@ function AccountActivityView() {
                 </div>
             </div>
             {tx.operations.length > 0 && <ul className="block-indent">
-                {tx.operations.map(op => <li key={op.id} className="appear">
-                    <OperationDescriptionView op={op} source={tx.source_account}/>
-                </li>)}
+                {tx.operations.filter(op => opBelongsToAccount(address, op, tx))
+                    .map(op => <li key={op.id} className="appear">
+                        <OperationDescriptionView op={op} source={tx.source_account}/>
+                    </li>)}
             </ul>}
         </li>)}
         {!history.records.length && <div className="dimmed text-tiny text-center">
             (No transactions so far)
         </div>}
     </ul>
+}
+
+function opBelongsToAccount(address, op, tx) {
+    if (tx.source_account === address) return true
+    if (op.source === address || op.destination === address || op.trustor === address || op.account === address || op.from === address) return true
+    if (op.claimants?.some(c => c.destination === address)) return true
+    return false
 }
 
 export default observer(AccountActivityView)

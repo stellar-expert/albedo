@@ -1,39 +1,18 @@
 import React, {useState} from 'react'
-import {debounce} from 'throttle-debounce'
-import './slippage.scss'
-
-const throttledUpdateSlippage = debounce(400, (callback, value) => callback(value))
+import {Slider} from '@stellar-expert/ui-framework'
 
 export default function SlippageView({defaultValue = 0.5, max = 10, step = 0.5, title, onChange}) {
     const [slippage, setSlippage] = useState(defaultValue)
 
-    function change(e) {
-        let v = e.target.value
-        if (typeof v === 'string') {
-            v = parseFloat(v.replace(/[^\d.]/g, '')) || 0
-            if (v >= 99) {
-                v = 99
-            }
-        }
+    return <Slider value={slippage} max={max} step={step} title={title} onChange={v=>{
         setSlippage(v)
-        throttledUpdateSlippage(onChange, v)
-    }
-
-    return <div className="swap-slippage dual-layout dimmed text-small">
-        <div>
-            {title}
-            {/*<InfoTooltip>
-            Controls the amount of price slippage (the maximum % of price movement) you are willing to accept
-            for a trade. If the actual price slippage during the order execution exceeds this threshold, the
-            trade will fail. The calculated amounts of tokens being bought/sold include the slippage. However,
-            effective exchange price is almost always better than the projected price with the slippage since
-            the price quoting mechanism already takes into account available on-chain liquidity.
-        </InfoTooltip>*/}</div>
-        <div>
-            <input type="range" min={0} max={max} step={step} value={slippage} onChange={change}/>
-        </div>
-        <div>
-            <input type="text" value={slippage} onChange={change}/>%
-        </div>
-    </div>
+        onChange(v)
+    }} />
+    /*<InfoTooltip>
+                Controls the amount of price slippage (the maximum % of price movement) you are willing to accept
+                for a trade. If the actual price slippage during the order execution exceeds this threshold, the
+                trade will fail. The calculated amounts of tokens being bought/sold include the slippage. However,
+                effective exchange price is almost always better than the projected price with the slippage since
+                the price quoting mechanism already takes into account available on-chain liquidity.
+            </InfoTooltip>*/
 }

@@ -12,7 +12,7 @@ function AvailableAmountLink({settings, index}) {
         settings.setAmount(availableABalance, index)
     }
 
-    return <div className="dimmed text-tiny condensed text-right">
+    return <div className="dimmed condensed text-tiny text-right" style={{paddingTop: '0.2em'}}>
         <a className="dimmed" href="#" onClick={setMax}>
             {availableABalance} {AssetDescriptor.parse(settings.asset[index]).toCurrency()} available
         </a>

@@ -13,11 +13,20 @@
   }
 
   .asset-icon {
+    display: block;
     width: 2.4em;
     height: 2.4em;
     margin-right: 0.5em;
     background: transparent center center no-repeat;
     background-size: contain;
+
+    &.icon {
+      width: 1.4em;
+      height: 1.4em;
+      font-size: 2em;
+      margin: 0;
+      text-align: left;
+    }
   }
 
   .asset-issuer {
@@ -34,5 +43,23 @@
 
   .asset-code {
     font-size: 1.2em;
+  }
+
+  &.liquidity-pool {
+    &:before {
+      content: '';
+      border: 1px solid var(--color-text);
+      border-right: none;
+      opacity: 0.2;
+      display: block;
+      height: 2.2em;
+      width: 0.4em;
+      position: absolute;
+      left: 0.7em;
+    }
+
+    > div:not(:last-child) {
+      font-size: 0.75em;
+    }
   }
 }

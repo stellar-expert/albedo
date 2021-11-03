@@ -1,8 +1,8 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
+import {useStellarNetwork} from '@stellar-expert/ui-framework'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
-import {useStellarNetwork} from '../../../state/network-selector'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 
 function createTestnetAccount() {
@@ -16,13 +16,13 @@ function validate(network, destination, transfer, directoryInfo) {
         Please check whether you copied it correctly.
     </>
 
-    if (!destination || !transfer.destAsset || !parseFloat(transfer.sourceAmount) || !parseFloat(transfer.destAmount)) return false
+    if (!destination || !transfer.asset[1] || !parseFloat(transfer.amount[0]) || !parseFloat(transfer.amount[1])) return false
 
     if (transfer.memo?.invalid) return <>
         Invalid memo format. Please check the value.
     </>
 
-    const assetCode = transfer.destAsset.split('-')[0]
+    const assetCode = transfer.asset[1].split('-')[0]
 
     function setCreateDestination() {
         runInAction(() => transfer.createDestination = true)
@@ -50,8 +50,8 @@ function validate(network, destination, transfer, directoryInfo) {
     if (transfer.mode === 'claimable') return null
 
     if (transfer.source !== transfer.destination) { //external payment
-        if (transfer.destAsset !== 'XLM') {
-            if (destination.nonExisting || !destination.balances[transfer.destAsset]) return <>
+        if (transfer.asset[1] !== 'XLM') {
+            if (destination.nonExisting || !destination.balances[transfer.asset[1]]) return <>
                 The recipient account does not have a trustline to {assetCode} and cannot
                 receive the payment. Yet you still can send tokens using a{' '}
                 <a href="#" onClick={switchToClaimableBalance}>claimable balance</a>.
@@ -68,7 +68,7 @@ function validate(network, destination, transfer, directoryInfo) {
                 return <>The recipient account requires a valid transaction memo for incoming payments. Please check
                     deposit
                     instructions and provide a memo, otherwise the payment may be lost.</>
-        if (transfer.createDestination && parseInt(transfer.destAmount) < 1) return <>
+        if (transfer.createDestination && parseInt(transfer.amount[1]) < 1) return <>
             In order to create the recipient account on the ledger, you need to send at least 1 XLM (preferably 2-5 XLM
             to cover future trustlines reserves and transaction fee expenses for the destination account).
         </>
@@ -77,7 +77,7 @@ function validate(network, destination, transfer, directoryInfo) {
             runInAction(() => transfer.createTrustline = true)
         }
 
-        if (!accountLedgerData.balances[transfer.destAsset] && !transfer.createTrustline) return <>
+        if (!accountLedgerData.balances[transfer.asset[1]] && !transfer.createTrustline) return <>
             You need to establish a trustline to {assetCode} before trading it.
             Would you like to <a href="#" onClick={setCreateTrustline}>create the trustline</a>?
             This action will temporarily lock 0.5 XLM on your account balance.

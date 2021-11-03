@@ -1,8 +1,7 @@
 import React from 'react'
 import {Keypair} from 'stellar-sdk'
-import {Button} from '@stellar-expert/ui-framework'
+import {Button, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../../util/horizon-connector'
-import {useStellarNetwork} from '../../../state/network-selector'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import AccountActivityView from '../../account/account-activity-view'
 import authorization from '../../../state/auth/authorization'
@@ -10,23 +9,25 @@ import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import './wallet.scss'
 
-export default function WalletOperationsWrapperView({title, action, disabled, prepareTransaction, onConfirm, children}) {
+export default function WalletOperationsWrapperView({title, action, disabled, prepareTransaction, onConfirm, onFinalize, children}) {
     const network = useStellarNetwork()
+
     async function confirm() {
         try {
             const tx = await prepareTransaction()
             if (!tx) return
-            await confirmTransaction(network, tx)
+            await confirmTransaction(network, tx, onFinalize)
             onConfirm()
         } catch (e) {
             console.error('Failed to prepare transaction', e)
+            alert('Transaction execution failed')
         }
     }
 
     return <div className="wallet-operations space">
-        <h3>{title}</h3>
+        {!!title && <h3>{title}</h3>}
+        <hr className="flare"/>
         {children}
-
         <div className="space">
             <Button block disabled={disabled} onClick={confirm}>{action}</Button>
         </div>
@@ -35,7 +36,7 @@ export default function WalletOperationsWrapperView({title, action, disabled, pr
     </div>
 }
 
-async function confirmTransaction(network, transaction) {
+async function confirmTransaction(network, transaction, onFinalize) {
     //obtain user credentials
     const credentials = await authorization.requestAuthorization(accountManager.activeAccount)
 
@@ -64,6 +65,10 @@ async function confirmTransaction(network, transaction) {
     //submit to the network
     createHorizon(network)
         .submitTransaction(transaction)
+        .then(() => {
+            accountLedgerData.loadAccountInfo()
+            onFinalize && onFinalize(network, transaction, accountLedgerData)
+        })
         .catch(e => {
             console.error(e)
             accountLedgerData.history.addNewTx({...inProgressTx, inProgress: false, successful: false})

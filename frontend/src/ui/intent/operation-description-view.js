@@ -1,6 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AccountAddress, Amount, AssetLink, AssetDescriptor} from '@stellar-expert/ui-framework'
+import {
+    AccountAddress,
+    Amount,
+    AssetLink,
+    AssetDescriptor,
+    formatPrice,
+    formatWithAutoPrecision
+} from '@stellar-expert/ui-framework'
 import {xdrParseClaimant} from '../../util/claim-condtions-xdr-parser'
 
 function formatBalanceId(balance) {
@@ -119,14 +126,16 @@ export default function OperationDescriptionView({op, source}) {
                 </>}
             </>
         case 'changeTrust':
+            const trustAsset = AssetDescriptor.parse(op.line)
             if (parseFloat(op.limit) > 0)
                 return <>
-                    <b>Create trustline</b> for <AssetLink asset={op.line}/>
-                    {op.limit !== '922337203685.4775807' && <> with limit <Amount amount={op.limit} asset={op.line}/></>}
+                    <b>Create trustline</b> for <AssetLink asset={trustAsset}/>
+                    {op.limit !== '922337203685.4775807' &&
+                    <> with limit <Amount amount={op.limit} asset={trustAsset}/></>}
                     <SourceAccount/>
                 </>
             return <>
-                <b>Remove trustline</b> to <AssetLink asset={op.line}/><SourceAccount/>
+                <b>Remove trustline</b> to <AssetLink asset={trustAsset}/><SourceAccount/>
             </>
         case 'allowTrust':
             asset = {code: op.assetCode, issuer: op.source || source}
@@ -223,6 +232,22 @@ export default function OperationDescriptionView({op, source}) {
             return <>
                 <b>Set trustline flags</b> {op.setFlags}, clear flags {op.clearFlags} for asset{' '}
                 <AssetLink asset={op.asset}/> of account <AccountAddress account={op.trustor}/><SourceAccount/>
+            </>
+        case 'liquidityPoolDeposit':
+            return <>
+                <b>Deposit liquidity</b> <Amount asset={'tokens A'} amount={op.maxAmountA}/>{' '}
+                and <Amount asset={'tokens B'} amount={op.maxAmountB}/> to the pool <AssetLink
+                asset={op.liquidityPoolId}/>{' '}
+                <span className="dimmed">(price range {formatPrice(op.minPrice)} - {formatPrice(op.maxPrice)})</span>
+                <SourceAccount/>
+            </>
+        case 'liquidityPoolWithdraw':
+            return <>
+                <b>Withdraw liquidity</b> from the pool <AssetLink asset={op.liquidityPoolId}/> –{' '}
+                {formatWithAutoPrecision(op.amount)} shares
+                <span className="dimmed"> (minimum <Amount asset={'tokens A'} amount={op.minAmountA}/>{' '}
+                    and <Amount asset={'tokens B'} amount={op.minAmountB}/>)</span>
+                <SourceAccount/>
             </>
     }
     throw new Error(`Not supported operation type: ${op.type}.`)

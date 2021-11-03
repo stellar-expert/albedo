@@ -2,8 +2,8 @@ import {autorun, runInAction, makeAutoObservable} from 'mobx'
 import {Asset, Memo} from 'stellar-sdk'
 import {debounce} from 'throttle-debounce'
 import BigNumber from 'bignumber.js'
+import {AssetDescriptor} from '@stellar-expert/ui-framework'
 import {streamLedgers} from '../../../util/ledger-stream'
-import {wrapAsset} from '../../../util/wrap-asset'
 import {createHorizon} from '../../../util/horizon-connector'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {prepareTransferTx} from './transfer-tx-builder'
@@ -160,7 +160,7 @@ class TransferSettings {
         this.conversionSlippage = slippage
     }
 
-    setAsset(asset, direction) {
+    setAsset(asset, index) {
         this.conversionPathLoaded = false
         this.createTrustline = false
         if (this.mode !== 'convert') {
@@ -168,14 +168,7 @@ class TransferSettings {
             this.createDestination = false
             this.amount[1] = this.amount[0]
         } else {
-            switch (direction) {
-                case 'source':
-                    this.asset[0] = asset
-                    break
-                case 'dest':
-                    this.asset[1] = asset
-                    break
-            }
+            this.asset[index] = asset
             if (this.asset[0] === this.asset[1]) {
                 this.amount[1] = this.amount[0]
             }
@@ -192,9 +185,10 @@ class TransferSettings {
             return
         }
         this.conversionFeasible = false
-        this.amount[this.conversionDirection === 'source' ? 1 : 0] = ''
+        const target = this.conversionDirection === 'source' ? 1 : 0
+        this.amount[target] = ''
 
-        if (!this.amount[0] || !this.amount[1] || !this.conversionDirection) return
+        if (!this.amount[0] && !this.amount[1] || !this.conversionDirection) return
         this.findConversionPath()
     }
 
@@ -203,10 +197,10 @@ class TransferSettings {
         let endpoint
         if (this.conversionDirection === 'source') {
             if (!parseFloat(this.amount[0])) return
-            endpoint = horizon.strictSendPaths(wrapAsset(this.asset[0]), this.amount[0], [wrapAsset(this.asset[1])])
+            endpoint = horizon.strictSendPaths(AssetDescriptor.parse(this.asset[0]).toAsset(), this.amount[0], [AssetDescriptor.parse(this.asset[1]).toAsset()])
         } else {
             if (!parseFloat(this.amount[1])) return
-            endpoint = horizon.strictReceivePaths([wrapAsset(this.asset[0])], wrapAsset(this.asset[1]), this.amount[1])
+            endpoint = horizon.strictReceivePaths([AssetDescriptor.parse(this.asset[0]).toAsset()], AssetDescriptor.parse(this.asset[1]).toAsset(), this.amount[1])
         }
         return endpoint.call()
             .then(({records}) => {

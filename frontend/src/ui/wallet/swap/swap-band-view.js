@@ -3,14 +3,13 @@ import {observer} from 'mobx-react'
 import {formatWithAutoPrecision} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import './swap-band.scss'
+import AvailableAmountLink from '../shared/available-amount-link-ivew'
 
 function extractCode(asset) {
     return asset.split('-')[0]
 }
 
 function SwapBandView({settings}) {
-    const availableSourceBalance = accountLedgerData.getAvailableBalance(settings.asset[0])
-
     /*function revert() {
         transfer.reverse(!predefinedAssets.includes(transfer.destAsset))
     }*/
@@ -25,7 +24,7 @@ function SwapBandView({settings}) {
                 <a href="#" className="icon-shuffle"/>
             </div>
         </> : <div/>}
-        <SwapBandView settings={settings}/>
+        <AvailableAmountLink settings={settings} index={0}/>
     </div>
 }
 

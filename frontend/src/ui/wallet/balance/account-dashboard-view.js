@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
 import {observer} from 'mobx-react'
 import {Tabs} from '@stellar-expert/ui-framework'
-import AccountActivityView from '../account-activity-view'
-import AccountContextView from '../account-context-view'
+import AccountActivityView from '../../account/account-activity-view'
+import AccountContextView from '../../account/account-context-view'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
-import AllAccountBalancesView from './account-balance-view'
+import AllAccountBalancesView from './account-all-balances-view'
 
 function AccountDashboardView() {
     const [tab, setTab] = useState('balance')

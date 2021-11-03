@@ -1,6 +1,6 @@
 import errors from '../util/errors'
 import {isInsideFrame} from '../util/frame-utils'
-import {syncLocalStorage} from '../state/storage/local-storage-synchronizer'
+import {syncLocalStorage} from '../storage/local-storage-synchronizer'
 
 const urlSchema = 'url:'
 
