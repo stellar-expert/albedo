@@ -1,18 +1,11 @@
 import React from 'react'
+import {observer} from 'mobx-react'
 import BigNumber from 'bignumber.js'
 import PropTypes from 'prop-types'
 import {isValidPoolId, useDependantState, stripTrailingZeros} from '@stellar-expert/ui-framework'
 import AssetSelector from './asset-selector-view'
 
-export default function TransferAmountView({
-                                               settings,
-                                               index,
-                                               balances,
-                                               filterBalances = 'assets',
-                                               restricted,
-                                               placeholder,
-                                               error
-                                           }) {
+function TransferAmountView({settings, index, balances, filterBalances = 'assets', restricted, placeholder, error}) {
     const amount = settings.amount[index],
         [inputAmount, setInputAmount] = useDependantState(() => {
             if (!amount || amount === '0') return ''
@@ -72,3 +65,5 @@ TransferAmountView.propTypes = {
     placeholder: PropTypes.string,
     error: PropTypes.bool
 }
+
+export default observer(TransferAmountView)
