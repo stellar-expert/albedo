@@ -8,7 +8,7 @@ function AssetIcon({asset}) {
         icon = meta?.toml_info?.image || meta?.toml_info?.orgLogo
     if (asset.toString() === 'XLM') return <span className="asset-icon icon icon-stellar"/>
     if (icon) return <span style={{backgroundImage: `url('${icon}')`}} className="asset-icon"/>
-    return <span className="asset-icon icon icon-circle"/>
+    return <span className="asset-icon icon icon-dot-circled"/>
 }
 
 function AssetIssuer({asset}) {
@@ -26,11 +26,13 @@ function AssetIssuer({asset}) {
 }
 
 function BalanceAmount({amount}) {
-    const [integer, fractional] = formatCurrency(amount).split('.')
-    return <>{integer}{!!fractional && <span className="dimmed text-small">.{fractional}</span>}</>
+    const [integer, fractional = ''] = formatCurrency(amount).split('.')
+    return <div className="asset-amount">
+        {integer}<span className="dimmed text-small">.{fractional.padEnd(7, '0')}</span>
+    </div>
 }
 
-function denominate(value){
+function denominate(value) {
     return new Bignumber(value).div(10000000).toFixed(7)
 }
 
@@ -63,11 +65,13 @@ export default function AccountBalanceView({balance, asset, children}) {
                     </div>
                 </div>
                 <div>
-                    <div className="asset-amount"><BalanceAmount amount={stakeValue[0]}/></div>
-                    <div className="asset-amount"><BalanceAmount amount={stakeValue[1]}/></div>
+                    <BalanceAmount amount={stakeValue[0]}/>
+                    <BalanceAmount amount={stakeValue[1]}/>
                 </div>
             </div>
-            {children}
+            {
+                children
+            }
             <hr className="flare"/>
         </>
     }
@@ -79,7 +83,7 @@ export default function AccountBalanceView({balance, asset, children}) {
                 <AssetIssuer asset={asset}/>
             </div>
             <div>
-                <div className="asset-amount"><BalanceAmount amount={balance.balance}/></div>
+                <BalanceAmount amount={balance.balance}/>
             </div>
         </div>
         <hr className="flare"/>

@@ -22,10 +22,10 @@ function LiquidityPoolDepositView() {
                                         disabled={disabled} onConfirm={() => deposit.resetOperationAmount()}
                                         onFinalize={() => navigation.navigate('/wallet/liquidity-pool')}>
         <div className="lp-deposit space">
-            <TransferAmountView settings={deposit} index={0} balances={userAssets}/>
+            <TransferAmountView settings={deposit} index={0} balances={userAssets} restricted/>
             <AvailableAmountLink settings={deposit} index={0}/>
             <div className="micro-space"/>
-            <TransferAmountView settings={deposit} index={1} balances={userAssets}/>
+            <TransferAmountView settings={deposit} index={1} balances={userAssets} restricted/>
             <AvailableAmountLink settings={deposit} index={1}/>
             <SlippageView title="Slippage tolerance" defaultValue={1} max={50} step={1}
                           onChange={v => deposit.setSlippage(v)}/>

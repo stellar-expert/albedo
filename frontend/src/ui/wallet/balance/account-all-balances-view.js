@@ -1,11 +1,12 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {observer} from 'mobx-react'
 import {parseAssetFromObject} from '@stellar-expert/ui-framework'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
 import AccountBalanceView from './account-balance-view'
 
 function AllAccountBalancesView({ledgerData}) {
-    if (!ledgerData) return <div className="loader"/>
+    const [fundingInProgress, setFundingInProgress] = useState(false)
+    if (!ledgerData || fundingInProgress) return <div className="loader"/>
     if (ledgerData.error && !ledgerData.nonExisting) return <div className="text-small error">
         <i className="icon-warning"/> {ledgerData.error}
     </div>
@@ -16,8 +17,11 @@ function AllAccountBalancesView({ledgerData}) {
     }
 
     function createTestnetAccount() {
+        setFundingInProgress(true)
         requestFriendbotFunding(address)
+            .then(() => new Promise(r => setTimeout(r, 5000)))
             .then(() => ledgerData.loadAccountInfo())
+            .finally(() => setFundingInProgress(false))
     }
 
     return <div>
@@ -28,10 +32,11 @@ function AllAccountBalancesView({ledgerData}) {
         {nonExisting && <div className="dimmed text-tiny space text-center">
             (Balances unavailable - account doesn't exist on the ledger)
             {network === 'testnet' && <div>
-                We can create a <b>testnet</b> account for you.
+                We can create a <b>testnet</b> account for you.{' '}
                 <a href="#" onClick={createTestnetAccount}>Create it now?</a>
             </div>}
         </div>}
     </div>
 }
+
 export default observer(AllAccountBalancesView)

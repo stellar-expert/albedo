@@ -13,11 +13,10 @@ class TransferSettings {
     constructor(network, mode = 'direct') {
         this.network = network
         this.mode = mode
-        makeAutoObservable(this)
-
         this.asset = ['XLM', 'XLM']
         this.amount = ['0', '0']
         this.conversionSlippage = 0.5
+        makeAutoObservable(this)
 
         autorun(() => {
             const {
@@ -243,6 +242,7 @@ class TransferSettings {
     }
 
     resetOperationAmount() {
+        this.amount = ['0', '0']
         this.setAmount(undefined, 0)
     }
 }

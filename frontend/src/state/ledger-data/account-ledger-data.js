@@ -108,6 +108,7 @@ class AccountLedgerData {
                     this.balances = accountData.balancesMap
                     this.pendingLiabilities = {} //reset after each account info update
                     this.nonExisting = false
+                    this.error = null
                 }
                 this.loaded = true
             }))
