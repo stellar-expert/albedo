@@ -1,13 +1,20 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
-import {useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AssetDescriptor, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 
 function createTestnetAccount() {
     requestFriendbotFunding(accountLedgerData.address)
         .then(() => accountLedgerData.loadAccountInfo())
+}
+
+function canReceive(destination, asset) {
+    if (destination.nonExisting) return false
+    if (asset === 'XLM') return true //TODO: check minimal balance
+    if (!destination.balancesMap[asset] && destination.id !== AssetDescriptor.parse(asset).issuer) return false
+    return true
 }
 
 function validate(network, destination, transfer, directoryInfo) {
@@ -51,11 +58,10 @@ function validate(network, destination, transfer, directoryInfo) {
 
     if (transfer.source !== transfer.destination) { //external payment
         if (transfer.asset[1] !== 'XLM') {
-            if (destination.nonExisting || !destination.balancesMap[transfer.asset[1]]) return <>
+            if (!canReceive(destination, transfer.asset[1])) return <>
                 The recipient account does not have a trustline to {assetCode} and cannot
                 receive the payment. Yet you still can send tokens using a{' '}
                 <a href="#" onClick={switchToClaimableBalance}>claimable balance</a>.
-
             </>
         } else if (destination.nonExisting && !transfer.createDestination)
             return <>

@@ -4,12 +4,6 @@ import {Dropdown, AssetLink, useAssetList} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import './asset-selector.scss'
 
-function AssetSelectorItem({asset}) {
-    return <span>
-        <AssetLink link={false} asset={asset}/>
-    </span>
-}
-
 function AssetSelectorView({value, predefinedAssets, onChange, restricted}) {
     const [search, setSearch] = useState(''),
         searchRef = useRef(),
@@ -20,8 +14,8 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted}) {
     for (let asset of predefinedAssets) {
         options.push({
             value: asset,
-            title: <AssetSelectorItem asset={asset}
-                                      hidden={search && !asset.split('-')[0].toLowerCase().includes(search.toLowerCase())}/>
+            title: <AssetLink link={false} asset={asset}/>,
+            hidden: search && !asset.split('-')[0].toLowerCase().includes(search.toLowerCase())
         })
     }
     let loadNextPage
@@ -29,7 +23,7 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted}) {
         const {assets, loadPage, loading} = useAssetList({search: search?.trim() || undefined})
         for (let {asset} of assets) {
             if (!predefinedAssets.includes(asset)) {
-                options.push({value: asset, title: <AssetSelectorItem asset={asset}/>})
+                options.push({value: asset, title: <AssetLink link={false} asset={asset}/>})
             }
         }
         if (!options.length) {
