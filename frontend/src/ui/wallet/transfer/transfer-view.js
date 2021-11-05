@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
-import {Dropdown, InfoTooltip, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {Dropdown, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
 import TransferSettings from './transfer-settings'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'

@@ -51,7 +51,7 @@ function validate(network, destination, transfer, directoryInfo) {
 
     if (transfer.source !== transfer.destination) { //external payment
         if (transfer.asset[1] !== 'XLM') {
-            if (destination.nonExisting || !destination.balances[transfer.asset[1]]) return <>
+            if (destination.nonExisting || !destination.balancesMap[transfer.asset[1]]) return <>
                 The recipient account does not have a trustline to {assetCode} and cannot
                 receive the payment. Yet you still can send tokens using a{' '}
                 <a href="#" onClick={switchToClaimableBalance}>claimable balance</a>.
