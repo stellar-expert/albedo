@@ -52,7 +52,7 @@ function AccountPoolBalanceView({balance, asset}) {
         return () => {
             unloaded = true
         }
-    })
+    }, [asset.toString()])
 
     if (!poolInfo) return <div className="loader"/>
 
