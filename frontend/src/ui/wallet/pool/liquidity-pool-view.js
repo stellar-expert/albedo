@@ -16,14 +16,14 @@ function LiquidityPoolView() {
             {shares.map(balance => {
                 const asset = parseAssetFromObject(balance)
                 return <AccountBalanceView balance={balance} asset={asset} key={asset.toFQAN()}>
-                    <div className="text-right">
+                    {balance.balance > 0 && <div className="text-right">
                         <a href={'/wallet/liquidity-pool/withdraw?pool=' + asset.toString()} className="button button-outline small">
                             Withdraw liquidity</a>
-                    </div>
+                    </div>}
                 </AccountBalanceView>
             })}
             {nonExisting && <div className="dimmed text-tiny space text-center">
-                (Liquidity pool stakes unavailable - account doesn't exist on the ledger)
+                (Liquidity pool stakes unavailable – account doesn't exist on the ledger)
             </div>}
             {!!error && !nonExisting && <div className="text-small error">
                 <i className="icon-warning"/> {error}

@@ -18,20 +18,22 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
         assetsRatio = `${assets[0].code}/${assets[1].code}`,
         estimatedValue = estimateLiquidityPoolStakeValue(stake, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
     return <div className="segment text-small">
-        {!!estimatedValue && <div>
+        {(!!estimatedValue || stake !== undefined) && <div>
             <div className="dual-layout">
                 <div className="dimmed">Your stake:</div>
                 <div>
                     {adjustAmount(stake)} shares{' '}
-                    <span className="dimmed">({formatWithAutoPrecision(100 * stake / poolInfo.total_shares)}%)</span>
+                    {stake > 0 && <span className="dimmed">({formatWithAutoPrecision(100 * stake / poolInfo.total_shares)}%)</span>}
                 </div>
             </div>
-            <div>
-                &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]}/>
-            </div>
-            <div>
-                &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]}/>
-            </div>
+            {!!estimatedValue && <>
+                <div>
+                    &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]}/>
+                </div>
+                <div>
+                    &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]}/>
+                </div>
+            </>}
         </div>}
         <div>
             <div className="dimmed">Total liquidity locked:</div>
@@ -42,12 +44,12 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
                 &emsp;<Amount amount={reserves[1]} asset={assets[1]}/>
             </div>
         </div>
-        <div className="dual-layout">
+        {!!price && <div className="dual-layout">
             <div className="dimmed">Current pool price:</div>
             <div>
                 {formatPrice(price)} {assetsRatio}
             </div>
-        </div>
+        </div>}
         <div className="dual-layout">
             <div className="dimmed">Pool fee rate:</div>
             <div>{poolInfo.fee_bp / 100}%</div>
