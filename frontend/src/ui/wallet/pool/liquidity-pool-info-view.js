@@ -12,14 +12,6 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
     /*if (assets[0].toString() === assets[1].toString())
         return <div>Invalid asset pair – select two different assets</div>*/
     if (poolInfo === undefined) return <div className="loader"/>
-    if (!poolInfo)
-        return <div>
-            <div className="text-tiny dimmed text-center">This liquidity pool doesn't exist.
-                <br/>
-                You can deposit assets to create the pool.
-            </div>
-            {/*TODO: pool orderbook prices for new pools*/}
-        </div>
     const assets = poolInfo.reserves.map(r => AssetDescriptor.parse(r.asset)),
         reserves = poolInfo.reserves.map(r => r.amount),
         price = parseFloat(reserves[0]) / parseFloat(reserves[1]),
