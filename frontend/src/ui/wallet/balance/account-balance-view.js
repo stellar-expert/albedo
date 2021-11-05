@@ -1,6 +1,13 @@
-import React from 'react'
-import Bignumber from 'bignumber.js'
-import {AccountAddress, AssetDescriptor, useAssetMeta, formatCurrency, estimateLiquidityPoolStakeValue} from '@stellar-expert/ui-framework'
+import React, {useEffect, useState} from 'react'
+import {
+    AccountAddress,
+    AssetDescriptor,
+    useAssetMeta,
+    formatCurrency,
+    estimateLiquidityPoolStakeValue,
+    useStellarNetwork
+} from '@stellar-expert/ui-framework'
+import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
 import './account-balance.scss'
 
 function AssetIcon({asset}) {
@@ -32,60 +39,74 @@ function BalanceAmount({amount}) {
     </div>
 }
 
-function denominate(value) {
-    return new Bignumber(value).div(10000000).toFixed(7)
+function AccountPoolBalanceView({balance, asset}) {
+    const [poolInfo, setPoolInfo] = useState(),
+        network = useStellarNetwork()
+    useEffect(() => {
+        let unloaded = false
+        resolvePoolParams(network, asset.toString(), true)
+            .then(res => {
+                if (unloaded) return
+                setPoolInfo(res)
+            })
+        return () => {
+            unloaded = true
+        }
+    })
+
+    if (!poolInfo) return <div className="loader"/>
+
+    const stake = poolInfo.total_shares,
+        reserves = poolInfo.reserves.map(r => r.amount),
+        assets = poolInfo.reserves.map(r => AssetDescriptor.parse(r.asset)),
+        stakeValue = estimateLiquidityPoolStakeValue(balance.balance, reserves, stake) || ['0', '0']
+
+    return <div className="account-balance liquidity-pool">
+        <div style={{width: '3em'}}>
+            <div>
+                <AssetIcon asset={assets[0]}/>
+            </div>
+            <div>
+                <AssetIcon asset={assets[1]}/>
+            </div>
+        </div>
+        <div className="text-left">
+            <div>
+                <div className="asset-code">{assets[0].code}</div>
+                <AssetIssuer asset={assets[0]}/>
+            </div>
+            <div>
+                <div className="asset-code">{assets[1].code}</div>
+                <AssetIssuer asset={assets[1]}/>
+            </div>
+        </div>
+        <div>
+            <BalanceAmount amount={stakeValue[0]}/>
+            <BalanceAmount amount={stakeValue[1]}/>
+        </div>
+    </div>
+}
+
+function AccountAssetBalanceView({balance, asset}) {
+    return <div className="account-balance">
+        <AssetIcon asset={asset}/>
+        <div className="text-left">
+            <div className="asset-code">{asset.code}</div>
+            <AssetIssuer asset={asset}/>
+        </div>
+        <div>
+            <BalanceAmount amount={balance.balance}/>
+        </div>
+    </div>
 }
 
 export default function AccountBalanceView({balance, asset, children}) {
     asset = AssetDescriptor.parse(asset)
-    const meta = useAssetMeta(asset)
-    if (asset.poolId) {
-        if (!meta) return <div className="loader"/>
-        const stake = denominate(meta.total_shares || meta.shares),
-            reserves = meta.assets.map(r => denominate(r.amount)),
-            stakeValue = estimateLiquidityPoolStakeValue(balance.balance, reserves, stake)
-        return <>
-            <div className="account-balance liquidity-pool">
-                <div style={{width: '3em'}}>
-                    <div>
-                        <AssetIcon asset={meta.assets[0].asset}/>
-                    </div>
-                    <div>
-                        <AssetIcon asset={meta.assets[1].asset}/>
-                    </div>
-                </div>
-                <div className="text-left">
-                    <div>
-                        <div className="asset-code">{AssetDescriptor.parse(meta.assets[0].asset).code}</div>
-                        <AssetIssuer asset={meta.assets[0].asset}/>
-                    </div>
-                    <div>
-                        <div className="asset-code">{AssetDescriptor.parse(meta.assets[1].asset).code}</div>
-                        <AssetIssuer asset={meta.assets[1].asset}/>
-                    </div>
-                </div>
-                <div>
-                    <BalanceAmount amount={stakeValue[0]}/>
-                    <BalanceAmount amount={stakeValue[1]}/>
-                </div>
-            </div>
-            {
-                children
-            }
-            <hr className="flare"/>
-        </>
-    }
     return <>
-        <div className="account-balance">
-            <AssetIcon asset={asset}/>
-            <div className="text-left">
-                <div className="asset-code">{asset.code}</div>
-                <AssetIssuer asset={asset}/>
-            </div>
-            <div>
-                <BalanceAmount amount={balance.balance}/>
-            </div>
-        </div>
+        {asset.poolId ?
+            <AccountPoolBalanceView asset={asset} balance={balance}/> :
+            <AccountAssetBalanceView asset={asset} balance={balance}/>}
+        {children}
         <hr className="flare"/>
     </>
 }
