@@ -174,9 +174,23 @@ class TransferSettings {
         }
     }
 
+    reverse() {
+        if (this.conversionDirection === 'source') {
+            this.amount = ['0', this.amount[0]]
+            this.conversionDirection = 'dest'
+        } else {
+            this.amount = [this.amount[1], '0']
+            this.conversionDirection = 'source'
+        }
+        this.asset = this.asset.slice().reverse()
+        this.createTrustline = false
+        this.conversionPathLoaded = false
+        this.createDestination = false
+    }
+
     recalculateSwap() {
         if (this.conversionPathLoaded || this.mode !== 'convert') return
-        this.path = undefined
+        this.conversionPath = undefined
         this.conversionPrice = undefined
         if (this.asset[0] === this.asset[1]) {
             this.conversionFeasible = true
@@ -237,13 +251,13 @@ class TransferSettings {
         })
     }
 
-    prepareTransaction() {
-        return prepareTransferTx(this)
-    }
-
     resetOperationAmount() {
         this.amount = ['0', '0']
-        this.setAmount(undefined, 0)
+        this.setAmount('0', 0)
+    }
+
+    prepareTransaction() {
+        return prepareTransferTx(this)
     }
 }
 

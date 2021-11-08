@@ -1,9 +1,8 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {formatWithAutoPrecision} from '@stellar-expert/ui-framework'
-import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
-import './swap-band.scss'
 import AvailableAmountLink from '../shared/available-amount-link-ivew'
+import './swap-band.scss'
 
 function extractCode(asset) {
     return asset.split('-')[0]
@@ -18,10 +17,10 @@ function SwapBandView({settings}) {
         {settings.mode === 'convert' ? <>
             <div className="dimmed text-tiny condensed">
                 {settings.conversionPathLoaded && !settings.conversionFeasible && <><i className="icon-block"/>not available</>}
-                {!!settings.conversionPrice && `~${formatWithAutoPrecision(settings.conversionPrice)} ${extractCode(settings.asset[1])}/${extractCode(settings.asset[1])}`}
+                {!!settings.conversionPrice && `~${formatWithAutoPrecision(settings.conversionPrice)} ${extractCode(settings.asset[1])}/${extractCode(settings.asset[0])}`}
             </div>
             <div className="switch">
-                <a href="#" className="icon-shuffle"/>
+                <a href="#" className="icon-shuffle" onClick={() => settings.reverse()}/>
             </div>
         </> : <div/>}
         <AvailableAmountLink settings={settings} index={0}/>
