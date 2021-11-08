@@ -19,6 +19,7 @@ export default function WalletOperationsWrapperView({title, action, disabled, pr
             await confirmTransaction(network, tx, onFinalize)
             onConfirm()
         } catch (e) {
+            if (e.code === -4) return
             console.error('Failed to prepare transaction', e)
             alert('Transaction execution failed')
         }
