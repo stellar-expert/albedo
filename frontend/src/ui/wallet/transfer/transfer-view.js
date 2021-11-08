@@ -11,6 +11,7 @@ import SwapSlippageView from '../shared/slippage-view'
 import TransferValidationView from './transfer-validation-view'
 import TransferMemoView from './transfer-memo-view'
 import AvailableAmountLink from '../shared/available-amount-link-ivew'
+import SwapBandView from '../swap/swap-band-view'
 
 const TransferTitleView = observer(function TransferTitleView({transfer}) {
     const options = [
@@ -52,10 +53,13 @@ function TransferView() {
                 <div className="space"/>
                 <TransferAmountView settings={transfer} index={0} balances={balances} restricted
                                     placeholder="Amount to send"/>
-                <AvailableAmountLink settings={transfer} index={0}/>
-                {transfer.mode === 'convert' &&
-                <TransferAmountView settings={transfer} index={1} balances={balances}
-                                    placeholder="Amount received"/>}
+                {transfer.mode !== 'convert' ?
+                    <AvailableAmountLink settings={transfer} index={0}/> :
+                    <>
+                        <SwapBandView settings={transfer}/>
+                        <TransferAmountView settings={transfer} index={1} balances={balances}
+                                            placeholder="Amount received"/>
+                    </>}
             </div>
             {transfer.mode === 'convert' &&
             <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
