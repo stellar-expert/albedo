@@ -16,7 +16,7 @@ function LiquidityPoolDepositView() {
     const network = useStellarNetwork(),
         userAssets = accountLedgerData.balancesWithPriority,
         [deposit] = useDependantState(() => new LiquidityPoolDepositSettings(network), [network]),
-        disabled = !deposit?.hasSufficientBalance,
+        disabled = !deposit.isValid,
         poolInfo = useLiquidityPoolInfo(deposit.poolId)
 
     return <WalletOperationsWrapperView title="Deposit liquidity" action="Deposit" prepareTransaction={() => deposit.prepareTransaction()}

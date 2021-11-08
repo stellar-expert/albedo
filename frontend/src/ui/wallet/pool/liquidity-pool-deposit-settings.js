@@ -43,10 +43,19 @@ export default class LiquidityPoolDepositSettings {
         return !!accountLedgerData.balances[this.poolId]
     }
 
+    get isValid() {
+        return this.amount[0] > 0
+            && this.amount[1] > 0
+            && this.asset[0] != this.asset[1]
+            && this.poolInfo?.loaded
+            && this.hasSufficientBalance
+    }
+
     setAsset(asset, index) {
         this.asset[index] = asset
-        this.amount = ['', '']
+        this.amount[index] = ''
         this.loadPoolInfo()
+            .then(() => this.recalculate(1 - index))
     }
 
     setAmount(amount, index) {
