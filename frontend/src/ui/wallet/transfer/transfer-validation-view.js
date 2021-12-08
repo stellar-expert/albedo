@@ -13,7 +13,8 @@ function createTestnetAccount() {
 function canReceive(destination, asset) {
     if (destination.nonExisting) return false
     if (asset === 'XLM') return true //TODO: check minimal balance
-    if (!destination.balancesMap[asset] && destination.id !== AssetDescriptor.parse(asset).issuer) return false
+    if (!destination.balancesMap || !destination.balancesMap[asset]) return false
+    if (destination.id === AssetDescriptor.parse(asset).issuer) return true
     return true
 }
 
@@ -23,11 +24,11 @@ function validate(network, destination, transfer, directoryInfo) {
         Please check whether you copied it correctly.
     </>
 
-    if (!destination || !transfer.asset[1] || !parseFloat(transfer.amount[0]) || !parseFloat(transfer.amount[1])) return false
-
-    if (transfer.memo?.invalid) return <>
+    if (transfer.invalidMemo) return <>
         Invalid memo format. Please check the value.
     </>
+
+    if (!destination || !transfer.asset[1] || !parseFloat(transfer.amount[0]) || !parseFloat(transfer.amount[1])) return false
 
     const assetCode = transfer.asset[1].split('-')[0]
 

@@ -1,7 +1,7 @@
 {
   "name": "albedo",
   "private": true,
-  "version": "0.14.3",
+  "version": "0.14.4",
   "description": "Delegated transactions and messages signer for Stellar Network",
   "author": "StellarExpertTeam<info@stellar.expert>",
   "license": "MIT",
@@ -53,7 +53,7 @@
     "@ledgerhq/hw-app-str": "^6.3.0",
     "@ledgerhq/hw-transport-webusb": "^6.3.0",
     "@stellar-expert/tx-signers-inspector": "^1.2.1",
-    "@stellar-expert/ui-framework": "github:stellar-expert/ui-framework",
+    "@stellar-expert/ui-framework": "github:stellar-expert/ui-framework#56ba6245bee6ff18a22532cd325d26f6d7e9d4eb",
     "aes-js": "^3.1.2",
     "archiver": "^5.3.0",
     "argon2-browser": "^1.18.0",

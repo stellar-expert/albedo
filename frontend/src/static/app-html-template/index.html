@@ -26,6 +26,7 @@
         }
 
         .loader {
+            --bg-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1OCA1OCI+DQo8cGF0aCBmaWxsPSIjMDY5MUI3IiBkPSJNMzAuMTA1Njc4NiwyLjUyODA3NTJoLTIuMjExNDMxNUw1LjUwNzA0ODYsNTUuNDQzNjAzNWwwLjA2Njk0OTgsMC4wMjgzMjAzaDUuOTc0MDYwMWw0LjQ4MDAwMDUtMTAuNTg5MDAwNw0KCWM5LjMwOTgxNDUsMy4xMzc5Nzc2LDE5LjM5OTY3MTYsMy4wODUzODgyLDI4LjY3NjI2NzYtMC4xNDk0NzEzbDQuNTQzMjgxNiwxMC43Mzg0NjA1aDMuMTc4MzQwOWwwLjA2NzAwMTMtMC4wMjgzMjAzDQoJTDMwLjEwNTY3ODYsMi41MjgwNzUyeiBNMzAuMTUwNTk4NSw0NS4xOTg2MTIyYy00LjUzMzk0Ny0wLjAwMDg4NS05LjAzODA4MDItMC43MzI5NTIxLTEzLjMzODkzMDEtMi4xNjc5OTkzbDEzLjU4NjAwMDQtMzIuMTEyMzY5NQ0KCWwxMy41MjU5OTkxLDMxLjk3MDA4OUMzOS40OTI4NDM2LDQ0LjQxODEyOSwzNC44MzgwNzc1LDQ1LjE5ODkxMzYsMzAuMTUwNTk4NSw0NS4xOTg2MTIyeiIvPg0KPC9zdmc+");
             display: block;
             font-size: 16px;
             width: 2em;
@@ -33,7 +34,9 @@
             margin: 1em auto;
             padding: 1em;
             box-sizing: border-box;
-            background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1OCA1OCI+DQo8cGF0aCBmaWxsPSIjMDY5MUI3IiBkPSJNMzAuMTA1Njc4NiwyLjUyODA3NTJoLTIuMjExNDMxNUw1LjUwNzA0ODYsNTUuNDQzNjAzNWwwLjA2Njk0OTgsMC4wMjgzMjAzaDUuOTc0MDYwMWw0LjQ4MDAwMDUtMTAuNTg5MDAwNw0KCWM5LjMwOTgxNDUsMy4xMzc5Nzc2LDE5LjM5OTY3MTYsMy4wODUzODgyLDI4LjY3NjI2NzYtMC4xNDk0NzEzbDQuNTQzMjgxNiwxMC43Mzg0NjA1aDMuMTc4MzQwOWwwLjA2NzAwMTMtMC4wMjgzMjAzDQoJTDMwLjEwNTY3ODYsMi41MjgwNzUyeiBNMzAuMTUwNTk4NSw0NS4xOTg2MTIyYy00LjUzMzk0Ny0wLjAwMDg4NS05LjAzODA4MDItMC43MzI5NTIxLTEzLjMzODkzMDEtMi4xNjc5OTkzbDEzLjU4NjAwMDQtMzIuMTEyMzY5NQ0KCWwxMy41MjU5OTkxLDMxLjk3MDA4OUMzOS40OTI4NDM2LDQ0LjQxODEyOSwzNC44MzgwNzc1LDQ1LjE5ODkxMzYsMzAuMTUwNTk4NSw0NS4xOTg2MTIyeiIvPg0KPC9zdmc+");
+            background: var(--bg-image);
+            mask-image: var(--bg-image);
+            -webkit-mask-image: var(--bg-image);
             background-size: auto 2em;
             animation: loader-appear 0.5s;
             overflow: hidden;

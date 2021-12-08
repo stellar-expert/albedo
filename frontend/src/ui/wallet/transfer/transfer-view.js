@@ -15,9 +15,9 @@ import SwapBandView from '../swap/swap-band-view'
 
 const TransferTitleView = observer(function TransferTitleView({transfer}) {
     const options = [
-        {title: 'Direct', value: 'direct'},
-        {title: 'Convert', value: 'convert'},
-        {title: 'Claimable', value: 'claimable'}
+        {title: 'direct', value: 'direct'},
+        {title: 'convert', value: 'convert'},
+        {title: 'claimable', value: 'claimable'}
     ]
 
     function onChange(mode) {

@@ -26,14 +26,14 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted}) {
                 options.push({value: asset, title: <AssetLink link={false} asset={asset}/>})
             }
         }
-        if (!options.length) {
+        if (!options.filter(opt => !opt.hidden).length) {
             if (loading) {
                 options.push({value: '...', disabled: true, title: <div className="loader"/>})
             } else {
                 options.push({
                     value: 'no',
                     disabled: true,
-                    title: <span className="dimmed text-center text-small">(not found)</span>
+                    title: <div className="dimmed text-center text-small">(not found)</div>
                 })
             }
         }

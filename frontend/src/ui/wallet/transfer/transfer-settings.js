@@ -5,9 +5,9 @@ import BigNumber from 'bignumber.js'
 import {AssetDescriptor} from '@stellar-expert/ui-framework'
 import {streamLedgers} from '../../../util/ledger-stream'
 import {createHorizon} from '../../../util/horizon-connector'
+import {encodeMemo} from '../../../util/memo'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {prepareTransferTx} from './transfer-tx-builder'
-import {encodeMemo} from '../../../util/memo'
 
 class TransferSettings {
     constructor(network, mode = 'direct') {
@@ -39,14 +39,6 @@ class TransferSettings {
      * @type {TransferMode}
      */
     mode = 'direct'
-
-    /**
-     * @type {String}
-     */
-    get source() {
-        return accountLedgerData.address
-    }
-
     /**
      * @type {String}
      */
@@ -62,7 +54,11 @@ class TransferSettings {
     /**
      * @type {Memo}
      */
-    memo
+    memo = null
+    /**
+     * @type {Boolean}
+     */
+    invalidMemo = false
     /**
      * @type {[String]}
      */
@@ -103,6 +99,12 @@ class TransferSettings {
      * @type {Number}
      */
     currentLedgerSequence
+    /**
+     * @type {String}
+     */
+    get source() {
+        return accountLedgerData.address
+    }
 
     get isSelfPayment() {
         return this.source === this.destination
@@ -133,9 +135,11 @@ class TransferSettings {
         this.createTrustline = false
         this.destinationFederationAddress = null
         this.memo = null
+        this.invalidMemo = false
         if (federationInfo) {
             this.destinationFederationAddress = federationInfo.link
             this.memo = encodeMemo(federationInfo)
+            this.invalidMemo = false
         }
     }
 
