@@ -28,10 +28,10 @@ module.exports = function (env, argv) {
             path: path.join(__dirname, '../distr/app/'),
             filename: pathData => {
                 if (['albedo-intent', 'albedo-intent-button', 'albedo-payment-button'].includes(pathData.chunk.name)) return '[name].js'
-                return fileNameFormat
+                return `${pathData.runtime}.${pathData.hash}.js`
             },
-            chunkFilename: pathData=>{
-                return pathData.chunk.id +'.js';
+            chunkFilename: pathData => {
+                return `${pathData.chunk.name}.${pathData.chunk.hash}.js`
             },
             publicPath: '/',
             clean: true
