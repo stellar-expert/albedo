@@ -22,7 +22,7 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
             <div className="dual-layout">
                 <div className="dimmed">Your stake:</div>
                 <div>
-                    {adjustAmount(stake)} shares{' '}
+                    {stake} shares{' '}
                     {stake > 0 && <span className="dimmed">({formatWithAutoPrecision(100 * stake / poolInfo.total_shares)}%)</span>}
                 </div>
             </div>

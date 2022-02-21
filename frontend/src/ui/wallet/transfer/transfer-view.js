@@ -10,7 +10,7 @@ import TransferAmountView from '../shared/transfer-amount-view'
 import SwapSlippageView from '../shared/slippage-view'
 import TransferValidationView from './transfer-validation-view'
 import TransferMemoView from './transfer-memo-view'
-import AvailableAmountLink from '../shared/available-amount-link-ivew'
+import AvailableAmountLink from '../shared/available-amount-link-view'
 import SwapBandView from '../swap/swap-band-view'
 
 const TransferTitleView = observer(function TransferTitleView({transfer}) {
@@ -44,7 +44,7 @@ function TransferView() {
 
     return <WalletOperationsWrapperView title={<TransferTitleView transfer={transfer}/>} action="Transfer"
                                         disabled={disabled} prepareTransaction={() => transfer.prepareTransaction()}
-                                        onConfirm={() => transfer.resetOperationAmount()}>
+                                        onFinalize={() => transfer.resetOperationAmount()}>
         <div className="transfer space">
             <div className="params">
                 <TransferDestinationView address={transfer.destination}

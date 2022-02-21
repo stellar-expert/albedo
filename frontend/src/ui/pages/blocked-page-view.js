@@ -1,5 +1,5 @@
 import React from 'react'
-import {parseQuery} from '../../util/url-utils'
+import {parseQuery} from '@stellar-expert/ui-framework'
 
 export default function BlockedPageView() {
     const {from = ''} = parseQuery()

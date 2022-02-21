@@ -10,14 +10,14 @@ function NavLink({link, icon, title, current}) {
 }
 
 export default function AccountNavMenu() {
-    const location = useLocation(),
-        network = useStellarNetwork()
+    useLocation()
+    useStellarNetwork()
 
     const links = [
-        {link: '/wallet/transfer', icon: 'icon-flash', title: 'Transfer'},
+        {link: '/account', icon: 'icon-coins', title: 'Balance'},
         {link: '/wallet/swap', icon: 'icon-switch', title: 'Swap'},
+        {link: '/wallet/transfer', icon: 'icon-flash', title: 'Transfer'},
         {link: '/wallet/liquidity-pool', icon: 'icon-liquidity-pool', title: 'Liquidity'},
-        {link: '/account', icon: 'icon-key', title: 'Balance'},
         {link: '/account-settings', icon: 'icon-settings', title: 'Settings'}
     ]
 

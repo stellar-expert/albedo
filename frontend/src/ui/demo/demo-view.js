@@ -1,9 +1,9 @@
 import React from 'react'
+import {useLocation} from 'react-router'
+import {parseQuery} from '@stellar-expert/ui-framework'
 import IntentBlock from './demo-intent-block/demo-intent-block-view'
 import DemoIntroView from './demo-intro-view'
 import DemoNavigationView from './demo-navigation-view'
-import {useLocation} from 'react-router'
-import {parseQuery} from '../../util/url-utils'
 
 export default function DemoView() {
     const location = useLocation(),

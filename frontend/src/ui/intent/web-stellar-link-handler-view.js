@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {navigation} from '@stellar-expert/ui-framework'
-import {parseQuery} from '../../util/url-utils'
+import {navigation, parseQuery} from '@stellar-expert/ui-framework'
 import actionContext from '../../state/action-context'
 import {replaceTokens} from '../../util/tx-replace-utils'
 
@@ -9,7 +8,7 @@ const allowedIntents = ['tx', 'pay']
 function WebStellarLinkHandlerView() {
     const [error, setError] = useState(null)
     useEffect(() => {
-        const {sep0007link = ''} = parseQuery(),
+        const {sep0007link = ''} = navigation.query,
             [intentPart, sepLinkParams] = sep0007link.split('?'),
             [protocol, intentName] = intentPart.split(':'),
             referrer = document.referrer && new URL(document.referrer).origin || null

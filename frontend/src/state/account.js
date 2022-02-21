@@ -6,7 +6,7 @@ import {encryptAccountSecret, decryptAccountSecret, persistAccountInBrowser} fro
 import {extractDeviceId} from '../util/device-id-generator'
 import {currentStorageVersion} from '../storage/storage-version'
 
-const ACCOUNT_TYPES = {
+export const ACCOUNT_TYPES = {
     STORED_ACCOUNT: 0,
     LEDGER_ACCOUNT: 1,
     TREZOR_ACCOUNT: 2
@@ -19,7 +19,7 @@ function cleanBipPath(path) {
 /**
  * Encapsulates general account properties and serves as a root container for the associated keypairs
  */
-class Account {
+export default class Account {
     /**
      * Create an Account instance from the stored account data
      * @param {Object} params - An object containing account properties
@@ -74,6 +74,12 @@ class Account {
     sessionTimeout = null
 
     /**
+     * The most recent checked ledger markers for notifications
+     * @type {Object}
+     */
+    seen
+
+    /**
      * Title to display in UI
      * @returns {String}
      */
@@ -122,6 +128,11 @@ class Account {
         return account
     }
 
+    /**
+     * Save account info to persistent storage
+     * @param {Credentials} credentials
+     * @return {Promise<Account>}
+     */
     async save(credentials) {
         this.verifyCredentials(credentials)
         await persistAccountInBrowser(this)
@@ -139,10 +150,32 @@ class Account {
         return secret
     }
 
+    /**
+     * Check validity of provided account credentials and throw exception if any problem found
+     * @param {Credentials} credentials
+     */
     verifyCredentials(credentials) {
         if (!credentials) throw new TypeError('Invalid credentials.')
         if (credentials.account !== this) throw new Error('Credentials account does not match invocation account.')
         if (!credentials.checkValidity()) throw new Error('Invalid credentials.')
+    }
+
+    /**
+     * Set the most recent checked ledger marker for particular notification
+     * @param {String} network
+     * @param {String} marker
+     * @param {Number} sequence
+     * @return {Promise<Account>}
+     */
+    async setCheckedMarker(network, marker, sequence) {
+        if (!(sequence > 0)) return this
+        const {seen = {}} = this,
+            container = seen[network] || {}
+        container[marker] = sequence
+        seen[network] = container
+        this.seen = seen
+        await persistAccountInBrowser(this)
+        return this
     }
 
     /**
@@ -168,9 +201,9 @@ class Account {
         if (this.sessionTimeout !== null) {
             res.sessionTimeout = this.sessionTimeout
         }
+        if (this.seen) {
+            res.seen = this.seen
+        }
         return res
     }
 }
-
-export default Account
-export {ACCOUNT_TYPES}

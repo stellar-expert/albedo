@@ -1,11 +1,5 @@
 .asset-selector {
-  position: absolute !important;
-  right: 0.5em;
-  top: 0.5em;
-
   .dd-header {
-    font-size: 0.85em;
-
     .asset-issuer {
       display: none;
     }
@@ -27,11 +21,15 @@
     }
 
     input {
-      padding-left: 1.5em;
       margin-bottom: 0;
 
       &:not(:placeholder-shown) + .icon-search {
         display: none;
+      }
+
+      &::placeholder {
+        font-size: 0.85em;
+        line-height: 1;
       }
     }
   }

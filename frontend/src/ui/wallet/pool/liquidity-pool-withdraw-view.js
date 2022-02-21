@@ -2,15 +2,7 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import Bignumber from 'bignumber.js'
 import {useLocation} from 'react-router'
-import {
-    navigation,
-    Slider,
-    isValidPoolId,
-    useDependantState,
-    useStellarNetwork,
-    stripTrailingZeros,
-    parseQuery, estimateLiquidityPoolStakeValue, adjustAmount
-} from '@stellar-expert/ui-framework'
+import {navigation, isValidPoolId, useDependantState, useStellarNetwork, stripTrailingZeros, parseQuery} from '@stellar-expert/ui-framework'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import SlippageView from '../shared/slippage-view'
 import LiquidityPoolWithdrawSettings from './liquidity-pool-withdraw-settings'
@@ -53,9 +45,8 @@ function LiquidityPoolWithdrawView() {
         }
     }
 
-    return <WalletOperationsWrapperView title="Withdraw liquidity" action="Withdraw"
+    return <WalletOperationsWrapperView title="Withdraw liquidity" action="Withdraw" disabled={disabled}
                                         prepareTransaction={() => withdraw.prepareTransaction()}
-                                        disabled={disabled} onConfirm={() => withdraw.setAmount('0')}
                                         onFinalize={() => navigation.navigate('/wallet/liquidity-pool')}>
         {withdraw.max === '0' ?
             <>

@@ -25,7 +25,7 @@ function SwapView() {
 
     return <WalletOperationsWrapperView title="Swap tokens" action="Swap" disabled={!valid || !swap.conversionFeasible}
                                         prepareTransaction={() => swap.prepareTransaction()}
-                                        onConfirm={() => swap.resetOperationAmount()}>
+                                        onFinalize={() => swap.resetOperationAmount()}>
         <div className="swap space">
             <div className="params">
                 <TransferAmountView settings={swap} index={0} balances={balances} restricted/>

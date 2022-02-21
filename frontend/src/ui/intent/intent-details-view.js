@@ -35,7 +35,7 @@ function RiskLevelIconView({risk}) {
 }
 
 function IntentDetailsView({expanded}) {
-    const {intentProps, intentErrors, txContext, networkName, origin} = actionContext
+    const {intent, intentProps, intentErrors, txContext, networkName, origin} = actionContext
     if (!intentProps) return null
     const {title, risk, unsafe} = intentProps,
         {pubkey} = actionContext.intentParams
@@ -45,9 +45,10 @@ function IntentDetailsView({expanded}) {
         <div className="dimmed">
             Requested by <a href={origin || '#'} target="_blank">{origin || 'Unknown application'}</a>
         </div>
-        <div className="space">
+        <div className="space"/>
+        {intent !== 'public_key' && <div>
             <IntentContextIconView color="info" main="cubes"/> Network: <b>{networkName}</b>
-        </div>
+        </div>}
         {!!pubkey &&
         <div>
             <IntentContextIconView color="warning" main="key" sub=""/> Public key: <AccountAddress account={pubkey}/>

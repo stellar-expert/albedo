@@ -256,6 +256,7 @@ class TransferSettings {
     }
 
     resetOperationAmount() {
+        this.createDestination = false
         this.amount = ['0', '0']
         this.setAmount('0', 0)
     }
@@ -266,7 +267,6 @@ class TransferSettings {
 }
 
 export default TransferSettings
-
 
 function adjustWithSlippage(value, direction, slippage) {
     return new BigNumber(value)

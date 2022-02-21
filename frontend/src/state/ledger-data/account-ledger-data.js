@@ -1,8 +1,9 @@
 import {useEffect, useState} from 'react'
 import {observable, makeObservable, action, computed, runInAction} from 'mobx'
 import {parseAssetFromObject, calculateAvailableBalance, useStellarNetwork} from '@stellar-expert/ui-framework'
-import {createHorizon} from '../../util/horizon-connector'
 import AccountTransactionHistory from './account-transactions-history'
+import AccountNotificationCounter from '../account-notification-counter'
+import {createHorizon} from '../../util/horizon-connector'
 
 const defaultThresholds = {low: 1, med: 1, high: 1}
 Object.freeze(defaultThresholds)
@@ -15,13 +16,16 @@ class AccountLedgerData {
         makeObservable(this, {
             address: observable,
             network: observable,
+            history: observable,
             accountData: observable.ref,
             balances: observable.ref,
             pendingLiabilities: observable.ref,
+            notificationCounters: observable,
             init: action,
             reset: action,
             error: observable,
             loaded: observable,
+            nonExisting: observable,
             balancesWithPriority: computed
         })
         this.pendingLiabilities = {}
@@ -58,6 +62,11 @@ class AccountLedgerData {
      */
     pendingLiabilities
 
+    /**
+     * @type {AccountNotificationCounter}
+     */
+    notificationCounters
+
     error
 
     nonExisting = false
@@ -81,6 +90,7 @@ class AccountLedgerData {
         this.address = address
         this.network = network
         this.history = new AccountTransactionHistory(network, address)
+        this.notificationCounters = new AccountNotificationCounter(network, address)
         this.reset()
         this.loadAccountInfo()
         this.history.startStreaming()
@@ -117,7 +127,7 @@ class AccountLedgerData {
     /**
      * Get asset amount available for trade/transfer with respect to liabilities and reserves
      * @param {String} asset - Asset identifier
-     * @param {Number} [additionalReserves] - Additional reserves required for the wallet operation
+     * @param {Number|String} [additionalReserves] - Additional reserves required for the wallet operation
      * @return {string}
      */
     getAvailableBalance(asset, additionalReserves = 0) {

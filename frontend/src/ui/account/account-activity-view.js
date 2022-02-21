@@ -1,11 +1,10 @@
-import React, {useRef} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {observer} from 'mobx-react'
 import {throttle} from 'throttle-debounce'
 import cn from 'classnames'
 import {ElapsedTime, TxLink, InlineProgress} from '@stellar-expert/ui-framework'
 import OperationDescriptionView from '../intent/operation-description-view'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
-import {xdrParseClaimant} from '../../util/claim-condtions-xdr-parser'
 
 function shortenBinaryString(src) {
     if (src.length <= 18) return src
@@ -17,22 +16,31 @@ function getTxStatusIcon(tx) {
     return <i className="icon-ok color-success"/>
 }
 
+function getScrollParent(node) {
+    if (node == null) return null
+    if (node.scrollHeight > node.clientHeight) return node
+    return getScrollParent(node.parentNode)
+}
+
 function AccountActivityView() {
-    const container = useRef(null)
-
-    function handleInteraction() {
-        const parent = container.current,
-            scrolledToBottom = Math.ceil(parent.scrollHeight - parent.scrollTop - 8) < parent.clientHeight
-        if (scrolledToBottom) {
-            accountLedgerData.history.loadNextPage()
-        }
-    }
-
     const {loaded, nonExisting, history, address} = accountLedgerData
+    useEffect(() => {
+        const container = document.scrollingElement
+        const handler = throttle(200, false, function (e) {
+            const scrolledToBottom = Math.ceil(container.scrollHeight - container.scrollTop - 70) < container.clientHeight
+            if (scrolledToBottom) {
+                accountLedgerData.history.loadNextPage()
+            }
+        })
+        document.addEventListener('scroll', handler)
+        return () => document.removeEventListener('scroll', handler)
+    }, [address, loaded, history])
 
     if (!loaded || !nonExisting && !history.records.length) return <div className="loader"/>
-    return <ul style={{minHeight: '20vmin', overflowY: 'auto', overflowX: 'hidden'}} className="text-small"
-               ref={container} onScroll={throttle(200, () => handleInteraction())}>
+
+    accountLedgerData.notificationCounters?.resetOperationsCounter()
+
+    return <ul style={{minHeight: '20vmin'}} className="text-small">
         {history.records.map(tx => <li key={tx.hash}>
             <div className="dual-layout">
                 {tx.inProgress ? <div className="dimmed">
@@ -40,6 +48,7 @@ function AccountActivityView() {
                 </div> : <div>
                     <span className="dimmed">{getTxStatusIcon(tx)} Transaction</span>&nbsp;
                     <TxLink tx={tx.hash}><span title={tx.hash}>{shortenBinaryString(tx.hash)}</span></TxLink>
+                    {tx.operations.length > 1 && <span className="dimmed text-tiny"> ({tx.operations.length} operations)</span>}
                     {tx.successful === false && <span className="dimmed"> - failed</span>}
                 </div>}
                 <div>
@@ -56,6 +65,10 @@ function AccountActivityView() {
         {!history.records.length && <div className="dimmed text-tiny text-center">
             (No transactions so far)
         </div>}
+        {history.loading && <li className="dimmed text-tiny text-center">
+            <div className="loader"/>
+            loading history...
+        </li>}
     </ul>
 }
 

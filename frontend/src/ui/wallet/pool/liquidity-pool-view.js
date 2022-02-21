@@ -15,7 +15,7 @@ function LiquidityPoolView() {
         <div>
             {shares.map(balance => {
                 const asset = parseAssetFromObject(balance)
-                return <AccountBalanceView balance={balance} asset={asset} key={asset.toFQAN()}>
+                return <AccountBalanceView balance={balance} key={asset.toFQAN()}>
                     {balance.balance > 0 && <div className="text-right">
                         <a href={'/wallet/liquidity-pool/withdraw?pool=' + asset.toString()} className="button button-outline small">
                             Withdraw liquidity</a>

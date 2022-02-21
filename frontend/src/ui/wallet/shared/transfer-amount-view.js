@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import PropTypes from 'prop-types'
 import {isValidPoolId, useDependantState, stripTrailingZeros} from '@stellar-expert/ui-framework'
 import AssetSelector from './asset-selector-view'
+import './transfer-amount.scss'
 
 function TransferAmountView({settings, index, balances, filterBalances = 'assets', restricted, placeholder, error}) {
     const amount = settings.amount[index],
@@ -15,7 +16,11 @@ function TransferAmountView({settings, index, balances, filterBalances = 'assets
             if (filterBalances === 'pools' && !isValidPoolId(a)) return false
             if (filterBalances === 'assets' && isValidPoolId(a)) return false
             return true
-        }) //skip
+        })
+
+    if (!predefinedAssets.length) {
+        predefinedAssets.push('XLM')
+    }
 
     function change(e) {
         const v = e.target.value.replace(/[^\d.]/g, '')
@@ -39,11 +44,10 @@ function TransferAmountView({settings, index, balances, filterBalances = 'assets
         style.borderColor = 'var(--color-alert)'
     }
 
-    return <div className="relative">
+    return <div className="transfer-amount relative">
         <input type="text" value={inputAmount} onChange={change} placeholder={placeholder || '0'} style={style}
                data-lpignore="true"/>
-        <AssetSelector value={settings.asset[index]} onChange={onAssetChange} predefinedAssets={predefinedAssets}
-                       restricted={restricted}/>
+        <AssetSelector value={settings.asset[index]} onChange={onAssetChange} predefinedAssets={predefinedAssets} restricted={restricted}/>
     </div>
 }
 

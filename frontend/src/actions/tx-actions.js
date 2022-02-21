@@ -1,8 +1,9 @@
 import {Asset, Memo, Operation, TransactionBuilder} from 'stellar-sdk'
-import {createHorizon} from '../util/horizon-connector'
+import Bignumber from 'bignumber.js'
 import {resolveNetworkParams} from '../util/network-resolver'
-import standardErrors from '../util/errors'
+import {createHorizon} from '../util/horizon-connector'
 import {estimateFee} from '../util/fee-estimator'
+import standardErrors from '../util/errors'
 
 /**
  * Normalize memo type to the values accepted by Memo.
@@ -94,7 +95,12 @@ async function prepareTxOperations(actionContext, source) {
                 operations = []
 
             //calculate send max amount from max price the user willing to pay
-            const sendMax = (Math.floor(amount * max_price * 10000000) / 10000000).toFixed(7)
+            const sendMax = new Bignumber(amount)
+                .mul(new Bignumber(max_price))
+                .mul(10000000)
+                .floor()
+                .div(10000000)
+                .toFixed(7)
 
             //check whether the trustline exists
             const trustlineExists = source.balances.some(balance =>

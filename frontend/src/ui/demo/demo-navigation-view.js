@@ -1,7 +1,7 @@
 import React from 'react'
-import {intentInterface} from '@albedo-link/intent'
 import {useLocation} from 'react-router'
-import {parseQuery} from '../../util/url-utils'
+import {intentInterface} from '@albedo-link/intent'
+import {parseQuery} from '@stellar-expert/ui-framework'
 
 const allSections = [
     'intro',

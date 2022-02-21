@@ -4,25 +4,24 @@ import {Dropdown, AssetLink, useAssetList} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import './asset-selector.scss'
 
-function AssetSelectorView({value, predefinedAssets, onChange, restricted}) {
+function AssetSelectorView({value, predefinedAssets, onChange, restricted, title}) {
     const [search, setSearch] = useState(''),
         searchRef = useRef(),
         options = []
-    if (!predefinedAssets.length) {
-        predefinedAssets = ['XLM']
-    }
-    for (let asset of predefinedAssets) {
-        options.push({
-            value: asset,
-            title: <AssetLink link={false} asset={asset}/>,
-            hidden: search && !asset.split('-')[0].toLowerCase().includes(search.toLowerCase())
-        })
+    if (predefinedAssets) {
+        for (let asset of predefinedAssets) {
+            options.push({
+                value: asset,
+                title: <AssetLink link={false} asset={asset}/>,
+                hidden: search && !asset.split('-')[0].toLowerCase().includes(search.toLowerCase())
+            })
+        }
     }
     let loadNextPage
     if (!restricted) {
         const {assets, loadPage, loading} = useAssetList({search: search?.trim() || undefined})
         for (let {asset} of assets) {
-            if (!predefinedAssets.includes(asset)) {
+            if (!predefinedAssets || !predefinedAssets.includes(asset)) {
                 options.push({value: asset, title: <AssetLink link={false} asset={asset}/>})
             }
         }
@@ -39,23 +38,21 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted}) {
         }
         loadNextPage = loadPage
     }
-    if (!accountLedgerData.loaded) return null
+    if (!accountLedgerData.loaded) return <>{title} </> || null
 
     function focusSearch() {
         setTimeout(() => searchRef.current?.focus(), 200)
     }
 
-    const header = <>
+    return <Dropdown solo className="asset-selector" options={options} value={value} onOpen={focusSearch} title={title}
+                     showToggle={!title} onChange={onChange} onScroll={e => e.rel === 'bottom' && loadNextPage?.call(this)} header={<>
         <h3>Select an asset</h3>
         <div className="relative">
-            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                   placeholder="Search by code or domain" ref={searchRef}/>
+            <input type="text" value={search} ref={searchRef} onChange={e => setSearch(e.target.value)}
+                   placeholder="Search by asset code or website"/>
             <i className="icon-search dimmed"/>
         </div>
-    </>
-    return <Dropdown options={options} value={value} className="asset-selector" header={header} solo
-                     onChange={v => onChange(v)} onOpen={focusSearch}
-                     onScroll={e => e.rel === 'bottom' && loadNextPage?.call(this)}/>
+    </>}/>
 }
 
 export default observer(AssetSelectorView)

@@ -31,7 +31,6 @@
 
   .asset-issuer {
     color: var(--color-dimmed);
-    font-size: 0.8em;
     letter-spacing: 0;
   }
 
@@ -60,6 +59,20 @@
 
     > div:not(:last-child) {
       font-size: 0.75em;
+    }
+  }
+
+  &.claimable {
+    .claimable-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      font-size: 1.4em;
+      margin-top: -0.8em;
+      margin-left: 1em;
+      color: var(--color-highlight);
+      text-shadow: 0 0 1px var(--color-bg);
     }
   }
 }

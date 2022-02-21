@@ -1,21 +1,21 @@
 import React, {useEffect, useState} from 'react'
+import cn from 'classnames'
 import {
-    AccountAddress,
-    AssetDescriptor,
-    useAssetMeta,
-    formatCurrency,
-    estimateLiquidityPoolStakeValue,
-    useStellarNetwork
+    AccountAddress, AssetDescriptor, ElapsedTime, navigation, useAssetMeta, formatCurrency, estimateLiquidityPoolStakeValue,
+    useStellarNetwork, parseAssetFromObject, getClaimableBalanceClaimStatus
 } from '@stellar-expert/ui-framework'
+import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
+import {confirmTransaction} from '../shared/wallet-tx-confirmation'
+import {prepareClaimBalanceTx, validateClaimClaimableBalance} from './claim-balance-tx-builder'
 import './account-balance.scss'
 
-function AssetIcon({asset}) {
+function AssetIcon({asset, className}) {
     const meta = useAssetMeta(asset),
         icon = meta?.toml_info?.image || meta?.toml_info?.orgLogo
-    if (asset.toString() === 'XLM') return <span className="asset-icon icon icon-stellar"/>
-    if (icon) return <span style={{backgroundImage: `url('${icon}')`}} className="asset-icon"/>
-    return <span className="asset-icon icon icon-dot-circled"/>
+    if (asset.toString() === 'XLM') return <span className={cn('asset-icon icon icon-stellar', className)}/>
+    if (icon) return <span style={{backgroundImage: `url('${icon}')`}} className={cn('asset-icon', className)}/>
+    return <span className={cn('asset-icon icon icon-dot-circled', className)}/>
 }
 
 function AssetIssuer({asset}) {
@@ -24,7 +24,7 @@ function AssetIssuer({asset}) {
     if (asset.isNative) {
         meta = {domain: 'stellar.org'}
     }
-    return <span className="asset-issuer">
+    return <span className="asset-issuer text-tiny">
         <i className="icon icon-link"/>
         {meta?.domain ?
             <>{meta.domain}</> :
@@ -100,12 +100,68 @@ function AccountAssetBalanceView({balance, asset}) {
     </div>
 }
 
-export default function AccountBalanceView({balance, asset, children}) {
-    asset = AssetDescriptor.parse(asset)
+const claimableBalanceStatusIcons = {
+    available: 'icon-ok',
+    pending: 'icon-clock',
+    expired: 'icon-back-in-time'
+}
+
+function AccountClaimableBalanceView({balance, asset, account}) {
+    const status = getClaimableBalanceClaimStatus(balance.claimants, account),
+        network = useStellarNetwork()
+
+    function claimBalance() {
+        const validationResult = validateClaimClaimableBalance(balance)
+        if (validationResult) return alert(validationResult)
+        if (!accountLedgerData.hasTrustline(asset) && !confirm(`You need to establish a trustline to before claiming this payment.
+Would you like to create the trustline?
+This action will temporarily lock 0.5 XLM on your account balance.`)) return
+        prepareClaimBalanceTx(balance, network)
+            .then(tx => {
+                if (!tx) return
+                return confirmTransaction(network, tx)
+                    .then(() => navigation.navigate('/account'))
+            })
+    }
+
     return <>
-        {asset.poolId ?
-            <AccountPoolBalanceView asset={asset} balance={balance}/> :
-            <AccountAssetBalanceView asset={asset} balance={balance}/>}
+        <div className="account-balance claimable">
+        <span style={{width: 'auto'}}>
+            <AssetIcon asset={asset}/>
+            <span className="claimable-status">
+                <span className={claimableBalanceStatusIcons[status] || 'icon-block'}/>
+            </span>
+        </span>
+            <div className="text-left">
+                <div className="asset-code">{asset.code}</div>
+                <AssetIssuer asset={asset}/>
+                <div className="dimmed text-tiny">
+                    (sent <ElapsedTime className="dimmed" ts={new Date(balance.last_modified_time)} suffix=" ago"/>)
+                </div>
+            </div>
+            <div>
+                <BalanceAmount amount={balance.amount}/>
+                <div className="text-right">
+                    {status === 'available' ?
+                        <a href="#" onClick={claimBalance}>claim tokens</a> :
+                        <span className="dimmed">{status}</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </>
+}
+
+function resolveType(balance, account) {
+    const asset = parseAssetFromObject(balance)
+    if (asset.poolId) return <AccountPoolBalanceView asset={asset} balance={balance}/>
+    if (balance.claimants) return <AccountClaimableBalanceView asset={asset.toFQAN()} balance={balance} account={account}/>
+    return <AccountAssetBalanceView asset={asset} balance={balance}/>
+}
+
+export default function AccountBalanceView({balance, account, children}) {
+    return <>
+        {resolveType(balance, account)}
         {children}
         <hr className="flare"/>
     </>

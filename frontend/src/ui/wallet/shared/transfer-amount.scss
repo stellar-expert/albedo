@@ -1,0 +1,13 @@
+.transfer-amount {
+  position: relative;
+
+  .asset-selector {
+    position: absolute !important;
+    right: 0.5em;
+    top: 0.5em;
+
+    .dd-header {
+      font-size: 0.85em;
+    }
+  }
+}

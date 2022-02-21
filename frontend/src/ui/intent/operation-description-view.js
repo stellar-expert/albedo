@@ -6,9 +6,9 @@ import {
     AssetLink,
     AssetDescriptor,
     formatPrice,
-    formatWithAutoPrecision
+    formatWithAutoPrecision,
+    ClaimableBalanceClaimants
 } from '@stellar-expert/ui-framework'
-import {xdrParseClaimant} from '../../util/claim-condtions-xdr-parser'
 
 function formatBalanceId(balance) {
     return `${balance.substr(8, 4)}…${balance.substr(-4)}`
@@ -34,24 +34,26 @@ export default function OperationDescriptionView({op, source}) {
             </>
         case 'pathPaymentStrictReceive':
             return <>
-                <b>Pay</b> <Amount amount={op.sendMax} asset={op.sendAsset}/>{' '}
+                <b>{source === op.destination ? 'Swap' : 'Pay'}</b> <Amount amount={op.sendMax} asset={op.sendAsset}/>{' '}
                 <span className="icon-shuffle"/>{' '}
                 {op.path.map((asset, i) => <span key={i + '-' + asset.toString()}>
                     <AssetLink asset={asset}/>{' '}
                     <span className="icon-shuffle"/>{' '}
                 </span>)}
-                <Amount amount={op.destAmount} asset={op.destAsset}/> to <AccountAddress account={op.destination}/>
+                <Amount amount={op.destAmount} asset={op.destAsset}/>
+                {source !== op.destination && <> to <AccountAddress account={op.destination}/></>}
                 <SourceAccount/>
             </>
         case 'pathPaymentStrictSend':
             return <>
-                <b>Pay</b> <Amount amount={op.sendAmount} asset={op.sendAsset}/>{' '}
+                <b>{source === op.destination ? 'Swap' : 'Pay'}</b> <Amount amount={op.sendAmount} asset={op.sendAsset}/>{' '}
                 <span className="icon-shuffle"/>{' '}
                 {op.path.map((asset, i) => <span key={i + '-' + asset.toString()}>
                     <AssetLink asset={asset}/>{' '}
                     <span className="icon-shuffle"/>{' '}
                 </span>)}
-                <Amount amount={op.destMin} asset={op.destAsset}/> to <AccountAddress account={op.destination}/>
+                <Amount amount={op.destMin} asset={op.destAsset}/>
+                {source !== op.destination && <> to <AccountAddress account={op.destination}/></>}
                 <SourceAccount/>
             </>
         case 'manageSellOffer':
@@ -171,9 +173,7 @@ export default function OperationDescriptionView({op, source}) {
         case 'createClaimableBalance':
             return <>
                 <b>Create claimable balance</b> <Amount amount={op.amount} asset={op.asset}/>{' '}
-                for claimants {op.claimants.map(xdrParseClaimant).map((c, i) => <span key={i}>{i > 0 && ', '}
-                <AccountAddress account={c.destination}/> {c.predicate}
-                </span>)}
+                for claimants <ClaimableBalanceClaimants claimants={op.claimants}/>
                 <SourceAccount/>
             </>
         case 'claimClaimableBalance':

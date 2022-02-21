@@ -1,4 +1,4 @@
-import {action, makeObservable, observable, runInAction} from 'mobx'
+import {action, computed, makeObservable, observable, runInAction} from 'mobx'
 import {createHorizon} from '../../util/horizon-connector'
 import {retrieveOperations} from './tx-operations'
 
@@ -9,11 +9,13 @@ export default class AccountTransactionHistory {
         this.records = []
         makeObservable(this, {
             records: observable,
+            loadingNextPagePromise: observable.ref,
             loadNextPage: action,
             startStreaming: action,
             addInProgressTx: action,
             addNewTx: action,
-            removeInProgressTx: action
+            removeInProgressTx: action,
+            loading: computed
         })
     }
 
@@ -39,31 +41,42 @@ export default class AccountTransactionHistory {
 
     loadingNextPagePromise = null
 
+    hasMore = undefined
+
     finalizeStream = null
+
+    get loading() {
+        return !!this.loadingNextPagePromise
+    }
 
     /**
      * Load transactions history
      * @return {Promise}
      */
     loadNextPage() {
-        if (!this.loadingNextPagePromise) {
+        if (!this.loadingNextPagePromise && this.hasMore !== false) {
             //extract paging token from the last available history record
             const cursor = this.records.length ? this.records[this.records.length - 1].paging_token : null
             this.loadingNextPagePromise = loadAccountTransactions({
                 network: this.network,
                 address: this.address,
-                cursor
+                cursor,
+                count: this.maxRecentEntries
             })
                 .then(newBatch => {
                     runInAction(() => {
                         this.removeInProgressTx(newBatch)
                         this.records.replace([...this.records, ...newBatch])
+                        if (newBatch.length < this.maxRecentEntries)
+                            this.hasMore = false
                     })
                     return newBatch
                 })
                 .catch(e => {
                     if (e.name !== 'NotFoundError') {
                         console.error(e)
+                    } else {
+                        this.hasMore = false
                     }
                 })
                 .finally(() => {
@@ -129,6 +142,7 @@ export default class AccountTransactionHistory {
         while (newHistory.length > this.maxRecentEntries) {
             newHistory.pop()
         }
+        this.hasMore = undefined
         this.records.replace(newHistory)
     }
 
@@ -174,15 +188,15 @@ export function streamAccountTransactions({network, address, onNewTx, includeFai
  * @param {'public'|'testnet'} network
  * @param {String} address
  * @param {Boolean} includeFailed
- * @param {Number} maxRecentEntries
+ * @param {Number} count
  * @param {String} cursor
  * @return {Promise<Array<TransactionRecord>>}
  */
-export function loadAccountTransactions({network, address, includeFailed = true, maxRecentEntries = 15, cursor}) {
+export function loadAccountTransactions({network, address, includeFailed = true, count = 15, cursor}) {
     return createHorizon({network})
         .transactions()
         .forAccount(address)
-        .limit(maxRecentEntries)
+        .limit(count)
         .order('desc')
         .cursor(cursor)
         .includeFailed(true)

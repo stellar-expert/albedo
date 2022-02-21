@@ -9,7 +9,7 @@ import LiquidityPoolInfoView from './liquidity-pool-info-view'
 import LiquidityPoolNonexistentView from './liquidity-pool-nonexistent-view'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import SlippageView from '../shared/slippage-view'
-import AvailableAmountLink from '../shared/available-amount-link-ivew'
+import AvailableAmountLink from '../shared/available-amount-link-view'
 import './liquidity-pool-deposit.scss'
 
 function LiquidityPoolDepositView() {
@@ -20,8 +20,7 @@ function LiquidityPoolDepositView() {
         poolInfo = useLiquidityPoolInfo(deposit.poolId)
 
     return <WalletOperationsWrapperView title="Deposit liquidity" action="Deposit" prepareTransaction={() => deposit.prepareTransaction()}
-                                        disabled={disabled} onConfirm={() => deposit.resetOperationAmount()}
-                                        onFinalize={() => navigation.navigate('/wallet/liquidity-pool')}>
+                                        disabled={disabled} onFinalize={() => navigation.navigate('/wallet/liquidity-pool')}>
         <div className="lp-deposit space">
             <TransferAmountView settings={deposit} index={0} balances={userAssets} restricted/>
             <AvailableAmountLink settings={deposit} index={0}/>

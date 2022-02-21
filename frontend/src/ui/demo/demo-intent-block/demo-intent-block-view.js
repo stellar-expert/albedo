@@ -1,13 +1,12 @@
 import React from 'react'
-import albedo, {intentInterface} from '@albedo-link/intent'
-import {Tabs, navigation, useDependantState} from '@stellar-expert/ui-framework'
 import {useLocation} from 'react-router'
+import albedo, {intentInterface} from '@albedo-link/intent'
+import {Tabs, navigation, useDependantState, parseQuery} from '@stellar-expert/ui-framework'
 import DemoIntentRequestParametersView from './demo-intent-request-parameters-view'
 import DemoIntentResultsView from './demo-intent-results-view'
 import DemoIntentExampleView from './demo-intent-example-view'
 import DemoExtraInfoView from '../demo-extra-info-view'
 import {generateInvocation} from '../demo-code-generator'
-import {parseQuery} from '../../../util/url-utils'
 
 albedo.frontendUrl = location.origin
 

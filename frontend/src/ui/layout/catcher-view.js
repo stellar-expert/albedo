@@ -31,7 +31,7 @@ ${componentStack ? 'Components stack: ' + componentStack : ''}
 ${navigator.userAgent}`
 
             return <div className="container">
-                <h2>Unhandled error occurred</h2>
+                <h3>Unhandled error occurred</h3>
                 <hr className="flare"/>
                 <div className="error space text-small" style={{overflow: 'auto', maxWidth: '100%'}}>
                     <BlockSelect as="div">
