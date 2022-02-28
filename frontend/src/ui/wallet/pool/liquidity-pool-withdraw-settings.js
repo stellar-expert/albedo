@@ -21,9 +21,9 @@ export default class LiquidityPoolWithdrawSettings {
 
     amount
 
-    slippage = 1
-
     poolInfo
+
+    balanceExceeded = false
 
     get poolAssets() {
         if (!this.poolInfo) return null
@@ -32,24 +32,26 @@ export default class LiquidityPoolWithdrawSettings {
 
     get max() {
         if (!this.poolInfo) return '0'
-        return accountLedgerData && accountLedgerData.balances[this.poolId]?.balance || '0'
+        return new Bignumber(accountLedgerData && accountLedgerData.balances[this.poolId]?.balance || '0')
+            .mul(new Bignumber(10000000))
+            .toString()
     }
 
     setAmount(amount) {
-        if (amount < 0 || !this.max || parseFloat(this.max) < parseFloat(amount)) {
+        const {max} = this
+        if (amount < 0 || max === '0') {
             amount = '0'
         }
+        this.balanceExceeded = new Bignumber(max).lt(new Bignumber(amount))
         this.amount = amount
     }
 
-    setSlippage(slippage) {
-        this.slippage = slippage
-    }
-
     getWithdrawalMinAmounts() {
-        const {poolInfo, amount, slippage} = this
-        if (!poolInfo) return
-        return estimateLiquidityPoolStakeValue(new Bignumber(amount).mul(1 - slippage / 100), poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
+        const {poolInfo, amount} = this
+        if (!poolInfo?.reserves) return ['0', '0']
+        const slippage = 1 / 100,
+            amt = new Bignumber(amount || 0).div(10000000).mul(1 - slippage).toString()
+        return estimateLiquidityPoolStakeValue(amt, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares) || ['0', '0']
     }
 
     loadPoolInfo(force = false) {

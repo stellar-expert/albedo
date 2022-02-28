@@ -1,11 +1,11 @@
 import React from 'react'
+import Bignumber from 'bignumber.js'
 import {
     AssetDescriptor,
     Amount,
     formatPrice,
     formatWithAutoPrecision,
-    estimateLiquidityPoolStakeValue,
-    adjustAmount
+    estimateLiquidityPoolStakeValue
 } from '@stellar-expert/ui-framework'
 
 export default function LiquidityPoolInfoView({poolInfo, stake}) {
@@ -15,26 +15,26 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
     const assets = poolInfo.reserves.map(r => AssetDescriptor.parse(r.asset)),
         reserves = poolInfo.reserves.map(r => r.amount),
         price = parseFloat(reserves[0]) / parseFloat(reserves[1]),
-        assetsRatio = `${assets[0].code}/${assets[1].code}`,
+        total = new Bignumber(poolInfo.total_shares).mul(new Bignumber(10000000)).toString(),
         estimatedValue = estimateLiquidityPoolStakeValue(stake, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
     return <div className="segment text-small">
         {(!!estimatedValue || stake !== undefined) && <div>
-            <div className="dual-layout">
-                <div className="dimmed">Your stake:</div>
-                <div>
-                    {stake} shares{' '}
-                    {stake > 0 && <span className="dimmed">({formatWithAutoPrecision(100 * stake / poolInfo.total_shares)}%)</span>}
-                </div>
+            <h4>Your current stake</h4>
+            <div>
+                {total} shares{' '}
+                {stake > 0 &&
+                <span className="dimmed condensed">({formatWithAutoPrecision(100 * stake / 10000000 / poolInfo.total_shares)}% of the pool liquidity)</span>}
             </div>
             {!!estimatedValue && <>
                 <div>
-                    &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]}/>
+                    &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]} adjust/>
                 </div>
                 <div>
-                    &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]}/>
+                    &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]} adjust/>
                 </div>
             </>}
         </div>}
+        <h4>Pool info</h4>
         <div>
             <div className="dimmed">Total liquidity locked:</div>
             <div>
@@ -44,19 +44,19 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
                 &emsp;<Amount amount={reserves[1]} asset={assets[1]}/>
             </div>
         </div>
-        {!!price && <div className="dual-layout">
-            <div className="dimmed">Current pool price:</div>
-            <div>
-                {formatPrice(price)} {assetsRatio}
-            </div>
-        </div>}
-        <div className="dual-layout">
-            <div className="dimmed">Pool fee rate:</div>
-            <div>{poolInfo.fee_bp / 100}%</div>
-        </div>
-        <div className="dual-layout">
-            <div className="dimmed">Liquidity providers:</div>
-            <div>{poolInfo.total_trustlines}</div>
-        </div>
+        <table>
+            {!!price && <tr>
+                <td className="dimmed">Current pool price:</td>
+                <td>{formatPrice(price)} {assets[0].code}/{assets[1].code}</td>
+            </tr>}
+            <tr>
+                <td className="dimmed">Liquidity providers:</td>
+                <td>{poolInfo.total_trustlines}</td>
+            </tr>
+            <tr>
+                <td className="dimmed">Pool fee rate:</td>
+                <td>{poolInfo.fee_bp / 100}%</td>
+            </tr>
+        </table>
     </div>
 }
