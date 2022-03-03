@@ -1,9 +1,10 @@
 import React from 'react'
 import {intentInterface} from '@albedo-link/intent'
-import {AccountAddress, AssetLink, Amount, formatLongHex} from '@stellar-expert/ui-framework'
+import {AccountAddress, AssetLink, Amount} from '@stellar-expert/ui-framework'
+import {shortenString} from '@stellar-expert/formatter'
 import actionContext from '../../state/action-context'
-import TxDetailsView from './tx-details-view'
 import {resolveNetworkParams} from '../../util/network-resolver'
+import TxDetailsView from './tx-details-view'
 import IntentErrorView from './intent-error-view'
 
 function FormattedAmount({amount, params, prefix = ''}) {
@@ -50,7 +51,7 @@ export default function IntentTextDescriptionView() {
         case 'trust':
             return <>
                 The application requested a trustline creation to asset <code>{intentParams.asset_code}</code>
-                {' '}issued by <code className="word-break">{formatLongHex(intentParams.asset_issuer, 12)}</code>.
+                {' '}issued by <code className="word-break">{shortenString(intentParams.asset_issuer, 12)}</code>.
             </>
         case 'pay':
             return <>

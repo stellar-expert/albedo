@@ -1,6 +1,7 @@
 import {makeAutoObservable, runInAction} from 'mobx'
 import Bignumber from 'bignumber.js'
-import {adjustAmount, generateLiquidityPoolId, AssetDescriptor} from '@stellar-expert/ui-framework'
+import {AssetDescriptor, generateLiquidityPoolId} from '@stellar-expert/asset-descriptor'
+import {adjustPrecision} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {prepareLiquidityDepositTx} from './liquidity-pool-deposit-tx-builder'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
@@ -95,10 +96,10 @@ export default class LiquidityPoolDepositSettings {
         if (this.reverse) {
             reserves = reserves.slice().reverse()
         }
-        const counter = new Bignumber(this.amount[sourceIndex])
+        const counter = new Bignumber(this.amount[sourceIndex] || 0)
             .mul(new Bignumber(reserves[1 - sourceIndex].amount))
             .div(new Bignumber(reserves[sourceIndex].amount))
-        this.amount[1 - sourceIndex] = adjustAmount(counter)
+        this.amount[1 - sourceIndex] = adjustPrecision(counter)
     }
 
     prepareTransaction() {

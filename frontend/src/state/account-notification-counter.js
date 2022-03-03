@@ -49,7 +49,6 @@ export default class AccountNotificationCounter {
             return resolveCounterLoader(type)(this.network, this.address, from)
                 .then(cnt => runInAction(() => this.counters[type] = cnt))
         }))
-            .then(() => setTimeout(() => console.log(this.counters), 5000))
     }
 
     resetCounter(type) {

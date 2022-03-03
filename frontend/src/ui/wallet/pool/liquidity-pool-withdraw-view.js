@@ -2,16 +2,9 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import Bignumber from 'bignumber.js'
 import {useLocation} from 'react-router'
-import {
-    Amount,
-    navigation,
-    isValidPoolId,
-    useDependantState,
-    useStellarNetwork,
-    stripTrailingZeros,
-    parseQuery,
-    AssetDescriptor
-} from '@stellar-expert/ui-framework'
+import {Amount, navigation, useDependantState, useStellarNetwork, parseQuery} from '@stellar-expert/ui-framework'
+import {AssetDescriptor, isValidPoolId} from '@stellar-expert/asset-descriptor'
+import {stripTrailingZeros} from '@stellar-expert/formatter'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import LiquidityPoolWithdrawSettings from './liquidity-pool-withdraw-settings'
 import LiquidityPoolInfoView from './liquidity-pool-info-view'

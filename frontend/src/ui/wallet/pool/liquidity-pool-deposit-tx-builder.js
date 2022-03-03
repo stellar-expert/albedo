@@ -1,6 +1,6 @@
 import {Operation, TransactionBuilder} from 'stellar-sdk'
 import Bignumber from 'bignumber.js'
-import {getLiquidityPoolAsset} from '@stellar-expert/ui-framework'
+import {getLiquidityPoolAsset} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'
 import {estimateFee} from '../../../util/fee-estimator'

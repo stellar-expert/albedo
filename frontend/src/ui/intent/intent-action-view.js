@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {observer} from 'mobx-react'
-import {Button, useDependantState, formatLongHex} from '@stellar-expert/ui-framework'
+import {Button, useDependantState} from '@stellar-expert/ui-framework'
+import {shortenString} from '@stellar-expert/formatter'
 import actionContext from '../../state/action-context'
 import accountManager from '../../state/account-manager'
 import IntentErrorView from './intent-error-view'
@@ -9,7 +10,7 @@ import IntentErrorView from './intent-error-view'
 function getConfirmationAccountName(alreadySigned) {
     const confirmation = alreadySigned ? 'Already signed by ' : 'Confirm using '
     if (accountManager.activeAccount) return confirmation + accountManager.activeAccount.shortDisplayName
-    if (actionContext.directKeyInput) return confirmation + `account ${formatLongHex(accountManager.selectedPublicKey, 8)}`
+    if (actionContext.directKeyInput) return confirmation + `account ${shortenString(accountManager.selectedPublicKey, 8)}`
     return confirmation + 'Albedo account'
 }
 

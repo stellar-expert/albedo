@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import Bignumber from 'bignumber.js'
-import {AssetDescriptor, formatPrice, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {formatPrice} from '@stellar-expert/formatter'
 import {resolveOrderbookInfo} from '../../../util/orderbook-info-resolver'
 
 export default function LiquidityPoolNonexistentView({assets}) {

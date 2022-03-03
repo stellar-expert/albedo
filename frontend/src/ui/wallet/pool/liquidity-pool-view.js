@@ -1,6 +1,6 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import {parseAssetFromObject} from '@stellar-expert/ui-framework'
+import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import AccountBalanceView from '../balance/account-balance-view'
 

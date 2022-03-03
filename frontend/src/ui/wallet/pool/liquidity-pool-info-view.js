@@ -1,12 +1,9 @@
 import React from 'react'
 import Bignumber from 'bignumber.js'
-import {
-    AssetDescriptor,
-    Amount,
-    formatPrice,
-    formatWithAutoPrecision,
-    estimateLiquidityPoolStakeValue
-} from '@stellar-expert/ui-framework'
+import {Amount} from '@stellar-expert/ui-framework'
+import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {formatPrice, formatWithAutoPrecision} from '@stellar-expert/formatter'
+import {estimateLiquidityPoolStakeValue} from'@stellar-expert/liquidity-pool-utils'
 
 export default function LiquidityPoolInfoView({poolInfo, stake}) {
     /*if (assets[0].toString() === assets[1].toString())
@@ -45,6 +42,7 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
             </div>
         </div>
         <table>
+            <tbody>
             {!!price && <tr>
                 <td className="dimmed">Current pool price:</td>
                 <td>{formatPrice(price)} {assets[0].code}/{assets[1].code}</td>
@@ -57,6 +55,7 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
                 <td className="dimmed">Pool fee rate:</td>
                 <td>{poolInfo.fee_bp / 100}%</td>
             </tr>
+            </tbody>
         </table>
     </div>
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import {formatPrice} from '@stellar-expert/ui-framework'
+import {formatPrice} from '@stellar-expert/formatter'
 import AvailableAmountLink from '../shared/available-amount-link-view'
 import './swap-band.scss'
 

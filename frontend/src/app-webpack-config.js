@@ -4,7 +4,7 @@ const path = require('path'),
     CopyPlugin = require('copy-webpack-plugin'),
     MiniCssExtractPlugin = require('mini-css-extract-plugin'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
-    uiFrameworkWebpackUtils = require('@stellar-expert/ui-framework/webpack-utils')
+    {webpackExcludeNodeModulesExcept} = require('@stellar-expert/webpack-utils')
 
 module.exports = function (env, argv) {
     const mode = argv.mode || 'development'
@@ -41,11 +41,11 @@ module.exports = function (env, argv) {
                 {
                     test: /\.js?$/,
                     loader: 'babel-loader',
-                    exclude: uiFrameworkWebpackUtils.generateWebpackExcludeExcept()
+                    exclude: webpackExcludeNodeModulesExcept('@stellar-expert/ui-framework')
                 },
                 {
                     test: /\.scss$/,
-                    exclude: uiFrameworkWebpackUtils.generateWebpackExcludeExcept(),
+                    exclude: webpackExcludeNodeModulesExcept('@stellar-expert/ui-framework'),
                     use: [
                         {
                             loader: MiniCssExtractPlugin.loader

@@ -1,9 +1,10 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
-import {AssetDescriptor, useStellarNetwork} from '@stellar-expert/ui-framework'
-import {requestFriendbotFunding} from '../../../util/horizon-connector'
+import {useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
+import {requestFriendbotFunding} from '../../../util/horizon-connector'
 
 function createTestnetAccount() {
     requestFriendbotFunding(accountLedgerData.address)

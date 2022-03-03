@@ -1,14 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    AccountAddress,
-    Amount,
-    AssetLink,
-    AssetDescriptor,
-    formatPrice,
-    formatWithAutoPrecision,
-    ClaimableBalanceClaimants
-} from '@stellar-expert/ui-framework'
+import {AccountAddress, Amount, AssetLink, ClaimableBalanceClaimants} from '@stellar-expert/ui-framework'
+import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {formatPrice, formatWithAutoPrecision} from '@stellar-expert/formatter'
 
 function formatBalanceId(balance) {
     return `${balance.substr(8, 4)}…${balance.substr(-4)}`

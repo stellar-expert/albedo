@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react'
 import cn from 'classnames'
-import {
-    AccountAddress, AssetDescriptor, ElapsedTime, navigation, useAssetMeta, formatCurrency, estimateLiquidityPoolStakeValue,
-    useStellarNetwork, parseAssetFromObject, getClaimableBalanceClaimStatus
-} from '@stellar-expert/ui-framework'
+import {AccountAddress, ElapsedTime, navigation, useAssetMeta, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AssetDescriptor, parseAssetFromObject} from '@stellar-expert/asset-descriptor'
+import {getClaimableBalanceClaimStatus} from '@stellar-expert/claimable-balance-utils'
+import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-utils'
+import {formatWithPrecision} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
@@ -33,7 +34,7 @@ function AssetIssuer({asset}) {
 }
 
 function BalanceAmount({amount}) {
-    const [integer, fractional = ''] = formatCurrency(amount).split('.')
+    const [integer, fractional = ''] = formatWithPrecision(amount).split('.')
     return <div className="asset-amount">
         {integer}<span className="dimmed text-small">.{fractional.padEnd(7, '0')}</span>
     </div>
@@ -107,8 +108,9 @@ const claimableBalanceStatusIcons = {
 }
 
 function AccountClaimableBalanceView({balance, asset, account}) {
-    const status = getClaimableBalanceClaimStatus(balance.claimants, account),
-        network = useStellarNetwork()
+    const status = getClaimableBalanceClaimStatus(balance.claimants.find(c => c.destination === account)),
+        network = useStellarNetwork(),
+        [claiming, setClaiming] = useState(false)
 
     function claimBalance() {
         const validationResult = validateClaimClaimableBalance(balance)
@@ -116,12 +118,14 @@ function AccountClaimableBalanceView({balance, asset, account}) {
         if (!accountLedgerData.hasTrustline(asset) && !confirm(`You need to establish a trustline to before claiming this payment.
 Would you like to create the trustline?
 This action will temporarily lock 0.5 XLM on your account balance.`)) return
+        setClaiming(true)
         prepareClaimBalanceTx(balance, network)
             .then(tx => {
                 if (!tx) return
                 return confirmTransaction(network, tx)
                     .then(() => navigation.navigate('/account'))
             })
+            .finally(() => setClaiming(false))
     }
 
     return <>
@@ -140,13 +144,19 @@ This action will temporarily lock 0.5 XLM on your account balance.`)) return
                 </div>
             </div>
             <div>
-                <BalanceAmount amount={balance.amount}/>
-                <div className="text-right">
-                    {status === 'available' ?
-                        <a href="#" onClick={claimBalance}>claim tokens</a> :
-                        <span className="dimmed">{status}</span>
-                    }
-                </div>
+                {claiming ?
+                    <div className="text-right">
+                        <div className="loader"/>
+                    </div> :
+                    <>
+                        <BalanceAmount amount={balance.amount}/>
+                        <div className="text-right">
+                            {status === 'available' ?
+                                <a href="#" onClick={claimBalance}>claim tokens</a> :
+                                <span className="dimmed">{status}</span>
+                            }
+                        </div>
+                    </>}
             </div>
         </div>
     </>

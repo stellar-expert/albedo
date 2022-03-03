@@ -1,6 +1,7 @@
 import {makeAutoObservable, runInAction} from 'mobx'
 import Bignumber from 'bignumber.js'
-import {AssetDescriptor, estimateLiquidityPoolStakeValue} from '@stellar-expert/ui-framework'
+import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {estimateLiquidityPoolStakeValue} from'@stellar-expert/liquidity-pool-utils'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
 import {prepareLiquidityWithdrawTx} from './liquidity-pool-withdraw-tx-builder'

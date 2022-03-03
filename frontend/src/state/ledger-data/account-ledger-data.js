@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 import {observable, makeObservable, action, computed, runInAction} from 'mobx'
-import {parseAssetFromObject, calculateAvailableBalance, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {calculateAvailableBalance, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
 import AccountTransactionHistory from './account-transactions-history'
 import AccountNotificationCounter from '../account-notification-counter'
 import {createHorizon} from '../../util/horizon-connector'
