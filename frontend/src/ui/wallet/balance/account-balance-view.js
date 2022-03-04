@@ -108,7 +108,8 @@ const claimableBalanceStatusIcons = {
 }
 
 function AccountClaimableBalanceView({balance, asset, account}) {
-    const status = getClaimableBalanceClaimStatus(balance.claimants.find(c => c.destination === account)),
+    const claimant = balance.claimants.find(c => c.destination === account),
+        status = claimant ? getClaimableBalanceClaimStatus(claimant) : 'unavailable',
         network = useStellarNetwork(),
         [claiming, setClaiming] = useState(false)
 
@@ -145,8 +146,10 @@ This action will temporarily lock 0.5 XLM on your account balance.`)) return
             </div>
             <div>
                 {claiming ?
-                    <div className="text-right">
-                        <div className="loader"/>
+                    <div className=" text-right">
+                        <div style={{display: 'inline-block'}}>
+                            <div className="loader"/>
+                        </div>
                     </div> :
                     <>
                         <BalanceAmount amount={balance.amount}/>

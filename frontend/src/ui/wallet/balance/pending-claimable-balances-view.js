@@ -1,9 +1,6 @@
 import React, {useEffect, useState} from 'react'
-import {observer} from 'mobx-react'
 import {useStellarNetwork} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../../util/horizon-connector'
-import accountManager from '../../../state/account-manager'
-import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import AccountBalanceView from './account-balance-view'
 
 const balancesBatchSize = 200
@@ -14,7 +11,7 @@ function useAccountClaimableBalances(account) {
 
     useEffect(() => {
         let res = []
-
+        setBalances(null)
         function fetchBalances(cursor = undefined) {
             let query = createHorizon(network).claimableBalances()
                 .claimant(account)
@@ -46,19 +43,18 @@ function useAccountClaimableBalances(account) {
     return balances
 }
 
-function PendingClaimableBalancesView() {
-    const {publicKey} = accountManager.activeAccount,
-        balances = useAccountClaimableBalances(publicKey)
+function PendingClaimableBalancesView({ledgerData, account}) {
+    const balances = useAccountClaimableBalances(account)
 
-    accountLedgerData.notificationCounters?.resetClaimableBalanceCounter()
+    ledgerData.notificationCounters?.resetClaimableBalanceCounter()
 
     return <div className="space">
         {balances ? <>
-                {balances.map(balance => <AccountBalanceView balance={balance} account={publicKey} key={balance.id}/>)}
+                {balances.map(balance => <AccountBalanceView balance={balance} account={account} key={balance.id}/>)}
                 {!balances.length && <div className="text-center text-small dimmed">No pending balances so far</div>}
             </> :
             <div className="loader"/>}
     </div>
 }
 
-export default observer(PendingClaimableBalancesView)
+export default PendingClaimableBalancesView

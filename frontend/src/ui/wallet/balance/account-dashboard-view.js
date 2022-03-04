@@ -9,6 +9,7 @@ import PendingClaimableBalancesView from './pending-claimable-balances-view'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
 import '../notifications/noification-counter.scss'
 import AccountNotificationCounterView from '../notifications/account-notification-counter-view'
+import accountManager from '../../../state/account-manager'
 
 function AccountDashboardView() {
     const [fundingInProgress, setFundingInProgress] = useState(false),
@@ -46,7 +47,8 @@ function AccountDashboardView() {
             {
                 name: 'claimable',
                 title: <>Pending<AccountNotificationCounterView type="cb"/></>,
-                render: () => <PendingClaimableBalancesView/>
+                render: () => <PendingClaimableBalancesView account={accountManager.activeAccount.publicKey}
+                                                            ledgerData={accountLedgerData}/>
             },
             {
                 name: 'history',
