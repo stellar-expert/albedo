@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import {useStellarNetwork} from '@stellar-expert/ui-framework'
-import accountManager from '../../../state/account-manager'
 import {createHorizon} from '../../../util/horizon-connector'
-import AccountBalanceView from './account-balance-view'
+import accountManager from '../../../state/account-manager'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
+import AccountBalanceView from './account-balance-view'
 
 const balancesBatchSize = 200
 
@@ -16,11 +16,14 @@ function useAccountClaimableBalances(account) {
         let res = []
 
         function fetchBalances(cursor = undefined) {
-            return createHorizon(network).claimableBalances()
+            let query = createHorizon(network).claimableBalances()
                 .claimant(account)
                 .order('desc')
                 .limit(balancesBatchSize)
-                .call()
+            if (cursor) {
+                query = query.cursor(cursor)
+            }
+            return query.call()
                 .then(({records}) => {
                     if (records.length) {
                         res = res.concat(records)

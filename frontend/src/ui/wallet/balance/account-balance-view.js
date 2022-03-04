@@ -137,7 +137,7 @@ This action will temporarily lock 0.5 XLM on your account balance.`)) return
             </span>
         </span>
             <div className="text-left">
-                <div className="asset-code">{asset.code}</div>
+                <div className="asset-code">{AssetDescriptor.parse(asset).code}</div>
                 <AssetIssuer asset={asset}/>
                 <div className="dimmed text-tiny">
                     (sent <ElapsedTime className="dimmed" ts={new Date(balance.last_modified_time)} suffix=" ago"/>)
