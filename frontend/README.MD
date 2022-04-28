@@ -1,7 +1,7 @@
 # Albedo Frontend
 
-[Albedo](../README.MD) signer frontend website and browser extensions.
-Provides a user-friendly interface for key management and operation intents.
+[Albedo](../README.MD) wallet frontend website and browser extensions.
+Provides a user-friendly interface for key management, basic wallet operations, and operation intents.
 
 Albedo - your single access point to all Stellar services.
 
@@ -9,7 +9,7 @@ Albedo - your single access point to all Stellar services.
 
 #### System requirements
 
-- Node.JS v10.21.0+ for assets compilation. 
+- Node.JS v14.15.0+ for assets compilation. 
 - Any web server that allows static files hosting.
 
 #### Assets compilation
@@ -39,7 +39,7 @@ Configuration parameters can be found in [default-config.json](./default-config.
 - `networks` section contains known Stellar networks and horizon endpoints.
 
 Configuration parameters may be overridden in `default-config.json` before the
-compilation or in runtime via `window.clientConfig` variable.
+compilation.
 
 ## Development - web app
 
@@ -105,7 +105,7 @@ third-party applications. This secure and fast bi-directional connection
 overcomes cross-origin problems and browser sandbox problems. The actions
 invoked are called "intents".
 
-#### Itents
+#### Intents
 
 There are 4 main groups of intents:
 

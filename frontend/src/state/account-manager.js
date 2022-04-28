@@ -41,8 +41,8 @@ class AccountManager {
     }
 
     /**
-     * Find account persisted in browser storage by an id
-     * @param id
+     * Find account persisted in browser storage by its id or public key
+     * @param {String} id
      * @returns {Account|null}
      */
     get(id) {

@@ -32,7 +32,7 @@ function SwapView() {
                 <SwapBandView settings={swap}/>
                 <TransferAmountView settings={swap} index={1} balances={balances}/>
             </div>
-            <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={updateSlippage}/>
+            <SwapSlippageView title="Slippage tolerance" defaultValue={1} onChange={updateSlippage}/>
             <TransferValidationView transfer={swap} destination={accountLedgerData} onValidate={setValid}/>
         </div>
     </WalletOperationsWrapperView>

@@ -1,17 +1,16 @@
 import React from 'react'
 import {render} from 'react-dom'
 import {configure} from 'mobx'
-import {
-    navigation,
-    bindClickNavHandler,
-    setStellarNetwork,
-    subscribeToStellarNetworkChange
-} from '@stellar-expert/ui-framework'
+import {navigation, bindClickNavHandler, setStellarNetwork, subscribeToStellarNetworkChange} from '@stellar-expert/ui-framework'
 import Router from './ui/app-router'
 import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage'
 import storageProvider from './storage/storage-provider'
 import accountManager from './state/account-manager'
 import {registerMessageListeners} from './util/message-listeners'
+import './ui/styles.scss'
+
+window.explorerFrontendOrigin = 'https://stellar.expert'
+window.explorerApiOrigin = 'https://api.stellar.expert'
 
 configure({enforceActions: 'never'})
 

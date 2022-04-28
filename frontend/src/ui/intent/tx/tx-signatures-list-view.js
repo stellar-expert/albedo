@@ -2,12 +2,10 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import {StrKey} from 'stellar-sdk'
 import {AccountAddress} from '@stellar-expert/ui-framework'
-import actionContext from '../../state/action-context'
-import accountManager from '../../state/account-manager'
-import {formatHint} from '../../util/signature-hint-utils'
+import accountManager from '../../../state/account-manager'
+import {formatHint} from '../../../util/signature-hint-utils'
 
-export default observer(function TxSignaturesListView() {
-    const {txContext} = actionContext
+function TxSignaturesListView({txContext}) {
     //available only for transaction-based intents
     if (!txContext) return null
     const {signatures, signatureSchema} = txContext
@@ -29,4 +27,6 @@ export default observer(function TxSignaturesListView() {
             </div>
         })}
     </div>
-})
+}
+
+export default observer(TxSignaturesListView)

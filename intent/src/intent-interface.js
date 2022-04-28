@@ -1,9 +1,7 @@
 const intentInterface = {
     public_key: {
-        risk: 'low',
         title: 'View public key',
         description: 'Requests account public key. It\'s a simple way of authentication for Stellar-based applications. The response ensures that a user owns the corresponding secret key.',
-        unsafe: false,
         implicitFlow: false,
         params: {
             token: {
@@ -16,7 +14,7 @@ const intentInterface = {
                 type: 'string',
                 required: false
             },
-            require_existing:{
+            require_existing: {
                 description: 'Allow existing Albedo accounts only.',
                 type: 'boolean',
                 required: false
@@ -38,10 +36,8 @@ const intentInterface = {
         }
     },
     sign_message: {
-        risk: 'medium',
         title: 'Sign text message',
         description: 'Requests arbitrary message signing. Can be used to implement identity/ownership verification.',
-        unsafe: false,
         implicitFlow: true,
         params: {
             message: {
@@ -80,10 +76,8 @@ const intentInterface = {
         }
     },
     tx: {
-        risk: 'high',
         title: 'Sign transaction',
         description: 'Requests a signature for the transaction. Returns the signed transaction envelope that can be submitted to the network or used for multi-sig coordination.',
-        unsafe: true,
         implicitFlow: true,
         params: {
             xdr: {
@@ -102,7 +96,12 @@ const intentInterface = {
                 required: false
             },
             callback: {
-                description: 'Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon. ',
+                description: 'Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon.',
+                type: 'string',
+                required: false
+            },
+            description: {
+                description: 'Optional human-friendly short transaction description provided by developers.',
                 type: 'string',
                 required: false
             },
@@ -136,10 +135,8 @@ const intentInterface = {
         }
     },
     pay: {
-        risk: 'high',
         title: 'Make payment',
         description: 'Requests a payment from a user. Works with any Stellar asset, supports transaction memo.',
-        unsafe: false,
         implicitFlow: true,
         params: {
             amount: {
@@ -178,7 +175,7 @@ const intentInterface = {
                 required: false
             },
             network: {
-                description: 'Stellar network identifier ("public" or "testnet").',
+                description: 'Stellar network identifier or private network passphrase.',
                 type: 'string',
                 required: false
             },
@@ -241,10 +238,8 @@ const intentInterface = {
         }
     },
     trust: {
-        risk: 'low',
         title: 'Establish trustline',
         description: 'Requests permission to create a trustline to a given Stellar asset. Gradually simplifies the process of creating trustlines for anchors, ICOs, and airdrops.',
-        unsafe: false,
         implicitFlow: true,
         params: {
             asset_code: {
@@ -278,7 +273,7 @@ const intentInterface = {
                 required: false
             },
             network: {
-                description: 'Stellar network identifier ("public" or "testnet").',
+                description: 'Stellar network identifier or private network passphrase.',
                 type: 'string',
                 required: false
             },
@@ -329,10 +324,8 @@ const intentInterface = {
         }
     },
     exchange: {
-        risk: 'high',
-        title: 'Purchase tokens',
+        title: 'Swap tokens',
         description: 'Requests permission to buy tokens on Stellar DEX at market price.',
-        unsafe: true,
         implicitFlow: false,
         params: {
             amount: {
@@ -381,7 +374,7 @@ const intentInterface = {
                 required: false
             },
             network: {
-                description: 'Stellar network identifier ("public" or "testnet").',
+                description: 'Stellar network identifier or private network passphrase.',
                 type: 'string',
                 required: false
             },
@@ -444,10 +437,8 @@ const intentInterface = {
         }
     },
     implicit_flow: {
-        risk: 'high',
         title: 'Implicit permissions',
         description: 'Requests temporary access token for one or more intents that can be used to execute actions without explicit confirmation from the user. In order to be executed implicitly, an implicit flow permissions for a given intent should be granted and "pubkey" parameter set.',
-        unsafe: true,
         implicitFlow: false,
         params: {
             intents: {
@@ -456,7 +447,7 @@ const intentInterface = {
                 required: true
             },
             network: {
-                description: 'Stellar network identifier ("public" or "testnet").',
+                description: 'Stellar network identifier or private network passphrase.',
                 type: 'string',
                 required: false
             }
@@ -493,10 +484,8 @@ const intentInterface = {
         }
     },
     manage_account: {
-        risk: 'low',
         title: 'Open account settings',
         description: 'Opens account settings window for a given account.',
-        unsafe: false,
         implicitFlow: false,
         params: {
             pubkey: {
@@ -505,7 +494,7 @@ const intentInterface = {
                 required: true
             },
             network: {
-                description: 'Stellar network identifier ("public" or "testnet").',
+                description: 'Stellar network identifier or private network passphrase.',
                 type: 'string',
                 required: false
             }
@@ -513,6 +502,46 @@ const intentInterface = {
         returns: {
             pubkey: {
                 description: 'Public key from intent request.',
+                type: 'string'
+            }
+        }
+    },
+    batch: {
+        title: 'Intents batch',
+        description: 'Requests execution of several tx intents bundled together. This intent is atomic – a user confirms or rejects all bundled requests at once, with the same account and the same Stellar network.',
+        implicitFlow: true,
+        params: {
+            intents: {
+                description: 'Requested tx intents that should be executed together.',
+                type: 'object[]',
+                required: true
+            },
+            pubkey: {
+                description: 'Specific public key requested by the application.',
+                type: 'string',
+                required: false
+            },
+            network: {
+                description: 'Stellar network identifier or private network passphrase.',
+                type: 'string',
+                required: false
+            }
+        },
+        returns: {
+            intents: {
+                description: 'Requested tx intents.',
+                type: 'object[]'
+            },
+            results: {
+                description: 'Array of results for each requested intent.',
+                type: 'object[]'
+            },
+            pubkey: {
+                description: 'User-selected public key.',
+                type: 'string'
+            },
+            network: {
+                description: 'Stellar network identifier.',
                 type: 'string'
             }
         }

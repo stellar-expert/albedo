@@ -19,7 +19,6 @@ import albedo from '@albedo-link/intent'
 
 ### Intents
 
-
 #### Intent `public_key` - View public key
 
 Requests account public key. It's a simple way of authentication for Stellar-based applications. The response ensures that a user owns the corresponding secret key.
@@ -80,7 +79,8 @@ Requests a signature for the transaction. Returns the signed transaction envelop
 - `xdr` *(string)* - *(required)* XDR-encoded transaction envelope to sign.
 - `pubkey` *(string)* - *(optional)* Specific public key requested by the application.
 - `network` *(string)* - *(optional)* Stellar network identifier.
-- `callback` *(string)* - *(optional)* Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon. 
+- `callback` *(string)* - *(optional)* Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon.
+- `description` *(string)* - *(optional)* Optional human-friendly short transaction description provided by developers.
 - `submit` *(boolean)* - *(optional)* If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
 
 **Returns**
@@ -113,7 +113,7 @@ Requests a payment from a user. Works with any Stellar asset, supports transacti
 - `memo` *(string)* - *(optional)* Transaction memo (required for exchanges and some anchors).
 - `memo_type` *(string)* - *(optional)* Transaction memo type.
 - `pubkey` *(string)* - *(optional)* Specific public key requested by the application.
-- `network` *(string)* - *(optional)* Stellar network identifier ("public" or "testnet").
+- `network` *(string)* - *(optional)* Stellar network identifier or private network passphrase.
 - `callback` *(string)* - *(optional)* Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon. 
 - `submit` *(boolean)* - *(optional)* If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
 
@@ -154,7 +154,7 @@ Requests permission to create a trustline to a given Stellar asset. Gradually si
 - `memo` *(string)* - *(optional)* Transaction memo (required for exchanges and some anchors).
 - `memo_type` *(string)* - *(optional)* Transaction memo type.
 - `pubkey` *(string)* - *(optional)* Specific public key requested by the application.
-- `network` *(string)* - *(optional)* Stellar network identifier ("public" or "testnet").
+- `network` *(string)* - *(optional)* Stellar network identifier or private network passphrase.
 - `callback` *(string)* - *(optional)* Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon. 
 - `submit` *(boolean)* - *(optional)* If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
 
@@ -179,7 +179,7 @@ albedo.trust({
     .then(res => console.log(res))
 ```
 
-#### Intent `exchange` - Purchase tokens
+#### Intent `exchange` - Swap tokens
 
 Requests permission to buy tokens on Stellar DEX at market price.
 
@@ -194,7 +194,7 @@ Requests permission to buy tokens on Stellar DEX at market price.
 - `memo` *(string)* - *(optional)* Transaction memo (required for exchanges and some anchors).
 - `memo_type` *(string)* - *(optional)* Transaction memo type.
 - `pubkey` *(string)* - *(optional)* Specific public key requested by the application.
-- `network` *(string)* - *(optional)* Stellar network identifier ("public" or "testnet").
+- `network` *(string)* - *(optional)* Stellar network identifier or private network passphrase.
 - `callback` *(string)* - *(optional)* Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon.
 - `submit` *(boolean)* - *(optional)* If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
 
@@ -233,7 +233,7 @@ Requests temporary access token for one or more intents that can be used to exec
 **Parameters**
 
 - `intents` *(string|string[])* - *(required)* Requested implicit flow intents.
-- `network` *(string)* - *(optional)* Stellar network identifier ("public" or "testnet").
+- `network` *(string)* - *(optional)* Stellar network identifier or private network passphrase.
 
 **Returns**
 
@@ -261,7 +261,7 @@ Opens account settings window for a given account.
 **Parameters**
 
 - `pubkey` *(string)* - *(required)* Specific public key requested by the application.
-- `network` *(string)* - *(optional)* Stellar network identifier ("public" or "testnet").
+- `network` *(string)* - *(optional)* Stellar network identifier or private network passphrase.
 
 **Returns**
 
@@ -271,6 +271,32 @@ Opens account settings window for a given account.
 
 ```js
 albedo.manageAccount()
+    .then(res => console.log(res))
+```
+
+#### Intent `batch` - Intents batch
+
+Requests execution of several tx intents bundled together. This intent is atomic – a user confirms or rejects all bundled requests at once, with the same account and the same Stellar network.
+
+**Parameters**
+
+- `intents` *(object[])* - *(required)* Requested tx intents that should be executed together.
+- `pubkey` *(string)* - *(optional)* Specific public key requested by the application.
+- `network` *(string)* - *(optional)* Stellar network identifier or private network passphrase.
+
+**Returns**
+
+- `intents` *(object[])* - Requested tx intents.
+- `results` *(object[])* - Array of results for each requested intent.
+- `pubkey` *(string)* - User-selected public key.
+- `network` *(string)* - Stellar network identifier.
+
+**Example**
+
+```js
+albedo.batch({
+    intents: 'tx,pay,trust,sign_message'
+})
     .then(res => console.log(res))
 ```
 

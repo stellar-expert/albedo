@@ -1,9 +1,12 @@
 import {Asset, Memo, Operation, TransactionBuilder} from 'stellar-sdk'
 import Bignumber from 'bignumber.js'
+import {intentInterface} from '@albedo-link/intent'
 import {resolveNetworkParams} from '../util/network-resolver'
-import {createHorizon} from '../util/horizon-connector'
 import {estimateFee} from '../util/fee-estimator'
 import standardErrors from '../util/errors'
+import {resolveAccountInfo} from '../util/account-info-resolver'
+import {runInAction} from 'mobx'
+import {handleTxError} from './tx-error-handler'
 
 /**
  * Normalize memo type to the values accepted by Memo.
@@ -20,18 +23,19 @@ function normalizeMemoType(memoType) {
 /**
  * Build a transactions from a given set of operations.
  * @param {ActionContext} actionContext - Current action context.
+ * @param {IntentRequest} intentRequest - Current intent request.
  * @param {String} publicKey - Public key for the account keypair selected by the user.
  * @returns {Transaction} Composed Stellar transaction.
  */
-async function buildTx(actionContext, publicKey) {
-    const {intentParams} = actionContext,
-        networkParams = resolveNetworkParams(intentParams),
-        horizon = createHorizon(intentParams)
+async function buildTx(actionContext, intentRequest, publicKey) {
+    const {intentParams} = intentRequest,
+        networkParams = resolveNetworkParams(intentParams)
 
     //fetch source account sequence and fee stats from Horizon
     const [source, fee] = await Promise.all([
-        horizon.loadAccount(publicKey),
-        estimateFee(networkParams)])
+        resolveAccountInfo(publicKey, networkParams),
+        estimateFee(networkParams)
+    ])
 
     //create builder with unlimited timeout and calculated fee
     const tx = new TransactionBuilder(source, {
@@ -69,7 +73,7 @@ async function prepareTxOperations(actionContext, source) {
                 asset = asset_issuer ? new Asset(asset_code, asset_issuer) : Asset.native()
             if (!asset_issuer) {
                 try {
-                    const acc = await createHorizon(intentParams).loadAccount(destination)
+                    const acc = await resolveAccountInfo(destination, actionContext.networkParams)
                 } catch (e) {
                     if (e.name === 'NotFoundError') {
                         return [Operation.createAccount({startingBalance: amount, destination})]
@@ -128,19 +132,21 @@ async function prepareTxOperations(actionContext, source) {
 /**
  * Process user action with tx intent request.
  * @param {ActionContext} actionContext
- * @param {String} publicKey
- * @param {ActionExecutionContext} executionContext
+ * @param {IntentRequest} intentRequest
+ * @param {ActionAuthenticationContext} executionContext
  * @returns {Promise}
  */
-async function processTxIntent({actionContext, executionContext}) {
-    let {txContext, intent, intentParams, intentProps} = actionContext
+async function processTxIntent({actionContext, intentRequest, executionContext}) {
+    let {txContext, intent, intentParams} = intentRequest
+    const intentInterfaceProps = intentInterface[intent]
     try {
         if (!txContext) {
-            const tx = await buildTx(actionContext, executionContext.publicKey)
-            txContext = await actionContext.setTxContext(tx)
+            const tx = await buildTx(actionContext, intentRequest, executionContext.publicKey)
+            txContext = await intentRequest.setTxContext(tx, actionContext.selectedAccount)
         }
 
-        if (!await txContext.sign(executionContext)) return null
+        if (!await txContext.sign(executionContext))
+            return null
 
         const {network} = txContext
         //prepare return params
@@ -151,63 +157,34 @@ async function processTxIntent({actionContext, executionContext}) {
         }
 
         //copy other fields from request
-        const fieldsToCopyFromRequest = [...Object.keys(intentProps.returns), 'memo', 'memo_type']
+        const fieldsToCopyFromRequest = [...Object.keys(intentInterfaceProps.returns), 'memo', 'memo_type']
         for (let field of fieldsToCopyFromRequest) {
             const val = intentParams[field]
             if (val) res[field] = val
         }
 
+        //retrieve hash and tx envelope
         const {tx} = txContext,
             hash = tx.hash().toString('hex'),
             envelopeXdr = tx.toEnvelope().toXDR().toString('base64')
 
-        if (actionContext.autoSubmitToHorizon) {
-            let result
-            //submit a transaction to Horizon
-            const horizon = createHorizon(intentParams)
-            try {
-                result = await horizon.submitTransaction(tx)
-            } catch (e) {
-                throw standardErrors.horizonError(e?.response?.data || 'Network error. Failed to connect to Horizon server ' + resolveNetworkParams(intentParams).horizon)
-            }
+        Object.assign(res, {
+            tx_hash: hash,
+            signed_envelope_xdr: envelopeXdr
+        })
 
-            Object.assign(res, {
-                tx_hash: hash,
-                signed_envelope_xdr: envelopeXdr,
-                result,
-                horizon: horizon.serverURL.origin()
-            })
-        } else {
-            //just prepare a signed envelope
-            Object.assign(res, {
-                tx_hash: hash,
-                signed_envelope_xdr: envelopeXdr
-            })
-        }
         return res
     } catch (err) {
-        //TODO: too general error handler - split into a few separate try-catch blocks to handle specific errors individually
-        if (err.code && err.message) throw err
-        //something wrong with the network connection
-        if (err.message === 'Network Error')
-            throw standardErrors.externalError('Network error. Failed to connect to Horizon server ' + resolveNetworkParams(intentParams).horizon)
-        if (err.response) { //treat as Horizon error
-            if (err.response.status === 404)
-                throw standardErrors.externalError(new Error('Source account doesn\'t exist on the network.'))
-            throw standardErrors.horizonError(e?.response?.data)
-        }
-        //unhandled error
-        //TODO: add detailed error description
-        throw standardErrors.unhandledError(err)
+        handleTxError(err, actionContext)
     }
 }
 
-export default function (responder) {
-    responder.registerReaction('trust', processTxIntent)
+export default function (registerReaction) {
+    registerReaction('trust', processTxIntent)
 
-    responder.registerReaction('pay', processTxIntent)
+    registerReaction('pay', processTxIntent)
 
-    responder.registerReaction('tx', processTxIntent)
+    registerReaction('tx', processTxIntent)
 
-    responder.registerReaction('exchange', processTxIntent)
+    registerReaction('exchange', processTxIntent)
 }

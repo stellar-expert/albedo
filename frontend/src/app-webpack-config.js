@@ -62,7 +62,8 @@ module.exports = function (env, argv) {
                             loader: 'sass-loader',
                             options: {
                                 sourceMap: !isProduction,
-                                additionalData: '@import "./src/ui/styles.scss";'
+                                additionalData: `@import "~@stellar-expert/ui-framework/basic-styles/variables.scss";
+@import "~@stellar-expert/ui-framework/basic-styles/themes.scss";`
                             }
                         }
                     ]

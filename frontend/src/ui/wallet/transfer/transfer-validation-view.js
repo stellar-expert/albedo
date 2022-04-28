@@ -14,11 +14,18 @@ function createTestnetAccount() {
 function canReceive(destination, asset) {
     if (destination.nonExisting) return false
     if (asset === 'XLM') return true //TODO: check minimal balance
-    if (!destination.balancesMap || !destination.balancesMap[asset]) return false
     if (destination.id === AssetDescriptor.parse(asset).issuer) return true
+    if (!destination.balancesMap || !destination.balancesMap[asset]) return false
     return true
 }
 
+/**
+ * @param {String} network
+ * @param {String} destination
+ * @param {TransferSettings} transfer
+ * @param {Object} [directoryInfo]
+ * @return {JSX.Element|boolean|null}
+ */
 function validate(network, destination, transfer, directoryInfo) {
     if (transfer.destinationFederationAddress && !transfer.destination) return <>
         Failed to resolve recipient public key from the federation address "{transfer.destinationFederationAddress}".
@@ -49,7 +56,7 @@ function validate(network, destination, transfer, directoryInfo) {
         The account does not exist on the ledger.
         <br/>
         {network === 'testnet' &&
-        <a href="#" onClick={createTestnetAccount}>Create a <b>testnet</b> account automatically?</a>}
+            <a href="#" onClick={createTestnetAccount}>Create a <b>testnet</b> account automatically?</a>}
     </>
 
     if (!transfer.hasSufficientBalance) return <>
@@ -84,6 +91,8 @@ function validate(network, destination, transfer, directoryInfo) {
         function setCreateTrustline() {
             runInAction(() => transfer.createTrustline = true)
         }
+
+        if (transfer.asset[0] === transfer.asset[1]) return false
 
         if (!accountLedgerData.balances[transfer.asset[1]] && !transfer.createTrustline) return <>
             You need to establish a trustline to {assetCode} before trading it.

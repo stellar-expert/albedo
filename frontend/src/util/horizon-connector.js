@@ -1,9 +1,8 @@
-import {Server} from 'stellar-sdk'
 import {resolveNetworkParams} from './network-resolver'
 
 /**
  * Create and init Horizon server wrapper instance.
- * @param {String} network
+ * @param {String|{network: String, [horizon]: string}} network - Network passphrase or network descriptor.
  * @return {Server}
  */
 export function createHorizon(network) {
@@ -12,8 +11,7 @@ export function createHorizon(network) {
         horizon = network.horizon
         network = network.network
     }
-    const {horizon: selectedHorizon} = resolveNetworkParams({network, horizon})
-    return new Server(selectedHorizon)
+    return resolveNetworkParams({network, horizon}).createHorizon()
 }
 
 /**

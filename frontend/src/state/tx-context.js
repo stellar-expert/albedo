@@ -1,20 +1,21 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
-import {Transaction, xdr as xdrTypes, Server} from 'stellar-sdk'
+import {Transaction} from 'stellar-sdk'
 import Bignumber from 'bignumber.js'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
-import {formatHint, hintMatchesKey} from '../util/signature-hint-utils'
-import {substituteSourceAccount, substituteSourceSequence, zeroAccount} from '../util/tx-replace-utils'
-import {resolveNetworkParams} from '../util/network-resolver'
-import standardErrors from '../util/errors'
 import accountManager from './account-manager'
+import standardErrors from '../util/errors'
+import {resolveAccountInfo} from '../util/account-info-resolver'
+import {hintMatchesKey} from '../util/signature-hint-utils'
+import {substituteSourceAccount, substituteSourceSequence, zeroAccount} from '../util/tx-replace-utils'
 
 export default class TxContext {
     /**
-     *
+     * Initialize transaction execution context for an intent request.
      * @param {Transaction} transaction
-     * @param {{[network]: String, [horizon]: String}} intentParams
+     * @param {Object} intentParams
+     * @param {StellarNetworkParams} networkParams
      */
-    constructor(transaction, intentParams) {
+    constructor(transaction, intentParams, networkParams) {
         makeObservable(this, {
             availableSigners: observable.shallow,
             signatures: observable.shallow,
@@ -31,8 +32,6 @@ export default class TxContext {
         })
 
         this.tx = transaction
-        //set up network passphrase and Horizon url
-        Object.assign(this, resolveNetworkParams(intentParams))
         //TODO: retrieve pre-set signatures from tx
         this.signatures = [...transaction.signatures]
         this.availableSigners = []
@@ -47,15 +46,9 @@ export default class TxContext {
 
     /**
      * Predefined network ("public", "testnet") or the passphrase of a private network.
-     * @type {String}
+     * @type {StellarNetworkParams}
      */
-    network
-
-    /**
-     * Horizon endpoint (only required for signature schema lookup).
-     * @type {String}
-     */
-    horizon
+    networkParams
 
     /**
      * Signers available for automatic signature.
@@ -128,9 +121,8 @@ export default class TxContext {
     async setTxSequence(newSequence) {
         try {
             if (newSequence === undefined) {
-                const horizon = new Server(this.horizon),
-                    sourceAccount = await horizon.loadAccount(this.sourceAccount)
-
+                const sourceAccount = await resolveAccountInfo(this.sourceAccount, this.networkParams)
+                //set incremented tx sequence
                 newSequence = new Bignumber(sourceAccount.sequenceNumber()).add(1).toString()
             }
             substituteSourceSequence(this.tx, newSequence)
@@ -199,8 +191,8 @@ export default class TxContext {
 
     /**
      * Sign the transaction using plain secret key.
-     * @param {ActionExecutionContext} executionContext
-     * @return {Boolean}
+     * @param {ActionAuthenticationContext} executionContext
+     * @return {Promise<Boolean>}
      */
     async sign(executionContext) {
         //replace tx source account and sequence number if necessary

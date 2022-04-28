@@ -8,7 +8,8 @@ import {extractDeviceId} from '../util/device-id-generator'
 export const ACCOUNT_TYPES = {
     STORED_ACCOUNT: 0,
     LEDGER_ACCOUNT: 1,
-    TREZOR_ACCOUNT: 2
+    TREZOR_ACCOUNT: 2,
+    EPHEMERAL_ACCOUNT: -1
 }
 
 function cleanBipPath(path) {
@@ -204,5 +205,43 @@ export default class Account {
             res.seen = this.seen
         }
         return res
+    }
+
+    static ephemeral(secret) {
+        const acc = new EphemeralAccount()
+        acc.setSecret(secret)
+        return acc
+    }
+}
+
+/**
+ * Temporary account wrapper for direct key input case.
+ */
+class EphemeralAccount extends Account {
+    constructor(params) {
+        super(params)
+        this.accountType = ACCOUNT_TYPES.EPHEMERAL_ACCOUNT
+        this.friendlyName = 'Stellar account'
+        makeObservable(this, {
+            secret: observable,
+            setSecret: action
+        })
+    }
+
+    get isEphemeral() {
+        return true
+    }
+
+    /**
+     * Plain account secret passphrase
+     * @type {String}
+     */
+    secret = null
+
+    setSecret(secret) {
+        if (!StrKey.isValidEd25519SecretSeed(secret)) return null
+        this.secret = secret
+        this.publicKey = Keypair.fromSecret(secret).publicKey()
+        this.id = 'ephemeral' + this.publicKey
     }
 }

@@ -1,36 +1,27 @@
 import {Keypair} from 'stellar-sdk'
 import shajs from 'sha.js'
-import {ACCOUNT_TYPES} from '../state/account'
-import HwSigner from '../hw-signer/hw-signer'
-import appSettings from '../state/app-settings'
 import isEqual from 'react-fast-compare'
+import HwSigner from '../hw-signer/hw-signer'
+import {ACCOUNT_TYPES} from '../state/account'
+import appSettings from '../state/app-settings'
 import actionContext from '../state/action-context'
 
-export default class ActionExecutionContext {
+export default class ActionAuthenticationContext {
     /**
      * Create new instance of AccountActionsWrapper for a given account.
      * @param {Account} account - Account to use.
-     * @return {ActionExecutionContext}
+     * @return {ActionAuthenticationContext}
      */
     static forAccount(account) {
-        const res = new ActionExecutionContext()
+        const res = new ActionAuthenticationContext()
         res.account = account
         res.publicKey = account.publicKey
+        if (account.secret) {
+            res.secret = account.secret
+        }
         if (account.isHWAccount) {
             res.hwSigner = new HwSigner(account.accountType)
         }
-        return res
-    }
-
-    /**
-     * Create new instance of AccountActionsWrapper from secret key (direct key input or restored implicit session).
-     * @param {String} secret - Secret key to use.
-     * @return {ActionExecutionContext}
-     */
-    static forSecret(secret) {
-        const res = new ActionExecutionContext()
-        res.secret = secret
-        res.publicKey = Keypair.fromSecret(secret).publicKey()
         return res
     }
 
@@ -80,7 +71,8 @@ export default class ActionExecutionContext {
                 publicKey: this.publicKey,
                 message: rawMessage
             })
-        } else throw new Error('Unsupported account type:' + this.account.accountType)
+        } else
+            throw new Error('Unsupported account type:' + this.account.accountType)
         return {
             signature,
             signedMessage: messageToSign
@@ -146,23 +138,16 @@ export default class ActionExecutionContext {
     }
 
     async retrieveSessionData() {
-        if (this.account) {
-            const res = {
-                accountType: this.account.accountType,
-                publicKey: this.publicKey
-            }
-            if (res.accountType === ACCOUNT_TYPES.STORED_ACCOUNT) {
-                res.secret = this.account.requestAccountSecret(this.credentials)
-            }
-            return res
+        const res = {
+            accountType: this.account.accountType,
+            publicKey: this.publicKey
         }
-        if (this.secret) {
-            return {
-                accountType: -1,
-                publicKey: this.publicKey,
-                secret: this.secret
-            }
+
+        if (res.accountType === ACCOUNT_TYPES.STORED_ACCOUNT) {
+            res.secret = this.account.requestAccountSecret(this.credentials)
+        } else if (this.secret) {
+            res.secret = this.secret
         }
-        throw new Error('Failed to prepare session data')
+        return res
     }
 }

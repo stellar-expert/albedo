@@ -13,20 +13,3 @@ describe('signer.getPublicKey', function () {
         expect(a).to.not.equal(b)
     })
 })
-
-describe('signer.sign', function () {
-    it('fails to sign an empty data', function () {
-        expect(() => signMessage('', 'password')).to.throw(/Invalid data/)
-    })
-    it('fails to sign data without password', function () {
-        expect(() => signMessage('123', '')).to.throw(/Invalid password format/)
-    })
-
-    it('signs the data', function () {
-        let password = 'password' + Math.random(),
-            data = new Date().toJSON(),
-            signature = signMessage(data, password)
-        expect(signature.length).to.equal(88)
-        expect(verifyMessage(data, signature, derivePublicKeyFromPassword(password))).to.be.true
-    })
-})

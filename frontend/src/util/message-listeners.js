@@ -5,6 +5,7 @@ import accountManager from '../state/account-manager'
 import stoplistTracker from '../stoplist/stoplist-tracker'
 import {isInsideFrame} from './frame-utils'
 import storageProvider from '../storage/storage-provider'
+import {setActionContext} from '../state/action-context-initializer'
 
 async function handleInternalCommand(data, origin) {
     if (data.sync) {
@@ -19,14 +20,14 @@ async function handleInternalCommand(data, origin) {
 
 async function handleIntentRequest(data, origin) {
     data.app_origin = origin || null
-    await actionContext.setContext(data)
+    await setActionContext(data)
 
     if (actionContext.intent === 'manage_account') {
         navigation.navigate('/account')
         return
     }
 
-    if (!actionContext.isImplicitIntent) {
+    if (!actionContext.implicitSession) {
         //interactive flow
         navigation.navigate('/confirm')
         return
@@ -34,17 +35,15 @@ async function handleIntentRequest(data, origin) {
     try {
         //implicit flow
         await actionContext.confirmRequest()
-        if (actionContext.response) {
-            await actionContext.finalize()
-        }
     } catch (e) {
-        await actionContext.rejectRequest(e)
+        actionContext.setIntentError(e)
+        await actionContext.rejectRequest()
     }
 }
 
 function notifyOpener() {
     setTimeout(() => {
-        (window.opener || window.parent).postMessage({albedo: {version: pkgInfo.version}}, '*')
+        (window.opener || window.parent).postMessage({albedo: {protocol: pkgInfo.protocol}}, '*')
     }, 300)
 }
 
@@ -59,7 +58,6 @@ export function registerMessageListeners(window) {
         if (isInsideFrame() && origin === window.origin) {
             if (await handleInternalCommand(data, origin)) return
         }
-        //TODO: we can store source in the actionContext to avoid possible source window disambiguation
         if (data.__albedo_intent_version && data.intent) {
             await handleIntentRequest(data, origin)
         }

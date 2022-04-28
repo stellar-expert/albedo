@@ -1,55 +1,64 @@
+import {Networks, Server} from 'stellar-sdk'
 import appSettings from '../state/app-settings'
-import {Networks} from 'stellar-sdk'
+
+class StellarNetworkParams {
+
+    network = 'public'
+
+    networkName = 'public'
+
+    horizon = appSettings.networks.public.horizon
+
+    createHorizon() {
+        return new Server(this.horizon)
+    }
+}
 
 /**
  * Resolve Stellar network identifier based on the intent settings.
  * @param {String} [network] - Stellar network id or passphrase.
  * @param {String} [horizon] - Horizon server URL (optional for predefined networks).
- * @return {{network: String, horizon: String, networkName: String}}
+ * @return {StellarNetworkParams}
  */
-function resolveNetworkParams({network, horizon}) {
-    let selectedNetwork,
-        networkName,
-        selectedHorizon = horizon
+export function resolveNetworkParams({network, horizon}) {
+    const params = new StellarNetworkParams()
+    params.horizon = horizon
+
     if (!network) {
         //no network provided - use pubnet settings by default
-        network = networkName = 'public'
+        network = 'public'
     }
     //try to find matching predefined network passphrase
     for (const key of Object.keys(Networks)) {
         if (Networks[key] === network) {
-            network = networkName = key.toLowerCase()
+            network = params.networkName = key.toLowerCase()
             break
         }
     }
     //try to fetch network details from the app config by name (predefined are "public" and "testnet")
     const networkSettings = appSettings.networks[network.toLowerCase()]
     if (networkSettings) {
-        networkName = network
+        params.networkName = network
         //use passphrase from predefined networks
-        selectedNetwork = Networks[network.toUpperCase()]
+        params.network = Networks[network.toUpperCase()]
         if (!horizon) {
             //use predefined Horizon URL if none was provided
-            selectedHorizon = networkSettings.horizon
+            params.horizon = networkSettings.horizon
         }
     } else {
         //we assume that a client provided network passphrase instead of network identifier - use it as is
-        selectedNetwork = network
+        params.network = network
         //in this case, a client should provide the horizon endpoint explicitly
-        if (!selectedHorizon) throw new Error(`No Horizon server endpoint provided with custom network "${network}".`)
-        networkName = 'private network'
+        if (!params.horizon) throw new Error(`No Horizon server endpoint provided with custom network "${network}".`)
+        params.networkName = 'private network'
     }
 
-    return {
-        network: selectedNetwork,
-        horizon: selectedHorizon,
-        networkName
-    }
+    Object.freeze(params)
+
+    return params
 }
 
-function isTestnet({network = 'public'}) {
+export function isTestnet({network = 'public'}) {
     return network.toLowerCase() === 'testnet' || network === Networks.TESTNET
 }
-
-export {resolveNetworkParams, isTestnet}
 

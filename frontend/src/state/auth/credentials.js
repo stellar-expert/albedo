@@ -1,4 +1,5 @@
-import {computeArgon2Hash, derivePublicKeyFromSecret} from '../../util/crypto-utils'
+import {computeArgon2Hash} from '../../util/crypto/argon2'
+import {derivePublicKeyFromSecret} from '../../util/crypto/ed25519'
 import {saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
 
 /**

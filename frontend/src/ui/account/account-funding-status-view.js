@@ -7,13 +7,16 @@ import standardErrors from '../../util/errors'
 import {requestFriendbotFunding} from '../../util/horizon-connector'
 
 export default observer(function AccountFundingStatusView() {
-    const {selectedPublicKey, selectedAccountInfo, intent, intentParams, requiresExistingAccount} = actionContext,
-        [fundingInProgress, setFundingInProgress] = useState(false)
+    const {selectedAccount, selectedAccountInfo, intentParams, requiresExistingAccount} = actionContext,
+        [fundingInProgress, setFundingInProgress] = useState(false),
+        selectedPublicKey = selectedAccount?.publicKey
+
     useEffect(() => {
         if (!requiresExistingAccount) return
         actionContext.loadSelectedAccountInfo()
         const updateInfoIntervalHandler = setInterval(() => {
-            if (actionContext.selectedAccountInfo && !actionContext.selectedAccountInfo.error) {
+            const {selectedAccountInfo} = actionContext
+            if (selectedAccountInfo && !selectedAccountInfo.error) {
                 clearInterval(updateInfoIntervalHandler)
                 return
             }
@@ -43,12 +46,11 @@ export default observer(function AccountFundingStatusView() {
                 </> :
                 <>
                     The account does not exist on the ledger. You need to create it before usage – send at least 2 XLM
-                    to
-                    the address{' '}
+                    to the address{' '}
                     <AccountAddress account={selectedPublicKey} chars={56} className="word-break condensed"
                                     copyToClipboard/>
-                </>
-            }
+                </>}
+            <div className="micro-space"/>
         </div>}
     </div>
     return null

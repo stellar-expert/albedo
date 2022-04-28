@@ -35,6 +35,10 @@ export interface AlbedoIntent {
      */
     manageAccount: (params: ManageAccountIntentParams) => Promise<ManageAccountIntentResult>,
     /**
+     * Requests execution of several tx intents bundled together. This intent is atomic – a user confirms or rejects all bundled requests at once, with the same account and the same Stellar network.
+     */
+    batch: (params: BatchIntentParams) => Promise<BatchIntentResult>,
+    /**
     * Check whether an implicit session exists for a given intent and pubkey.
     */
     isImplicitSessionAllowed: (intent: string, pubkey: string) => boolean,
@@ -131,9 +135,13 @@ export interface TxIntentParams {
     */
     network?: string,
     /**
-    * Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon. 
+    * Optional URL callback where Albedo will POST the signed transaction XDR instead of submitting it to Horizon.
     */
     callback?: string,
+    /**
+    * Optional human-friendly short transaction description provided by developers.
+    */
+    description?: string,
     /**
     * If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
     */
@@ -193,7 +201,7 @@ export interface PayIntentParams {
     */
     pubkey?: string,
     /**
-    * Stellar network identifier ("public" or "testnet").
+    * Stellar network identifier or private network passphrase.
     */
     network?: string,
     /**
@@ -279,7 +287,7 @@ export interface TrustIntentParams {
     */
     pubkey?: string,
     /**
-    * Stellar network identifier ("public" or "testnet").
+    * Stellar network identifier or private network passphrase.
     */
     network?: string,
     /**
@@ -365,7 +373,7 @@ export interface ExchangeIntentParams {
     */
     pubkey?: string,
     /**
-    * Stellar network identifier ("public" or "testnet").
+    * Stellar network identifier or private network passphrase.
     */
     network?: string,
     /**
@@ -431,7 +439,7 @@ export interface ImplicitFlowIntentParams {
     */
     intents: string|string[],
     /**
-    * Stellar network identifier ("public" or "testnet").
+    * Stellar network identifier or private network passphrase.
     */
     network?: string
 }
@@ -473,7 +481,7 @@ export interface ManageAccountIntentParams {
     */
     pubkey: string,
     /**
-    * Stellar network identifier ("public" or "testnet").
+    * Stellar network identifier or private network passphrase.
     */
     network?: string
 }
@@ -483,6 +491,40 @@ export interface ManageAccountIntentResult {
     * Public key from intent request.
     */
     pubkey: string
+}
+
+export interface BatchIntentParams {
+    /**
+    * Requested tx intents that should be executed together.
+    */
+    intents: object[],
+    /**
+    * Specific public key requested by the application.
+    */
+    pubkey?: string,
+    /**
+    * Stellar network identifier or private network passphrase.
+    */
+    network?: string
+}
+
+export interface BatchIntentResult {
+    /**
+    * Requested tx intents.
+    */
+    intents: object[],
+    /**
+    * Array of results for each requested intent.
+    */
+    results: object[],
+    /**
+    * User-selected public key.
+    */
+    pubkey: string,
+    /**
+    * Stellar network identifier.
+    */
+    network: string
 }
 
 export type StellarNetwork = 'public' | 'testnet'

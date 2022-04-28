@@ -7,7 +7,7 @@ import TransportHandler from './transport-handler'
  */
 function createDialogTransport(frontendUrl) {
     const url = `${frontendUrl}/confirm`,
-        w = 440,
+        w = 480,
         h = 600,
         // Fixes dual-screen position                         Most browsers      Firefox
         dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX,

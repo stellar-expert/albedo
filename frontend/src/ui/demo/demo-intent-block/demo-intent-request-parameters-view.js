@@ -3,8 +3,9 @@ import isEqual from 'react-fast-compare'
 import {intentInterface} from '@albedo-link/intent'
 import {useDependantState} from '@stellar-expert/ui-framework'
 import allDemos from '../demo-intent-default-params'
+import DemoIntentRequestParameterControlView from './demo-intent-request-parameter-control-view'
 
-export default function DemoIntentRequestParametersView({intent, inProgress, onChange}) {
+export default function DemoIntentRequestParametersView({intent, inProgress, onChange, nested}) {
     const {params: intentParams, implicitFlow} = intentInterface[intent]
     const [allParams, setAllParams] = useDependantState(() => {
         const defaultParams = allDemos[intent]
@@ -39,30 +40,10 @@ export default function DemoIntentRequestParametersView({intent, inProgress, onC
     if (!keys.length) return <div className="dimmed">No parameters</div>
 
     return <>
-        {keys.map(param => {
-            const {required, type, description} = intentParams[param] || {}
-            if (!description) return null
-            let descr = ' - ' + description
-            if (!required) {
-                descr = ' (optional)' + descr
-            }
-            if (param === 'submit' || type === 'boolean') return <div key={param}>
-                <label>
-                    <input type="checkbox" checked={allParams[param]} disabled={inProgress}
-                           onChange={e => updateParam(param, e.target.checked)}/>{' '}
-                    <code>{param}</code>{descr}
-                </label>
-            </div>
-
-            return <div key={param}>
-                <label>
-                    <code>{param}</code>{descr}
-                </label>
-                <input type="text" value={allParams[param]} disabled={inProgress}
-                       onChange={e => updateParam(param, e.target.value)}/>
-            </div>
-        })}
-        {!!implicitFlow && <p className="dimmed text-small space">
+        {keys.map(param =>
+            <DemoIntentRequestParameterControlView key={param} param={param} value={allParams[param]} intentParams={intentParams}
+                                                   inProgress={inProgress} nested={nested} onChange={updateParam}/>)}
+        {!nested && !!implicitFlow && <p className="dimmed text-small">
             <i className="icon-info"/> This intent can be executed implicitly if{' '}
             <a href="/playground?section=implicit_flow">implicit flow</a>{' '}
             permissions were granted and "pubkey" parameter set.

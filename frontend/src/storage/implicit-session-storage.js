@@ -1,17 +1,24 @@
-import {
-    generateRandomEncryptionKey,
-    encryptDataAes,
-    decryptDataAes,
-    encodeBase64,
-    decodeBase64
-} from '../util/crypto-utils'
 import storageProvider from './storage-provider'
+import {encodeBase64, decodeBase64} from '../util/crypto/base64'
+import {decryptDataAes, encryptDataAes} from '../util/crypto/aes'
+import {generateRandomEncryptionKey} from '../util/crypto/random'
 
 const sessionPrefix = 'session_'
 
 /**
  * @typedef {Object} SessionDescriptor
+ * @property {String} pubkey
  * @property {String} sessionKey
+ * @property {Number} validUntil
+ */
+
+/**
+ * @typedef {Object} DecryptedImplicitSession
+ * @property {String} id
+ * @property {String} intents
+ * @property {String} network
+ * @property {String} publicKey
+ * @property {String} [secret]
  * @property {Number} validUntil
  */
 
@@ -49,7 +56,7 @@ function splitSessionKey(sessionKey) {
  * @param {Object} data - Extra data to encrypt.
  * @return {Promise<{pubkey: String, sessionKey: String, validUntil: Number}>}
  */
-async function saveImplicitSession(account, duration, data) {
+export async function saveImplicitSession(account, duration, data) {
     duration = parseInt(duration) || 0
     if (duration <= 0) {
         //min 1 hour
@@ -81,27 +88,32 @@ async function saveImplicitSession(account, duration, data) {
     }
 }
 
-async function parseSessionData(sessionKey) {
+/**
+ * Parse implicit session key and retrieve corresponding data.
+ * @param {String} sessionKey
+ * @return {Promise<{sessionData: String, encryptionKey: Uint8Array}>}
+ */
+export async function parseSessionData(sessionKey) {
     const {uid, encryptionKey} = splitSessionKey(sessionKey)
     const sessionData = await storageProvider.getItem(uid)
     return {sessionData, encryptionKey}
 }
 
 /**
- *
+ * Restore implicit
  * @param {String} sessionKey
- * @return {Boolean|SessionDescriptor}
+ * @return {DecryptedImplicitSession}
  */
-async function restoreImplicitSession(sessionKey) {
+export async function restoreImplicitSession(sessionKey) {
     const {sessionData, encryptionKey} = await parseSessionData(sessionKey)
-    if (!sessionData) return false
+    if (!sessionData) return
     const {encryptedSecret} = JSON.parse(sessionData),
         decrypted = decryptDataAes(encryptedSecret, encryptionKey)
     const session = JSON.parse(decrypted)
     if (isSessionExpired(session)) {
         //remove expired token
         await storageProvider.removeItem(splitSessionKey(sessionKey).uid)
-        return false
+        return
     }
     return session
 }
@@ -112,9 +124,9 @@ function removeAccountImplicitSessions(account) {
 
 /**
  * Automatically clean up expired sessions every 60 seconds.
- * @return {number} - Interval handler.
+ * @return {Number} - Interval handler.
  */
-function scheduleCleanupExpiredSessions() {
+export function scheduleCleanupExpiredSessions() {
     return setInterval(async function () {
         const keys = await storageProvider.enumerateKeys()
         //iterate through all sessions
@@ -131,11 +143,4 @@ function scheduleCleanupExpiredSessions() {
             }
         }
     }, 60000)
-}
-
-export {
-    saveImplicitSession,
-    parseSessionData,
-    restoreImplicitSession,
-    scheduleCleanupExpiredSessions
 }

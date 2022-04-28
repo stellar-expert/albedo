@@ -7,21 +7,28 @@ class AlbedoError extends Error {
     }
 
     /**
-     * Unique code.
+     * Unique error code.
      * @type {Number}
      */
     code = 0
 
     /**
-     * Whether an error is critical or not.
-     * @type {Boolean}
+     * Extended error info (if available).
      */
-    critical = true
+    ext
+
+    toJSON() {
+        const res = {message: this.message, code: this.code}
+        if (this.ext) {
+            res.ext = this.ext
+        }
+        return res
+    }
 }
 
 function buildError(params) {
     const {message, code = 0, ext} = params
-    const error = new Error(message)
+    const error = new AlbedoError(message)
     error.code = code
     if (ext) {
         error.ext = ext
@@ -63,7 +70,7 @@ class StandardErrors {
 
     horizonError(data) {
         return buildError({
-            message: 'Transaction failed when submitted to Stellar network.',
+            message: 'Transaction failed during execution in Stellar network.',
             ext: data,
             code: -5
         })
@@ -105,20 +112,19 @@ class StandardErrors {
         })
     }
 
-    get accountNotSelected(){
+    get accountNotSelected() {
         return buildError({
             message: 'Account not selected.',
             code: -1105
         })
     }
 
-    get accountDoesNotExist(){
+    get accountDoesNotExist() {
         return buildError({
             message: 'Account does not exist on the ledger.',
             code: -1106
         })
     }
-
 
     get messageSigningFailed() {
         return buildError({
@@ -126,6 +132,7 @@ class StandardErrors {
             code: -2001
         })
     }
+
     //Ledger-specific errors
     get hashSigningNotAllowed() {
         return buildError({
@@ -136,10 +143,9 @@ class StandardErrors {
 
     /**
      * Prepare an error for the serialization before sending via postMessage
-     * @param {Error|Object} error
-     * @param {Object} intentParams
+     * @param {Error|Object|String} error
      */
-    prepareErrorDescription(error, intentParams) {
+    prepareErrorDescription(error) {
         if (error.code === undefined) {
             error = standardErrors.unhandledError(error)
         }
@@ -151,7 +157,7 @@ class StandardErrors {
             error = Object.assign({}, stdError, {ext: error.ext})
         }
 
-        return {error, __reqid: intentParams.__reqid}
+        return {error}
     }
 }
 

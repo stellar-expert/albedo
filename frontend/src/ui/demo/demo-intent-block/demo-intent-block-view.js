@@ -2,11 +2,12 @@ import React from 'react'
 import {useLocation} from 'react-router'
 import albedo, {intentInterface} from '@albedo-link/intent'
 import {Tabs, navigation, useDependantState, parseQuery} from '@stellar-expert/ui-framework'
-import DemoIntentRequestParametersView from './demo-intent-request-parameters-view'
+import DemoBatchParametersView from './demo-batch-parameters-view'
 import DemoIntentResultsView from './demo-intent-results-view'
 import DemoIntentExampleView from './demo-intent-example-view'
 import DemoExtraInfoView from '../demo-extra-info-view'
 import {generateInvocation} from '../demo-code-generator'
+import DemoIntentRequestParametersView from './demo-intent-request-parameters-view'
 
 albedo.frontendUrl = location.origin
 
@@ -107,8 +108,9 @@ export default function DemoIntentBlockView({intent}) {
         <div className="intent-description">{description}</div>
         <div className="space">
             <b>Parameters</b>
-            <DemoIntentRequestParametersView {...{intent, inProgress, selectedTab}}
-                                             onChange={params => setAllParams(params)}/>
+            {intent==='batch'?
+                <DemoBatchParametersView {...{intent, inProgress}} onChange={params => setAllParams(params)}/>:
+                <DemoIntentRequestParametersView {...{intent, inProgress}} onChange={params => setAllParams(params)}/>}
         </div>
         <Tabs tabs={getTabs(intent)} selectedTab={selectedTab} onChange={tab => selectTab(tab)}/>
         <DemoIntentExampleView {...{intent, allParams, selectedTab, inProgress}} onExec={exec}/>

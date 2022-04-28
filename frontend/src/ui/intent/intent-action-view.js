@@ -1,16 +1,14 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import {observer} from 'mobx-react'
 import {Button, useDependantState} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
-import actionContext from '../../state/action-context'
-import accountManager from '../../state/account-manager'
+import actionContext, {ActionContextStatus} from '../../state/action-context'
 import IntentErrorView from './intent-error-view'
 
-function getConfirmationAccountName(alreadySigned) {
+function getConfirmationAccountName(account, alreadySigned) {
     const confirmation = alreadySigned ? 'Already signed by ' : 'Confirm using '
-    if (accountManager.activeAccount) return confirmation + accountManager.activeAccount.shortDisplayName
-    if (actionContext.directKeyInput) return confirmation + `account ${shortenString(accountManager.selectedPublicKey, 8)}`
+    if (account?.isEphemeral) return confirmation + `account ${shortenString(account.publicKey, 12)}`
+    if (account) return confirmation + account.shortDisplayName
     return confirmation + 'Albedo account'
 }
 
@@ -27,26 +25,23 @@ function IntentActionView() {
             intent,
             txContext,
             intentErrors,
-            confirmed,
+            status,
             response,
             autoSubmitToHorizon,
             requiresExistingAccount,
+            selectedAccount,
             selectedAccountInfo,
-            selectedPublicKey,
-            hasNoMatchingKey,
-            runtimeErrors,
-            dispatchingResponse,
-            directKeyInput
+            runtimeErrors
         } = actionContext,
-        {activeAccount} = accountManager,
-        alreadySigned = txContext && selectedPublicKey && txContext.findSignatureByKey(selectedPublicKey),
+        selectedPublicKey = selectedAccount?.publicKey,
+        alreadySigned = txContext && selectedAccount && txContext.findSignatureByKey(selectedPublicKey),
         [signingInProgress, setSigningInProgress] = useDependantState(() => false, [selectedPublicKey, alreadySigned]),
-        accountUnavailable = !selectedPublicKey || hasNoMatchingKey || (requiresExistingAccount && intent !== 'tx') && (!selectedAccountInfo || selectedAccountInfo.error),
-        inProgress = confirmed && !intentErrors && !alreadySigned && signingInProgress,
-        externalSignature = confirmed && activeAccount?.isHWAccount && !txContext?.isFullySigned,
-        pendingHorizonSubmission = confirmed && autoSubmitToHorizon && txContext?.isFullySigned && !response
+        accountUnavailable = !selectedPublicKey || (requiresExistingAccount && intent !== 'tx') && (!selectedAccountInfo || selectedAccountInfo.error),
+        inProgress = [ActionContextStatus.confirmed, ActionContextStatus.processed].includes(status) && !intentErrors && !alreadySigned && signingInProgress,
+        externalSignatureRequested = status >= ActionContextStatus.confirmed && status < ActionContextStatus.processed && selectedAccount?.isHWAccount && !txContext?.isFullySigned,
+        pendingHorizonSubmission = status >= ActionContextStatus.processed && status < ActionContextStatus.submitted && autoSubmitToHorizon && txContext?.isFullySigned && !response
 
-    if (dispatchingResponse) return <div>
+    if (status >= ActionContextStatus.processed) return <div>
         <PendingStatus>Processing response…</PendingStatus>
     </div>
 
@@ -54,26 +49,23 @@ function IntentActionView() {
         <Button block outline onClick={() => actionContext.rejectRequest()}>Proceed</Button>
     </div>
 
+    function confirm() {
+        setSigningInProgress(true)
+        actionContext.confirmRequest()
+    }
+
     return <div>
-        {externalSignature && <PendingStatus>Confirm the action on the hardware wallet</PendingStatus>}
+        {externalSignatureRequested && <PendingStatus>Confirm the action on the hardware wallet</PendingStatus>}
         {pendingHorizonSubmission && <PendingStatus>Submitting to Horizon…</PendingStatus>}
         {!!runtimeErrors && <div className="space">
             <IntentErrorView/>
             <div className="micro-space"/>
         </div>}
-        {!directKeyInput &&
-        <Button block disabled={alreadySigned || accountUnavailable || inProgress} onClick={() => {
-            setSigningInProgress(true)
-            actionContext.confirmRequest()
-        }}>{getConfirmationAccountName(alreadySigned)}</Button>
-        }
-        {!!txContext?.isPartiallySigned &&
-        <Button block outline onClick={() => actionContext.finalize()}>
-            Proceed with partially signed tx
-        </Button>}
+        <Button block disabled={alreadySigned || accountUnavailable || inProgress} onClick={confirm}>
+            {getConfirmationAccountName(selectedAccount, alreadySigned)}</Button>
         {' '}
-        <Button block outline disabled={!!dispatchingResponse} onClick={() => actionContext.rejectRequest()}>Reject
-        </Button>
+        <Button block outline disabled={status >= ActionContextStatus.processed}
+                onClick={() => actionContext.rejectRequest()}>Reject</Button>
     </div>
 }
 

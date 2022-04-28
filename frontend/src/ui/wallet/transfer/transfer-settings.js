@@ -9,7 +9,7 @@ import {encodeMemo} from '../../../util/memo'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {prepareTransferTx} from './transfer-tx-builder'
 
-class TransferSettings {
+export default class TransferSettings {
     constructor(network, mode = 'direct') {
         this.network = network
         this.mode = mode
@@ -116,7 +116,7 @@ class TransferSettings {
     }
 
     /**
-     *
+     * Set transfer mode
      * @param {TransferMode} mode
      */
     setMode(mode) {
@@ -129,6 +129,11 @@ class TransferSettings {
         this.conversionDirection = 'source'
     }
 
+    /**
+     * Set transfer destination
+     * @param {String} address
+     * @param {Object} federationInfo
+     */
     setDestination(address, federationInfo = null) {
         this.destination = address || null
         this.createDestination = false
@@ -144,7 +149,7 @@ class TransferSettings {
     }
 
     /**
-     *
+     * Set transfer tokens amount
      * @param {String} amount
      * @param {Number} index
      */
@@ -158,11 +163,20 @@ class TransferSettings {
         }
     }
 
+    /**
+     * Maximum allowed price slippage
+     * @param {Number} slippage
+     */
     setSlippage(slippage) {
         this.conversionPathLoaded = false
         this.conversionSlippage = slippage
     }
 
+    /**
+     * Set asset transfer
+     * @param {String|AssetDescriptor} asset
+     * @param {Number} index
+     */
     setAsset(asset, index) {
         this.conversionPathLoaded = false
         this.createTrustline = false
@@ -178,6 +192,9 @@ class TransferSettings {
         }
     }
 
+    /**
+     * Reverse swap direction
+     */
     reverse() {
         if (this.conversionDirection === 'source') {
             this.amount = ['0', this.amount[0]]
@@ -192,6 +209,9 @@ class TransferSettings {
         this.createDestination = false
     }
 
+    /**
+     * Estimate swap price and amount
+     */
     recalculateSwap() {
         if (this.conversionPathLoaded || this.mode !== 'convert') return
         this.conversionPath = undefined
@@ -209,6 +229,9 @@ class TransferSettings {
         this.findConversionPath()
     }
 
+    /**
+     * Find path payment path
+     */
     findConversionPath() {
         const horizon = createHorizon(this.network)
         let endpoint
@@ -246,6 +269,9 @@ class TransferSettings {
             })
     }
 
+    /**
+     * Trigger price and amount estimates when new ledger arrives
+     */
     startLedgerStreaming() {
         this.stopLedgerStreaming = streamLedgers({
             network: this.network,
@@ -255,19 +281,31 @@ class TransferSettings {
         })
     }
 
+    /**
+     * Set amounts to zero
+     */
     resetOperationAmount() {
         this.createDestination = false
         this.amount = ['0', '0']
         this.setAmount('0', 0)
     }
 
+    /**
+     * Build transfer transaction
+     * @return {Promise<Transaction>}
+     */
     prepareTransaction() {
         return prepareTransferTx(this)
     }
 }
 
-export default TransferSettings
-
+/**
+ * Adjust converted amount with regard to maximum slippage amount
+ * @param {String} value
+ * @param {Number} direction
+ * @param {Number} slippage
+ * @return {String}
+ */
 function adjustWithSlippage(value, direction, slippage) {
     return new BigNumber(value)
         .times((1 + direction * slippage / 100).toPrecision(15))

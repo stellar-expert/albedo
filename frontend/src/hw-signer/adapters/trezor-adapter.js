@@ -3,7 +3,7 @@ import TrezorConnect, {DEVICE_EVENT, DEVICE} from 'trezor-connect'
 import {Keypair, xdr} from 'stellar-sdk'
 import {DEVICE_CONNECTED, DEVICE_DISCONNECTED} from './adapter-events'
 import standardErrors from '../../util/errors'
-import {decodeBase64} from '../../util/crypto-utils'
+import {decodeBase64} from '../../util/crypto/base64'
 
 let initialized = false
 

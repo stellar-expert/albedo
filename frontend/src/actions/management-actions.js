@@ -16,15 +16,14 @@ function findFriendlyName(account, desiredName) {
     return Promise.reject(new Error('Failed to pick up friendly name for the key pair.'))
 }
 
-export default function (responder) {
-    responder.registerReaction('implicit_flow', function ({actionContext, executionContext}) {
-        const {intentParams} = actionContext,
-            {activeAccount} = accountManager,
-            {intents, network} = intentParams
+export default function (registerReaction) {
+    registerReaction('implicit_flow', function ({intentRequest, executionContext}) {
+        const {account} = executionContext,
+            {intents, network} = intentRequest.intentParams
         return executionContext.retrieveSessionData()
             .then(data => {
                 Object.assign(data, {intents, network})
-                return saveImplicitSession(activeAccount, 3600, data)
+                return saveImplicitSession(account, 3600, data)
             })
             .then(({sessionKey, validUntil, pubkey}) => ({
                 granted: true,
@@ -37,10 +36,7 @@ export default function (responder) {
             }))
     })
 
-    responder.registerReaction('manage_account', function ({actionContext, executionContext}) {
-        const {intentParams} = actionContext,
-            {activeAccount} = accountManager,
-            {network, pubkey} = intentParams
-        return Promise.resolve({pubkey})
+    registerReaction('manage_account', function ({intentRequest}) {
+        return Promise.resolve({pubkey: intentRequest.intentParams.pubkey})
     })
 }

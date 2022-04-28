@@ -1,4 +1,4 @@
-import {decryptDataAes, encryptDataAes} from '../util/crypto-utils'
+import {decryptDataAes, encryptDataAes} from '../util/crypto/aes'
 import {currentStorageVersion} from './storage-version'
 import storageProvider from './storage-provider'
 import {syncLocalStorage} from './local-storage-synchronizer'

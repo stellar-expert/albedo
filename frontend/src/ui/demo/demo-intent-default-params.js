@@ -1,4 +1,5 @@
-import {encodeBase64, generateRandomEncryptionKey} from '../../util/crypto-utils'
+import {encodeBase64} from '../../util/crypto/base64'
+import {generateRandomEncryptionKey} from '../../util/crypto/random'
 
 export default {
     public_key: {

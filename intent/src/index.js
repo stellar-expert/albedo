@@ -59,13 +59,25 @@ AlbedoIntent.prototype = {
      * @param {Object} params - Intent parameters.
      * @param {String} params.xdr - A Stellar transaction in XDR format encoded in base64.
      * @param {String} [params.pubkey] - Specific public key requested by the application.
-     * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
+     * @param {String} [params.network] - Stellar network identifier or private network passphrase.
      * @param {Boolean} [params.submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
      * @returns {Promise<TxIntentResult>}
      */
     tx(params) {
         //TODO: check if txXdr is a Transaction instance and serialize it
         return this.request('tx', params)
+    },
+
+    /**
+     * Requests execution of several tx intents bundled together. This intent is atomic – a user confirms or rejects all bundled requests at once, with the same account and the same Stellar network.
+     * @param {Object} params - Intent parameters.
+     * @param {String} params.intents - Requested tx intents.
+     * @param {String} [params.pubkey] - Specific public key requested by the application.
+     * @param {String} [params.network] - Stellar network identifier or private network passphrase.
+     * @returns {Promise<BatchIntentResult>}
+     */
+    batch(params) {
+        return this.request('batch', params)
     },
 
     /**
@@ -78,7 +90,7 @@ AlbedoIntent.prototype = {
      * @param {String} [params.memo] - [Optional] Memo to be included in the payment.
      * @param {('MEMO_TEXT' | 'MEMO_ID' | 'MEMO_HASH' | 'MEMO_RETURN')} [params.memo_type] - [Optional] Memo type to be included in the payment.
      * @param {String} [params.pubkey] - Specific public key requested by the application.
-     * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
+     * @param {String} [params.network] - Stellar network identifier or private network passphrase.
      * @param {Boolean} [params.submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
      * @returns {Promise<PayIntentResult>}
      */
@@ -93,7 +105,7 @@ AlbedoIntent.prototype = {
      * @param {String} params.asset_issuer - Asset account issuer.
      * @param {String} [params.limit] - [Optional] Trustline limit.
      * @param {String} [params.pubkey] - Specific public key requested by the application.
-     * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
+     * @param {String} [params.network] - Stellar network identifier or private network passphrase.
      * @param {Boolean} [params.submit] - If set, the signed transaction will be submitted to the Horizon server instead of returning it to the application.
      * @returns {Promise<TrustIntentResult>}
      */
@@ -133,13 +145,17 @@ AlbedoIntent.prototype = {
      * Open account settings window for a given account.
      * @param {Object} params - Intent parameters.
      * @param {String} params.pubkey - Specific public key requested by the application.
-     * @param {String} [params.network] - Stellar account network identifier or private network passphrase.
+     * @param {String} [params.network] - Stellar network identifier or private network passphrase.
      * @returns {Promise<ManageAccountIntentResult>}
      */
     manageAccount(params) {
         return this.request('manage_account', params)
     },
 
+    /**
+     * Generate random token that can be used for authentication or encryption
+     * @return {String}
+     */
     generateRandomToken() {
         return generateRandomToken()
     },
@@ -166,7 +182,7 @@ AlbedoIntent.prototype = {
      * Revoke session permission granted for an account.
      * @param {String} pubkey
      */
-    forgetImplicitSession(pubkey){
+    forgetImplicitSession(pubkey) {
         forgetSession(pubkey)
     }
 }
@@ -192,4 +208,5 @@ albedo.default = albedo
 bindWebStellarLinkHandler(albedo)
 
 export {intentInterface, intentErrors}
+
 export default albedo

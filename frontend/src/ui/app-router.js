@@ -13,7 +13,7 @@ import AccountSettings from './account/settings/account-settings-view'
 import IntroView from './pages/intro-view'
 import WebStellarLinkHandler from './intent/web-stellar-link-handler-view'
 import InstallExtensionView from './pages/install-extension-view'
-import TxResultView from './intent/tx-result-view'
+import TxResultView from './intent/tx/tx-result-view'
 import BlockedPageView from './pages/blocked-page-view'
 import CatcherView from './layout/catcher-view'
 

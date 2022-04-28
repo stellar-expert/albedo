@@ -1,10 +1,9 @@
 import standardErrors from '../util/errors'
 
-export default function (responder) {
-    responder.registerReaction('sign_message', async function ({actionContext, executionContext}) {
+export default function (registerReaction) {
+    registerReaction('sign_message', async function ({intentRequest, executionContext}) {
         try {
-            const {message} = actionContext.intentParams,
-                {signature, signedMessage} = await executionContext.signMessage(message)
+            const {signature, signedMessage} = await executionContext.signMessage(intentRequest.intentParams.message)
 
             return {
                 pubkey: executionContext.publicKey,
@@ -18,11 +17,10 @@ export default function (responder) {
         }
     })
 
-    responder.registerReaction('public_key', async function ({actionContext, executionContext}) {
+    registerReaction('public_key', async function ({intentRequest, executionContext}) {
         try {
             const {publicKey} = executionContext,
-                messageToSign = actionContext.intentParams.token,
-                {signature, signedMessage} = await executionContext.signMessage(messageToSign)
+                {signature, signedMessage} = await executionContext.signMessage(intentRequest.intentParams.token)
 
             return {
                 pubkey: publicKey,

@@ -10,10 +10,11 @@ const urlSchema = 'url:'
  * @param {Object} data - Response data.
  * @return {Promise<void>}
  */
-function execCallback(callback, data) {
+function execSep7Callback(callback, data) {
     if (callback.indexOf(urlSchema) !== 0) return Promise.reject(new Error('Unsupported callback schema: ' + callback))
     const action = callback.substr(urlSchema.length)
     const form = document.createElement('form')
+
     document.body.appendChild(form)
     form.method = 'post'
     form.action = action
@@ -26,9 +27,15 @@ function execCallback(callback, data) {
         form.appendChild(input)
     }
     form.submit()
-    return Promise.resolve()
+    return new Promise(resolve => setTimeout(resolve, 2000))
 }
 
+/**
+ * Dispatch response message back to caller.
+ * @param {Object} res
+ * @param {ActionContext} actionContext
+ * @return {Promise}
+ */
 function postMessage(res, actionContext) {
     const target = locateCallerWindow(actionContext)
     if (!target) {
@@ -38,47 +45,49 @@ function postMessage(res, actionContext) {
     return Promise.resolve()
 }
 
+/**
+ * Get the caller window handler.
+ * @return {Window}
+ */
 function locateCallerWindow() {
     return isInsideFrame() ? window.parent : window.opener
 }
 
 /**
  * Process and send intent response back to the caller window.
- * @param {Object} res - Response object.
- * @param {ActionContext} actionContext - Action context to use
- * @return {Promise<void>}
+ * @param {ActionContext} actionContext
+ * @return {Promise}
  */
-export async function dispatchIntentResponse(res, actionContext) {
-    const {callback, __reqid} = actionContext.intentParams
-    res.__reqid = __reqid
+export async function dispatchIntentResponse(actionContext) {
+    const {callback} = actionContext.intentParams,
+        {result} = actionContext
+    result.__reqid = actionContext.requestId
 
     if (callback) {
-        await execCallback(callback, res)
+        await execSep7Callback(callback, result)
     }
     const callerWindow = locateCallerWindow()
-    if (!callerWindow || callerWindow === window) return res
+    if (!callerWindow || callerWindow === window) return
     if (actionContext.intent === 'implicit_flow') {
         await syncLocalStorage()
     }
-    return postMessage(res, actionContext)
+    return postMessage(result, actionContext)
 }
 
 /**
- * Reject the request.
+ * Reject request and return an error to the caller app.
  * @param {Error|String} [error] - Rejection reason or validation error.
  * @param {ActionContext} actionContext - Current action context.
  */
-export function handleIntentResponseError(error, actionContext) {
-    if (!error) {
-        error = errors.actionRejectedByUser
+export function dispatchIntentError(error, actionContext) {
+    const errorResult = errors.prepareErrorDescription(error)
+    errorResult.__reqid = actionContext.requestId
+    if (actionContext.result) {
+        Object.assign(errorResult, actionContext.result)
     }
-    error = errors.prepareErrorDescription(error, actionContext.intentParams)
-
-    const {callback} = actionContext.intentParams || {}
-    if (callback) {
-        alert(error.message || error)
-    } else {
-        return postMessage(error, actionContext)
-            .catch(e => console.error(e))
-    }
+    /*//SEP-7 callback doesn't imply error handling - just show an error in UI
+    alert(error.message || error)*/
+    //post message back to a caller app
+    return postMessage(errorResult, actionContext)
+        .catch(e => console.error(e))
 }

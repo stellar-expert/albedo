@@ -1,4 +1,5 @@
-import {encodeBase64, generateRandomEncryptionKey} from '../util/crypto-utils'
+import {encodeBase64} from '../util/crypto/base64'
+import {generateRandomEncryptionKey} from '../util/crypto/random'
 import {isExtensionInstalled} from '../extension/extension-detection'
 
 const ttl = 60 * 60 * 1000

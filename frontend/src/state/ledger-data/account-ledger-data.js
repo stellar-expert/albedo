@@ -5,6 +5,8 @@ import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
 import AccountTransactionHistory from './account-transactions-history'
 import AccountNotificationCounter from '../account-notification-counter'
 import {createHorizon} from '../../util/horizon-connector'
+import {resolveAccountInfo} from '../../util/account-info-resolver'
+import {resolveNetworkParams} from '../../util/network-resolver'
 
 const defaultThresholds = {low: 1, med: 1, high: 1}
 Object.freeze(defaultThresholds)
@@ -166,7 +168,7 @@ const accountLedgerData = new AccountLedgerData()
 export default accountLedgerData
 
 function fetchAccountHorizonData(network, address) {
-    return createHorizon({network}).loadAccount(address)
+    return resolveAccountInfo(address, resolveNetworkParams({network}))
         .then(accountData => {
             const balances = {}
             for (let balance of accountData.balances) {

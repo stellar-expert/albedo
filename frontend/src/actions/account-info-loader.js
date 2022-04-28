@@ -1,20 +1,22 @@
-import {createHorizon} from '../util/horizon-connector'
 import standardErrors from '../util/errors'
+import {resolveAccountInfo} from '../util/account-info-resolver'
 
 const pending = {}
 
-function loadSelectedAccountInfo(actionContext) {
-    const {intent, intentParams, selectedPublicKey} = actionContext
-    if (!selectedPublicKey) return Promise.resolve(standardErrors.accountNotSelected)
+/**
+ * Load relevant account information for a user-selected account from Horizon.
+ * @param {ActionContext} actionContext
+ * @return {Promise<AccountResponse>}
+ */
+export function loadSelectedAccountInfo(actionContext) {
+    const {networkParams, selectedAccount} = actionContext,
+        pubkey = selectedAccount?.publicKey
+    if (!pubkey) return Promise.reject(standardErrors.accountNotSelected)
     //check whether we already loading the requested account info
-    const pendingPromise = pending[selectedPublicKey]
+    const pendingPromise = pending[pubkey]
     if (pendingPromise) return pendingPromise
     //load the account
-    const promise = createHorizon(intentParams)
-        .loadAccount(selectedPublicKey)
-        .then(acc => {
-            return acc
-        })
+    const promise = resolveAccountInfo(pubkey, networkParams)
         .catch(err => {
             if (err.name === 'NotFoundError') {
                 return {error: standardErrors.accountDoesNotExist}
@@ -23,10 +25,8 @@ function loadSelectedAccountInfo(actionContext) {
             return {error: standardErrors.unhandledError(err)}
         })
         .finally(() => {
-            delete pending[selectedPublicKey]
+            delete pending[pubkey]
         })
-    pending[selectedPublicKey] = promise
+    pending[pubkey] = promise
     return promise
 }
-
-export {loadSelectedAccountInfo}

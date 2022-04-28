@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import {navigation, parseQuery} from '@stellar-expert/ui-framework'
-import actionContext from '../../state/action-context'
 import {replaceTokens} from '../../util/tx-replace-utils'
+import {setActionContext} from '../../state/action-context-initializer'
+import {resolveNetworkParams} from '../../util/network-resolver'
 
 const allowedIntents = ['tx', 'pay']
 
@@ -29,10 +30,11 @@ function WebStellarLinkHandlerView() {
         if (params.network_passphrase) {
             params.network = params.network_passphrase
         }
-        replaceTokens(params)
+
+        replaceTokens(params, resolveNetworkParams(params))
         setError(null)
-        actionContext.setContext(params)
-        navigation.navigate('/confirm')
+        setActionContext(params)
+            .then(() => navigation.navigate('/confirm'))
 
     }, [window.location.href])
     if (!error) return <div className="loader"/>

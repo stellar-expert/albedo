@@ -5,16 +5,15 @@ import {parseQuery} from '@stellar-expert/ui-framework'
 
 const allSections = [
     'intro',
-    //'showcase',
     'public_key',
-    //'basic_info',
     'sign_message',
     'tx',
     'pay',
     'trust',
     'exchange',
     'implicit_flow',
-    'manage_account'
+    'manage_account',
+    'batch'
 ]
 
 export default function DemoNavigationView() {

@@ -1,7 +1,8 @@
 {
   "name": "albedo",
   "private": true,
-  "version": "0.14.10",
+  "version": "0.15.0",
+  "protocol": 3,
   "description": "Delegated transactions and messages signer for Stellar Network",
   "author": "StellarExpertTeam<info@stellar.expert>",
   "license": "MIT",
@@ -56,7 +57,7 @@
     "@stellar-expert/claimable-balance-utils": "github:stellar-expert/claimable-balance-utils",
     "@stellar-expert/formatter": "github:stellar-expert/formatter",
     "@stellar-expert/liquidity-pool-utils": "github:stellar-expert/liquidity-pool-utils",
-    "@stellar-expert/tx-signers-inspector": "^1.2.1",
+    "@stellar-expert/tx-signers-inspector": "^1.3.0",
     "@stellar-expert/ui-framework": "github:stellar-expert/ui-framework",
     "@stellar-expert/webpack-utils": "github:stellar-expert/webpack-utils",
     "aes-js": "^3.1.2",

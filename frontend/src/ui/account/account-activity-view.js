@@ -13,7 +13,7 @@ function shortenBinaryString(src) {
 
 function getTxStatusIcon(tx) {
     if (!tx.successful) return <i className="icon-warning color-warning"/>
-    return <i className="icon-ok color-success"/>
+    return <i className="icon-ok dimmed" style={{opacity: 0.5}}/>
 }
 
 function getScrollParent(node) {

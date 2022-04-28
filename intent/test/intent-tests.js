@@ -12,6 +12,8 @@ describe('intent tests', function () {
         frontendStub.destroy()
     })
 
+    const testAccountPubkey = 'GCVDRFL5OSQWH6FCC35S2DJ7PPMARI3ASMVTSYXWZH44B3AMVYXUJYWF'
+
     const testCases = [
         {
             desc: 'Pubkey intent',
@@ -59,34 +61,18 @@ describe('intent tests', function () {
             params: {amount: 1},
             expectedError: intentErrors.invalidIntentRequest //no destination param
         },
-        //no check for amount type
-        // {
-        //     desc: 'Pay intent with invalid amount value prop',
-        //     intent: 'pay',
-        //     method: 'pay',
-        //     params: { amount: 'asdsa', destination: 'GCVDRFL5OSQWH6FCC35S2DJ7PPMARI3ASMVTSYXWZH44B3AMVYXUJYWF' },
-        //     shouldFail: true //invalid amount
-        // },
         {
             desc: 'Pay intent without amount prop',
             intent: 'pay',
             method: 'pay',
-            params: {destination: 'GCVDRFL5OSQWH6FCC35S2DJ7PPMARI3ASMVTSYXWZH44B3AMVYXUJYWF'},
+            params: {destination: testAccountPubkey},
             expectedError: intentErrors.invalidIntentRequest //no amount param
         },
-        //no check for ed25519 pubkey
-        // {
-        //     desc: 'Pay intent with invalid pubkey',
-        //     intent: 'pay',
-        //     method: 'pay',
-        //     params: { destination: 'invalid pubkey', amount: 1 },
-        //     shouldFail: true //invalid pubkey
-        // },
         {
             desc: 'Pay intent',
             intent: 'pay',
             method: 'pay',
-            params: {amount: 1, destination: 'GCVDRFL5OSQWH6FCC35S2DJ7PPMARI3ASMVTSYXWZH44B3AMVYXUJYWF'}
+            params: {amount: 1, destination: testAccountPubkey}
         },
         {
             desc: 'Trustline intent without asset_code and asset_issuer props',
@@ -106,14 +92,14 @@ describe('intent tests', function () {
             desc: 'Trustline intent without asset_issuer prop',
             intent: 'trust',
             method: 'trust',
-            params: {asset_issuer: 'GCVDRFL5OSQWH6FCC35S2DJ7PPMARI3ASMVTSYXWZH44B3AMVYXUJYWF'},
+            params: {asset_issuer: testAccountPubkey},
             expectedError: intentErrors.invalidIntentRequest //no asset_issuer param
         },
         {
             desc: 'Trustline intent',
             intent: 'trust',
             method: 'trust',
-            params: {asset_code: 'ASSET', asset_issuer: 'GCVDRFL5OSQWH6FCC35S2DJ7PPMARI3ASMVTSYXWZH44B3AMVYXUJYWF'}
+            params: {asset_code: 'ASSET', asset_issuer: testAccountPubkey}
         },
         {
             desc: 'Exchange intent without amount and max_price props',
@@ -154,11 +140,37 @@ describe('intent tests', function () {
             intent: 'implicit_flow',
             method: 'implicitFlow',
             params: {intents: 'tx'}
+        },
+        {
+            desc: 'Manage account intent without pubkey prop',
+            intent: 'manage_account',
+            method: 'manageAccount',
+            params: {},
+            expectedError: intentErrors.invalidIntentRequest //no pubkey param
+        },
+        {
+            desc: 'Manage account intent',
+            intent: 'manage_account',
+            method: 'manageAccount',
+            params: {pubkey: testAccountPubkey}
+        },
+        {
+            desc: 'Batch intent without intents prop',
+            intent: 'batch',
+            method: 'batch',
+            params: {},
+            expectedError: intentErrors.invalidIntentRequest //no intents param
+        },
+        {
+            desc: 'Batch intent',
+            intent: 'batch',
+            method: 'batch',
+            params: {intents: []}
         }
     ]
     for (let {method, intent, params, expectedError, desc} of testCases) {
         it(desc, async function () {
-            this.timeout(5000)
+            this.timeout(1000)
             let error
             try {
                 const res = await intentLib[method](params)
@@ -181,4 +193,5 @@ describe('intent tests', function () {
             }
         })
     }
+    return true
 })

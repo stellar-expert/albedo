@@ -1,12 +1,7 @@
 import React from 'react'
 import {intentInterface} from '@albedo-link/intent'
 import {Button, CodeBlock, CopyToClipboard, useDependantState} from '@stellar-expert/ui-framework'
-import {
-    generateAlbedoCode,
-    generateButtonScriptCode,
-    generateWebStellarLinkCode,
-    getIntentTitle
-} from '../demo-code-generator'
+import {generateAlbedoCode, generateButtonScriptCode, generateWebStellarLinkCode, getIntentTitle} from '../demo-code-generator'
 import DemoHtmlPreviewView from './demo-html-preview-view'
 
 function generateExample(intent, allParams, selectedTab, inProgress, onExec) {

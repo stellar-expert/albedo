@@ -1,39 +1,78 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
-import {Transaction, Keypair, TransactionBuilder} from 'stellar-sdk'
-import {intentInterface} from '@albedo-link/intent'
-import {navigation, setStellarNetwork} from '@stellar-expert/ui-framework'
-import accountManager from './account-manager'
-import responder from '../actions/responder'
-import {dispatchIntentResponse, handleIntentResponseError} from '../actions/callback-dispatcher'
-import errors from '../util/errors'
-import TxContext from './tx-context'
-import {resolveNetworkParams} from '../util/network-resolver'
-import {restoreImplicitSession} from '../storage/implicit-session-storage'
-import {isImplicitIntentRequested} from '../ui/intent/implicit-intent-detector'
+import {Transaction, Keypair} from 'stellar-sdk'
+import {navigation} from '@stellar-expert/ui-framework'
+import {processIntents} from '../actions/responder'
+import {dispatchIntentResponse, dispatchIntentError} from '../actions/callback-dispatcher'
 import {loadSelectedAccountInfo} from '../actions/account-info-loader'
-import lastActionResult from './last-action-result'
+import {submitTxIntents} from '../actions/tx-submit-handler'
+import errors from '../util/errors'
+
+/**
+ * @enum {Number}
+ */
+export const ActionContextStatus = {
+    /** Not initialized */
+    empty: 0,
+    /** Waiting for user's approval */
+    pending: 1,
+    /** Confirmed, processing intents */
+    confirmed: 2,
+    /** All intents processed */
+    processed: 3,
+    /** Submitted to Horizon (if requested) */
+    submitted: 4,
+    /** Dispatching execution result to a caller */
+    dispatched: 5,
+    /** Rejected by a user */
+    rejected: -1,
+    /** Error occurred */
+    error: -2
+}
 
 /**
  * Provides context for initiated action.
  */
 class ActionContext {
-    /**
-     * Requested intent.
-     * @type {String}
-     */
-    intent = null
+    constructor() {
+        makeObservable(this, {
+            status: observable,
+            intentRequests: observable,
+            origin: observable,
+            networkParams: observable,
+            intentParams: observable.shallow,
+            intentErrors: observable,
+            runtimeErrors: observable,
+            requestedPubkey: observable,
+            selectedAccount: observable,
+            selectedAccountInfo: observable,
+            isBatchRequest: computed,
+            reset: action,
+            setIntentError: action,
+            confirmRequest: action,
+            setStatus: action,
+            selectAccount: action,
+            cancelAction: action,
+            loadSelectedAccountInfo: action
+        })
+    }
 
     /**
-     * Request params.
-     * @type {Object}
+     * Current request status.
+     * @type {ActionContextStatus}
      */
-    intentParams = null
+    status = ActionContextStatus.empty
+
+    /**
+     * Actions requested by a user.
+     * @type {IntentRequest[]}
+     */
+    intentRequests = []
 
     /**
      * Network identifier.
-     * @type {string}
+     * @type {StellarNetworkParams}
      */
-    networkName = 'public'
+    networkParams
 
     /**
      * Origin of the caller app.
@@ -41,242 +80,120 @@ class ActionContext {
     origin
 
     /**
-     * Requested transaction context.
-     * @type {TxContext}
+     * Original request params.
+     * @type {Object}
      */
-    txContext = null
+    intentParams
 
     /**
-     * Intent confirmation status.
-     * @type {boolean}
+     * Public key requested by application.
+     * @type {String}
      */
-    confirmed = false
+    requestedPubkey
 
     /**
-     * Whether action processed or not.
-     * @type {Boolean}
-     */
-    processed = false
-
-    /**
-     * Errors found during intent validation or execution.
+     * Errors thrown during intent validation or execution.
      * @type {String}
      */
     intentErrors = null
 
     /**
-     * Temporary runtime error (non-blocking).
+     * Temporary runtime errors (non-blocking).
      * @type {String}
      */
     runtimeErrors = null
 
-    response = null
-
-    directKeyInput = false
+    /**
+     * Result generated during intents execution.
+     * @type {Object}
+     */
+    result = null
 
     /**
-     * Directly provided secret key (only for direct input case).
+     * Unique identifier of the external request.
      * @type {String}
      */
-    secret = null
+    requestId = null
 
+    /**
+     * Account that will be used for signing intents.
+     * @type {Account}
+     */
+    selectedAccount = null
+
+    /**
+     * Horizon info for selected account.
+     * @type {AccountResponse}
+     */
     selectedAccountInfo = null
-
-    dispatchingResponse = false
 
     /**
      * Contains information about the restored implicit session - only for intents requested in the implicit mode.
-     * @type {Object}
+     * @type {DecryptedImplicitSession}
      */
     implicitSession = null
 
-    constructor() {
-        makeObservable(this, {
-            intent: observable,
-            origin: observable,
-            intentParams: observable.shallow,
-            networkName: observable,
-            txContext: observable,
-            confirmed: observable,
-            processed: observable,
-            intentErrors: observable,
-            runtimeErrors: observable,
-            directKeyInput: observable,
-            secret: observable,
-            selectedAccountInfo: observable,
-            dispatchingResponse: observable,
-            selectedPublicKey: computed,
-            requiresExistingAlbedoAccount: computed,
-            hasNoMatchingKey: computed,
-            autoSubmitToHorizon: computed,
-            reset: action,
-            setContext: action,
-            confirmRequest: action,
-            finalize: action,
-            cancelAction: action,
-            setTxContext: action,
-            loadSelectedAccountInfo: action
-        })
-    }
-
-    /**
-     * An implicit intent mode has been requested if true
-     * @type {Boolean}
-     */
-    get isImplicitIntent() {
-        return !!this.implicitSession
+    get intent() {
+        return this.intentParams?.intent
     }
 
     get requiresExistingAccount() {
         return !['public_key', 'sign_message', 'implicit_flow', 'tx'].includes(this.intent)
     }
 
-    get selectedPublicKey() {
-        try {
-            if (this.directKeyInput) {
-                if (!this.secret) return null
-                return Keypair.fromSecret(this.secret).publicKey()
-            }
-            return accountManager.activeAccount?.publicKey || null
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
-    get requiresExistingAlbedoAccount() {
-        return this.intent === 'public_key' && this.intentParams.require_existing
-    }
-
-    get hasNoMatchingKey() {
-        const {pubkey} = this.intentParams || {}
-        return pubkey && !accountManager.accounts.some(acc => acc.publicKey === pubkey)
-    }
-
-    get autoSubmitToHorizon() {
-        return this?.intentParams?.submit || false
+    get isBatchRequest() {
+        return this.intent === 'batch'
     }
 
     reset() {
         Object.assign(this, {
-            intent: null,
+            status: ActionContextStatus.empty,
+            intentRequests: [],
             origin: null,
-            intentProps: null,
+            networkParams: null,
             intentParams: null,
-            secret: null,
-            txContext: null,
-            response: null,
+            requestedPubkey: null,
+            selectedAccount: null,
+            selectedAccountInfo: null,
             intentErrors: null,
             runtimeErrors: null,
-            confirmed: false,
-            processed: false,
             implicitSession: null,
-            dispatchingResponse: false
+            result: null,
+            requestId: null
         })
     }
 
+    setIntentError(e) {
+        this.intentErrors = e
+        this.setStatus(ActionContextStatus.error)
+    }
+
     /**
-     * Set current context based on the request params.
-     * @param {object} params - Intent request parameters.
+     * Set current action status.
+     * @param {ActionContextStatus} status
+     * @param {Boolean} [resetRuntimeErrors]
      */
-    async setContext(params) {
-        this.reset()
-        const {intent, __albedo_intent_version, app_origin, ...intentParams} = params
-
-        Object.assign(this, {
-            intentErrors: null,
-            origin: app_origin,
-            confirmed: false,
-            processed: false,
-            intent,
-            intentParams
-        })
-        //intent should be present
-        if (!intent) {
-            this.intentErrors = 'Parameter "intent" is required.'
-            return this.rejectRequest()
+    setStatus(status, resetRuntimeErrors = false) {
+        this.status = status
+        if (resetRuntimeErrors) {
+            this.runtimeErrors = null
         }
-        /*if (account && !StrKey.isValidEd25519PublicKey(account)) {
-            this.intentErrors = 'Invalid "account" parameter. Stellar account public key expected.'
-            return
-        }*/
+    }
 
-        const {network, networkName} = resolveNetworkParams(intentParams)
-
-        this.networkName = networkName
-
-        this.intentProps = intentInterface[intent]
-        if (!this.intentProps) {
-            this.intentErrors = `Unknown intent "${intent}".`
-            return this.rejectRequest()
-        }
-        const allowedParams = this.intentProps.params
-        for (let param in allowedParams)
-            if (allowedParams.hasOwnProperty(param)) {
-                const descriptor = allowedParams[param],
-                    value = intentParams[param]
-                if (descriptor.required && !value) {
-                    this.intentErrors = `Parameter "${param}" is required.`
-                    return this.rejectRequest()
+    /**
+     * Set selected account for the action.
+     * @param {Account} account
+     */
+    selectAccount(account = null) {
+        if (account && this.requestedPubkey && this.requestedPubkey !== account.publicKey) return
+        const updated = this.selectedAccount !== account
+        if (updated) {
+            this.selectedAccount = account
+            for (let ir of this.intentRequests)
+                if (ir.txContext) {
+                    ir.setTxContext(ir.txContext.tx, account)
                 }
-            }
-
-        //check whether we deal with an implicit intent
-        if (isImplicitIntentRequested({intent, ...intentParams})) {
-            //try to find corresponding session
-            this.implicitSession = await restoreImplicitSession(intentParams.session)
-        }
-
-        //set transaction context in advance for the tx intent
-        if (intent === 'tx') {
-            const {network} = resolveNetworkParams(intentParams)
-            try {
-                const tx = TransactionBuilder.fromXDR(intentParams.xdr, network)
-                await this.setTxContext(tx)
-            } catch (e) {
-                this.intentErrors = `Invalid transaction XDR`
-                return this.rejectRequest()
-            }
-        }
-
-        //validate implicit flow request preconditions
-        if (intent === 'implicit_flow') {
-            let {intents = []} = intentParams
-            /*if (app_origin !== window.origin) { //this check is not needed without the implicit mode whitelist
-                this.intentErrors = `Origin "${app_origin}" is not allowed to request implicit flow permissions.`
-                return this.rejectRequest()
-            }*/
-            if (typeof intents === 'string') {
-                intents = intents.split(',')
-            }
-            if (!(intents instanceof Array) || !intents.length) {
-                //TODO: reject intent immediately if possible
-                this.intentErrors = `No intents were specified for the implicit mode.`
-                return this.rejectRequest()
-            }
-            this.intentParams.intents = intents
-            //check that intent exists and is allowed in the implicit mode
-            for (let requestedIntent of intents) {
-                const descriptor = intentInterface[requestedIntent]
-                if (!descriptor) {
-                    this.intentErrors = `Unknown intent requested: "${requestedIntent}".`
-                    return this.rejectRequest()
-                }
-                if (!descriptor.implicitFlow) {
-                    this.intentErrors = `Intent ${requestedIntent} can't be used in the implicit flow.`
-                    return this.rejectRequest()
-                }
-            }
-        }
-
-        if (intent === 'manage_account') {
-            const {pubkey} = intentParams
-            const acc = accountManager.get(pubkey)
-            if (!acc) return this.rejectRequest()
-            await accountManager.setActiveAccount(acc)
-            if (intentParams.network) {
-                //TODO: consider setting the network temporary, without overriding the last selected network
-                setStellarNetwork(networkName)
-            }
+            this.loadSelectedAccountInfo()
         }
     }
 
@@ -284,70 +201,62 @@ class ActionContext {
      * Confirm the intent request.
      */
     async confirmRequest() {
-        if (!this.selectedPublicKey || (this.hasNoMatchingKey && !this.directKeyInput)) {
-            this.runtimeErrors = errors.accountNotSelected
-            if (this.isImplicitIntent) {
-                return this.rejectRequest(e)
+        if (!this.selectedAccount) {
+            if (this.implicitSession) {
+                this.intentErrors = errors.invalidIntentRequest('Failed to restore session information')
+                return this.rejectRequest()
             }
+            this.runtimeErrors = errors.accountNotSelected
             return
         }
-        this.confirmed = true
-        this.runtimeErrors = null
+
+        this.setStatus(ActionContextStatus.confirmed, true)
+
         try {
-            this.response = await responder.process(this)
-            if (!this.response) return
-            if (!this.txContext || this.txContext.isFullySigned) {
-                return await this.finalize()
-            }
-        } catch (e) {
-            console.error(e)
-            this.intentErrors = e
+            await processIntents(this)
+            this.setStatus(ActionContextStatus.processed)
 
-            if (this.isImplicitIntent) {
-                return this.rejectRequest(e)
-            }
-        }
-    }
+            await submitTxIntents(this)
+            this.setStatus(ActionContextStatus.submitted)
 
-    /**
-     * Send response back to the caller window and reset action context state - only for interactive flow.
-     * @return {Promise<Object>}
-     */
-    async finalize() {
-        if (!this.intent) return //likely it was called after the response has been submitted
-        try {
-            if (!this.response)
-                throw new Error('Tried to finalize the action without a response.')
+            await dispatchIntentResponse(this)
+            this.setStatus(ActionContextStatus.dispatched)
 
-            lastActionResult.setResult(this.response)
-            this.dispatchingResponse = true
-            const res = await dispatchIntentResponse(this.response, this)
             navigation.navigate('/result')
             this.reset()
-            return res
         } catch (e) {
             console.error(e)
-            this.intentErrors = e
-            this.reset()
+            this.setIntentError(e)
+
+            if (this.implicitSession) {
+                return this.rejectRequest()
+            }
         }
     }
 
     /**
      * Reject the request.
-     * @param {Error} [error] - Rejection reason or validation error.
+     * @return {Promise}
      */
-    rejectRequest(error) {
-        if (!this.intent) return Promise.resolve()
+    rejectRequest() {
+        //if (this.status <= ActionContextStatus.empty) return Promise.resolve()
+        let error
         const {intentErrors} = this
-        if (!error && intentErrors) {
+        if (intentErrors) {
             if (intentErrors.code === undefined) {
                 error = errors.invalidIntentRequest(intentErrors)
             } else {
                 error = intentErrors
             }
+        } else {
+            error = errors.actionRejectedByUser
+            this.setStatus(ActionContextStatus.rejected)
         }
-        return handleIntentResponseError(error, this)
-            .finally(() => this.reset())
+        return dispatchIntentError(error, this)
+            .finally(() => {
+                this.reset()
+                setTimeout(() => window.close(), 500)
+            })
     }
 
     /**
@@ -356,31 +265,6 @@ class ActionContext {
     cancelAction() {
         //TODO: implement contextual action and nav path here
         navigation.navigate('/')
-    }
-
-    /**
-     * Prepare and set TxContext for supported intents.
-     * @param {Transaction} transaction
-     * @return {Promise<TxContext>}
-     */
-    async setTxContext(transaction) {
-        //set tx context, retrieve network params from intent params
-        const txContext = new TxContext(transaction, this.intentParams)
-        //discover available signers using current account
-        //TODO: update available signers when the activeAccount is changed
-        const {activeAccount} = accountManager,
-            availableSigners = !activeAccount ? [] : [activeAccount.publicKey]
-        txContext.setAvailableSigners(availableSigners)
-        try {
-            await txContext.updateSignatureSchema()
-        } catch (e) {
-            console.error(e)
-        }
-
-        runInAction(() => {
-            actionContext.txContext = txContext
-        })
-        return txContext
     }
 
     loadSelectedAccountInfo() {
@@ -394,7 +278,9 @@ class ActionContext {
 const actionContext = new ActionContext()
 
 window.addEventListener('beforeunload', function () {
-    actionContext.rejectRequest()
+    if (actionContext.intent) {
+        actionContext.rejectRequest()
+    }
 })
 
 export default actionContext

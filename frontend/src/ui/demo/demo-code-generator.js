@@ -1,24 +1,35 @@
-export function generateInvocation(intent, params) {
-    const args = []
-
-    for (const key of Object.keys(params)) {
-        let val = params[key]
-        if (typeof val === 'string') {
-            if (!val) {
-                val = undefined
-            } else {
-                val = `'${val.trim().replace('\'', '\\\'')}'`
-            }
-        }
-        if (val) {
-            args.push(`    ${key}: ${val}`)
-        }
+function serializeInvocationValue(value, level) {
+    function space(level) {
+        return ' '.repeat(level * 4)
     }
 
-    const formattedArgs = !args.length ? '' : `{
+    if (value instanceof Array) {
+        return `[
+${space(level)}${value.map(v => serializeInvocationValue(v, level + 1)).join(',\n' + space(level))}
+${space(level - 1)}]`
+    }
+    if (typeof value === 'object') {
+        const args = []
+        for (const key of Object.keys(value)) {
+            let nestedValue = serializeInvocationValue(value[key], level + 1)
+            if (nestedValue) {
+                args.push(space(level) + `${key}: ${nestedValue}`)
+            }
+        }
+        return !args.length ? '' : `{
 ${args.join(',\n')}
-}`
+${space(level - 1)}}`
+    }
+    if (typeof value === 'string') {
+        if (!value)
+            return value
+        return `'${value.trim().replace('\'', '\\\'')}'`
+    }
+    return value
+}
 
+export function generateInvocation(intent, params) {
+    const formattedArgs = serializeInvocationValue(params, 1)
     const method = intent.replace(/_([a-z])/g, g => g[1].toUpperCase())
     return `albedo.${method}(${formattedArgs})`
 }

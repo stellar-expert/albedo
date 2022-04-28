@@ -1,5 +1,4 @@
-@import '~@stellar-expert/ui-framework/basic-styles/variables.scss';
-@import '~@stellar-expert/ui-framework/basic-styles/themes.scss';
+@import '~@stellar-expert/ui-framework/index.scss';
 
 .container {
   max-width: 50rem;
@@ -25,11 +24,3 @@
     }
   }
 }
-
-.fa.fa-space {
-  width: 1.8em;
-  text-align: center;
-}
-
-/* components */
-@import "components/stacked-icons";

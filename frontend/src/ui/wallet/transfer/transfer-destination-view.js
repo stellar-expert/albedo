@@ -33,6 +33,6 @@ export default function TransferDestinationView({address, federationAddress, onC
 
     return <div>
         <input type="text" value={value} onChange={change} placeholder="Recipient address or federation link"
-               data-lpignore="true"/>
+               className="key" data-lpignore="true"/>
     </div>
 }
