@@ -1,7 +1,7 @@
 {
   "name": "albedo",
   "private": true,
-  "version": "0.15.0",
+  "version": "0.15.1",
   "protocol": 3,
   "description": "Delegated transactions and messages signer for Stellar Network",
   "author": "StellarExpertTeam<info@stellar.expert>",
@@ -88,7 +88,7 @@
     "react-router": "^5.2.1",
     "sass-loader": "^12.4.0",
     "sha.js": "^2.4.11",
-    "stellar-sdk": "^9.1.0",
+    "stellar-sdk": "^10.1.0",
     "stream-browserify": "^3.0.0",
     "svg-inline-loader": "^0.8.2",
     "terser-webpack-plugin": "^5.2.5",

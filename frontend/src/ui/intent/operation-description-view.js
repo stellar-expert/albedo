@@ -113,10 +113,12 @@ export default function OperationDescriptionView({op, source}) {
                 </>}
                 {op.highThreshold !== undefined && <>
                     <br/>Set high threshold to {op.highThreshold}</>}
-                {!!op.signer && <>
+                {!!op.signer && (op.signer.weight > 0 ? <>
                     <br/>Add new signer <AccountAddress account={op.signer.ed25519PublicKey}/> with
                     weight {op.signer.weight}
-                </>}
+                </> : <>
+                    <br/>Remove signer <AccountAddress account={op.signer.ed25519PublicKey}/>
+                </>)}}
                 {op.masterWeight !== undefined && <>
                     <br/>Set master key weight to {op.masterWeight}
                 </>}
@@ -127,7 +129,7 @@ export default function OperationDescriptionView({op, source}) {
                 return <>
                     <b>Create trustline</b> for <AssetLink asset={trustAsset}/>
                     {op.limit !== '922337203685.4775807' &&
-                    <> with limit <Amount amount={op.limit} asset={trustAsset}/></>}
+                        <> with limit <Amount amount={op.limit} asset={trustAsset}/></>}
                     <SourceAccount/>
                 </>
             return <>
