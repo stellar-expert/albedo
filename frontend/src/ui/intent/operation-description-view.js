@@ -210,7 +210,7 @@ export default function OperationDescriptionView({op, source}) {
                 <b>Revoke sponsorship</b> on claimable balance {formatBalanceId(op.balanceId)}
                 <SourceAccount/>
             </>
-        case 'revokeSponsorshipSigner':
+        case 'revokeSignerSponsorship':
             return <>
                 <b>Revoke sponsorship</b> on signer <AccountAddress account={op.signer}/> for
                 account <AccountAddress account={op.accountId}/><SourceAccount/>
