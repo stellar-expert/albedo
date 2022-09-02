@@ -103,8 +103,11 @@ module.exports = function (env, argv) {
             }),
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': JSON.stringify(mode),
-                albedoOrigin: JSON.stringify(mode === 'development' ? 'https://localhost:5001' : 'https://albedo.link'),
-                appVersion: JSON.stringify(pkgInfo.version)
+                albedoOrigin: JSON.stringify(mode === 'development' ? 'http://localhost:5001' : 'https://albedo.link'),
+                appVersion: JSON.stringify(pkgInfo.version),
+                walletConnectBroker: JSON.stringify(process.env.WALLET_CONNECT_BROKER),
+                onesignalAppId: JSON.stringify(process.env.ONESIGNAL_APP_ID),
+                onesignalSafariId: JSON.stringify(process.env.ONESIGNAL_SAFARI_ID)
             }),
             new webpack.ProvidePlugin({Buffer: ['buffer', 'Buffer']}),
             new HtmlWebpackPlugin({
@@ -122,9 +125,11 @@ module.exports = function (env, argv) {
                 path: false,
                 fs: false,
                 url: false,
+                events: require.resolve('events'),
+                buffer: require.resolve('buffer/'),
                 stream: require.resolve('stream-browserify')
             },
-            symlinks: false,
+            symlinks: true,
             modules: [path.resolve(__dirname, '../node_modules'), 'node_modules']
         }
     }
@@ -135,7 +140,7 @@ module.exports = function (env, argv) {
             port: 5001,
             host: '0.0.0.0',
             allowedHosts: 'all',
-            https: true,
+            https: false,
             compress: true,
             hot: false,
             static: {
@@ -155,12 +160,14 @@ module.exports = function (env, argv) {
         const TerserPlugin = require('terser-webpack-plugin'),
             CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 
-        settings.optimization.minimizer = [new TerserPlugin({
-            terserOptions: {
-                toplevel: true
-            }
-        }),
-            new CssMinimizerPlugin()]
+        settings.optimization.minimizer = [
+            new TerserPlugin({
+                terserOptions: {
+                    toplevel: true
+                }
+            }),
+            new CssMinimizerPlugin()
+        ]
 
         const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
         settings.plugins.push(new BundleAnalyzerPlugin({

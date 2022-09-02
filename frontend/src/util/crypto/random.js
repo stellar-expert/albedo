@@ -1,9 +1,9 @@
-import nacl from 'tweetnacl'
-
 /**
  * Generates random key for encryption.
  * @returns {Uint8Array}
  */
 export function generateRandomEncryptionKey(seedSize = 32) {
-    return nacl.randomBytes(seedSize)
+    const res = new Uint8Array(seedSize)
+    crypto.getRandomValues(res)
+    return res
 }

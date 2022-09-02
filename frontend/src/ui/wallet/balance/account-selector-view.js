@@ -1,8 +1,9 @@
 import React, {useState} from 'react'
-import {Dropdown, AccountIdenticon, formatExplorerLink, navigation} from '@stellar-expert/ui-framework'
+import {Dropdown, AccountIdenticon, formatExplorerLink} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import accountManager from '../../../state/account-manager'
 
-export default function AccountSelectorView() {
+export default function AccountSelectorView({actionMode = false}) {
     const [current, setCurrentAccount] = useState(() => accountManager.activeAccount)
 
     function handleAction(action) {
@@ -18,6 +19,9 @@ export default function AccountSelectorView() {
                 break
             case 'signup':
                 navigation.navigate('/signup')
+                break
+            case 'walletconnect':
+                navigation.navigate('/wallet-connect/connect')
                 break
             default:
                 const account = accountManager.get(action)
@@ -51,20 +55,27 @@ export default function AccountSelectorView() {
         title: <>Create/import new account</>
     })
 
-    if (dropdownOptions.length > 1) {
-        dropdownOptions.push('-')
+    if (!actionMode) {
+        if (dropdownOptions.length > 1) {
+            dropdownOptions.push('-')
+        }
+
+        dropdownOptions.push({
+            value: 'settings',
+            title: <>Manage settings for this account</>
+        })
+
+        dropdownOptions.push({
+            value: 'explorer',
+            title: <>View details on StellarExpert</>
+        })
+
+        dropdownOptions.push({
+            value: 'walletconnect',
+            title: <>Link via WalletConnect</>
+        })
     }
 
-    dropdownOptions.push({
-        value: 'settings',
-        title: <>Manage settings for this account</>
-    })
-
-    dropdownOptions.push({
-        value: 'explorer',
-        title: <>View details on StellarExpert</>
-    })
-
     return <Dropdown value="title" onChange={handleAction} options={dropdownOptions} hideSelected
-                     header={<h3 style={{margin:0}}>Switch account</h3>}/>
+                     header={<h3 style={{margin: 0}}>Switch account</h3>}/>
 }

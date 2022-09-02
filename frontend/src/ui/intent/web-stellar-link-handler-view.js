@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {navigation, parseQuery} from '@stellar-expert/ui-framework'
+import {navigation, parseQuery} from '@stellar-expert/navigation'
 import {replaceTokens} from '../../util/tx-replace-utils'
 import {setActionContext} from '../../state/action-context-initializer'
 import {resolveNetworkParams} from '../../util/network-resolver'

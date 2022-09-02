@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import cn from 'classnames'
-import {AccountAddress, ElapsedTime, navigation, useAssetMeta, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AccountAddress, ElapsedTime, useAssetMeta, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import {AssetDescriptor, parseAssetFromObject} from '@stellar-expert/asset-descriptor'
 import {getClaimableBalanceClaimStatus} from '@stellar-expert/claimable-balance-utils'
 import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-utils'

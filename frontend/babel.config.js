@@ -15,16 +15,12 @@ module.exports = function (api) {
                             'not ie 11',
                             'not op_mini all'
                         ],
-                        node: '12'
+                        node: '16'
                     }
                 }
             ]
         ],
         plugins: [
-            ['@babel/plugin-proposal-class-properties', {loose: true}],
-            ['@babel/plugin-proposal-private-methods', {loose: true}],
-            ['@babel/plugin-proposal-private-property-in-object', {loose: true}],
-            '@babel/plugin-proposal-object-rest-spread',
             '@babel/plugin-syntax-dynamic-import'
         ]
     }

@@ -1,6 +1,5 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
-import {Transaction, Keypair} from 'stellar-sdk'
-import {navigation} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import {processIntents} from '../actions/responder'
 import {dispatchIntentResponse, dispatchIntentError} from '../actions/callback-dispatcher'
 import {loadSelectedAccountInfo} from '../actions/account-info-loader'
@@ -199,8 +198,10 @@ class ActionContext {
 
     /**
      * Confirm the intent request.
+     * @type {Boolean} autoRedirect
+     * @return {Promise}
      */
-    async confirmRequest() {
+    async confirmRequest(autoRedirect = true) {
         if (!this.selectedAccount) {
             if (this.implicitSession) {
                 this.intentErrors = errors.invalidIntentRequest('Failed to restore session information')
@@ -222,7 +223,9 @@ class ActionContext {
             await dispatchIntentResponse(this)
             this.setStatus(ActionContextStatus.dispatched)
 
-            navigation.navigate('/result')
+            if (autoRedirect) {
+                navigation.navigate('/result')
+            }
             this.reset()
         } catch (e) {
             console.error(e)

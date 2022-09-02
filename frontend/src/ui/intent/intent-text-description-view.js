@@ -54,7 +54,8 @@ function IntentTextDescriptionView({intent, intentParams, expanded = true, multi
                         intentParams.description :
                         intentParams.description.substring(0, 46).trim() + '…'}"
                     </div>}
-                    <TxDetailsView xdr={intentParams.xdr} network={actionContext.networkParams.network}/>
+                    <TxDetailsView xdr={intentParams.xdr} network={actionContext.networkParams.network}
+                                   account={actionContext.selectedAccount}/>
                 </>}
             </IntentDescriptionLayout>
         case 'trust':

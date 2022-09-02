@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import CredentialsRequest from './credentials-request-view'
-import {Dropdown, navigation} from '@stellar-expert/ui-framework'
+import {Dropdown} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import accountManager from '../../state/account-manager'
 import {ACCOUNT_TYPES} from '../../state/account'
 import Credentials from '../../state/auth/credentials'

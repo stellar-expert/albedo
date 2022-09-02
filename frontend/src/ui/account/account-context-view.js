@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react'
 import {observer} from 'mobx-react'
-import {AccountAddress, CopyToClipboard, navigation, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AccountAddress, CopyToClipboard, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import accountManager from '../../state/account-manager'
 import AccountSelectorView from '../wallet/balance/account-selector-view'
 import NetworkSelectorView from '../wallet/balance/network-selector-view'
@@ -8,7 +9,7 @@ import accountLedgerData from '../../state/ledger-data/account-ledger-data'
 import AccountNavMenu from './account-nav-menu'
 import './account-context.scss'
 
-function AccountContextView({children}) {
+function AccountContextView({children, actionMode = false}) {
     const {activeAccount} = accountManager,
         network = useStellarNetwork()
     if (!activeAccount) {
@@ -24,7 +25,7 @@ function AccountContextView({children}) {
     }, [network, activeAccount.publicKey])
 
     return <div>
-        <h2><AccountSelectorView/></h2>
+        <h2><AccountSelectorView actionMode={actionMode}/></h2>
         <div className="dual-layout">
             <div className="nowrap">
                 <AccountAddress account={activeAccount.publicKey} chars={12} title="Account address" icon={false}/>
@@ -32,7 +33,7 @@ function AccountContextView({children}) {
             </div>
             <div className="text-right"><NetworkSelectorView/></div>
         </div>
-        <AccountNavMenu/>
+        {!actionMode && <AccountNavMenu/>}
         {children}
     </div>
 }

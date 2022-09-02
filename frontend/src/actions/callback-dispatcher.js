@@ -71,7 +71,7 @@ export async function dispatchIntentResponse(actionContext) {
     if (actionContext.intent === 'implicit_flow') {
         await syncLocalStorage()
     }
-    return postMessage(result, actionContext)
+    return await postMessage(result, actionContext)
 }
 
 /**

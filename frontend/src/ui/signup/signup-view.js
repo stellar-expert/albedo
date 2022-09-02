@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {navigation} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import OnBoardingNotesStepView from './onboarding-notes-step-view'
 import SecretBackupStepView from './secret-backup-step-view'
 import SignupSetPasswordStepView from './signup-set-password-step-view'

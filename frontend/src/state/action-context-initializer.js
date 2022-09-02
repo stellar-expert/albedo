@@ -120,7 +120,7 @@ function extractBatchedIntents(intents, networkParams, actionContextParams) {
 /**
  * Set current context based on the request params.
  * @param {Object} params - Intent request parameters received from a caller app.
- * @return {Promise}
+ * @return {Promise<ActionContext>}
  */
 export async function setActionContext(params) {
     function reject(error) {
@@ -191,6 +191,8 @@ export async function setActionContext(params) {
         if (actionContext.implicitSession) {
             actionContext.selectAccount(Account.ephemeral(actionContext.implicitSession.secret))
         }
+
+        return actionContext
     } catch (e) {
         return reject(e)
     }

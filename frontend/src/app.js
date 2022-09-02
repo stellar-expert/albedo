@@ -1,7 +1,9 @@
 import React from 'react'
 import {render} from 'react-dom'
 import {configure} from 'mobx'
-import {navigation, bindClickNavHandler, setStellarNetwork, subscribeToStellarNetworkChange} from '@stellar-expert/ui-framework'
+import {setStellarNetwork, subscribeToStellarNetworkChange} from '@stellar-expert/ui-framework'
+import {navigation, bindClickNavHandler} from '@stellar-expert/navigation'
+import webPushNotificationsAdapter from './notifications/web-push-notifications-adapter'
 import Router from './ui/app-router'
 import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage'
 import storageProvider from './storage/storage-provider'
@@ -43,3 +45,6 @@ accountManager.reload()
         //periodically cleanup expired sessions
         scheduleCleanupExpiredSessions()
     })
+
+
+webPushNotificationsAdapter.initPushSubscription()

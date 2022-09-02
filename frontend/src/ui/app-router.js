@@ -28,6 +28,9 @@ export default function AppRouter({history}) {
                     <Route path="/wallet">
                         <DynamicModule load={() => import(/* webpackChunkName: "wallet" */ './wallet/wallet-router')}
                                        moduleKey="wallet"/></Route>
+                    <Route path="/wallet-connect">
+                        <DynamicModule load={() => import(/* webpackChunkName: "wallet-connect" */ './wallet-connect/wc-router')}
+                                       moduleKey="wallet-connect"/></Route>
                     <Route path="/login" component={Login}/>
                     <Route path="/import" component={ImportAccount}/>
                     <Route path="/signup" component={CreateAccount}/>

@@ -84,8 +84,7 @@ export default class Account {
      * @returns {String}
      */
     get displayName() {
-        if (this.accountType && !this.accountType) return this.shortDisplayName
-        return `${this.shortDisplayName} (${shortenString(this.publicKey, 8)})`
+        return `${this.shortDisplayName} (${shortenString(this.publicKey, 12)})`
     }
 
     get shortDisplayName() {

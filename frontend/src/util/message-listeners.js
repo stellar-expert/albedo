@@ -1,4 +1,4 @@
-import {navigation} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import pkgInfo from '../../package.json'
 import actionContext from '../state/action-context'
 import accountManager from '../state/account-manager'

@@ -1,5 +1,5 @@
 import {observable, action, runInAction, makeObservable} from 'mobx'
-import {navigation} from '@stellar-expert/ui-framework'
+import {navigation} from '@stellar-expert/navigation'
 import Credentials from './credentials'
 import {getCredentialsFromExtensionStorage, saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
 import standardErrors from '../../util/errors'
