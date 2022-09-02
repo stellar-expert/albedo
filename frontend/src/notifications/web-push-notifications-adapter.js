@@ -13,7 +13,8 @@ const webPushNotificationsAdapter = {
             appId: appSettings.oneSignal.appId,
             safari_web_id: appSettings.oneSignal.safariId,
             allowLocalhostAsSecureOrigin: process.env.NODE_ENV === 'development',
-            //requiresUserPrivacyConsent: true, //implicit request
+            requiresUserPrivacyConsent: true, //implicit request
+            autoRegister: false,
             promptOptions: {
                 actionMessage: 'requests permissions to send transaction requests to this device',
                 acceptButton: 'Allow',
@@ -48,9 +49,9 @@ const webPushNotificationsAdapter = {
      * @return {Promise<Boolean>}
      */
     async ensurePushNotifications() {
+        await OneSignal.provideUserConsent(true)
         if (await this.isSubscribed())
             return true
-        await OneSignal.provideUserConsent(true)
         await OneSignal.showNativePrompt()
         return await this.isSubscribed()
     }
