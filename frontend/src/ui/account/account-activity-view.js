@@ -1,7 +1,6 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect} from 'react'
 import {observer} from 'mobx-react'
 import {throttle} from 'throttle-debounce'
-import cn from 'classnames'
 import {ElapsedTime, TxLink, InlineProgress} from '@stellar-expert/ui-framework'
 import OperationDescriptionView from '../intent/operation-description-view'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
@@ -26,12 +25,12 @@ function AccountActivityView() {
     const {loaded, nonExisting, history, address} = accountLedgerData
     useEffect(() => {
         const container = document.scrollingElement
-        const handler = throttle(200, false, function (e) {
+        const handler = throttle(200, function () {
             const scrolledToBottom = Math.ceil(container.scrollHeight - container.scrollTop - 70) < container.clientHeight
             if (scrolledToBottom) {
                 accountLedgerData.history.loadNextPage()
             }
-        })
+        }, {noLeading: true})
         document.addEventListener('scroll', handler)
         return () => document.removeEventListener('scroll', handler)
     }, [address, loaded, history])

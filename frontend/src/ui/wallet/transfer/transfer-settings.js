@@ -31,7 +31,7 @@ export default class TransferSettings {
             this.recalculateSwap()
         })
 
-        this.findConversionPath = debounce(400, false, this.findConversionPath.bind(this))
+        this.findConversionPath = debounce(400, this.findConversionPath.bind(this))
     }
 
     network
@@ -99,6 +99,7 @@ export default class TransferSettings {
      * @type {Number}
      */
     currentLedgerSequence
+
     /**
      * @type {String}
      */
@@ -286,6 +287,7 @@ export default class TransferSettings {
      */
     resetOperationAmount() {
         this.createDestination = false
+        this.createTrustline = false
         this.amount = ['0', '0']
         this.setAmount('0', 0)
     }
