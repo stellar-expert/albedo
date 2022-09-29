@@ -44,7 +44,12 @@ function SignupView({secret, skipSecretBackup}) {
                 <SecretBackupStepView credentials={credentials} onSuccess={() => updateCurrentStatus('finished')}/>
             </>
         case 'finished':
-            navigation.navigate(actionContext.intent ? '/confirm' : '/account')
+            if (actionContext.intent) {
+                actionContext.selectAccount(credentials.account)
+                navigation.navigate('/confirm')
+            } else {
+                navigation.navigate('/account')
+            }
             return null
         default:
             throw new Error(`Unknown signup status: ${status}`)

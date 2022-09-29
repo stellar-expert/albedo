@@ -31,7 +31,7 @@ function TxDetailsView({xdr, network, account, compact = false}) {
     const isFeeBump = !!tx.innerTransaction
     const feeSponsor = isFeeBump && tx.feeSource
     const txHash = tx.hash().toString('hex')
-    const sourceAccountDiffers = tx.source !== account.publicKey
+    const sourceAccountDiffers = tx.source !== account?.publicKey
     if (isFeeBump) {
         tx = tx.innerTransaction
     }
@@ -39,7 +39,7 @@ function TxDetailsView({xdr, network, account, compact = false}) {
         {tx.operations.length === 1 ?
             <OperationDescription op={tx.operations[0]} source={tx.source}/> :
             <>{tx.operations.map((op, i) => <div key={i}>
-                <i className="icon icon-angle-right"/> <OperationDescription key={i} op={op} source={tx.source}/>
+                <i className="icon icon-angle-right"/><OperationDescription key={i} op={op} source={tx.source}/>
             </div>)}</>}
         {sourceAccountDiffers && <div>
             <span className="label">Source account: </span>

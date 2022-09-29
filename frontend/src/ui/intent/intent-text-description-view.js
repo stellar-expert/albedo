@@ -24,7 +24,7 @@ function NetworkInfo() {
 
 function IntentDescriptionLayout({text, children, submit, multi}) {
     return <div>
-        <div className="text-small">
+        <div className="text-small micro-space">
             {!multi && <NetworkInfo/>}
             <CallerOrigin/> {text}.
             {!!submit && <div className="dimmed">
@@ -54,8 +54,10 @@ function IntentTextDescriptionView({intent, intentParams, expanded = true, multi
                         intentParams.description :
                         intentParams.description.substring(0, 46).trim() + '…'}"
                     </div>}
-                    <TxDetailsView xdr={intentParams.xdr} network={actionContext.networkParams.network}
-                                   account={actionContext.selectedAccount}/>
+                    <div className="micro-space text-small">
+                        <TxDetailsView xdr={intentParams.xdr} network={actionContext.networkParams.network}
+                                       account={actionContext.selectedAccount}/>
+                    </div>
                 </>}
             </IntentDescriptionLayout>
         case 'trust':

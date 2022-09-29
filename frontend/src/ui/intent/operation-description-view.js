@@ -8,6 +8,12 @@ function formatBalanceId(balance) {
     return `${balance.substr(8, 4)}…${balance.substr(-4)}`
 }
 
+function SetOptionsTrait({children}) {
+    return <div>
+        <i className="icon icon-angle-double-right dimmed"/>{children}
+    </div>
+}
+
 export default function OperationDescriptionView({op, source}) {
     function SourceAccount() {
         if (!op.source || op.source === source) return null
@@ -85,43 +91,34 @@ export default function OperationDescriptionView({op, source}) {
         case 'setOptions':
             return <>
                 <b>Set options</b><SourceAccount/>
-                {!!(op.setFlags && (op.setFlags & 1)) && <>
-                    <br/>Set trustline authorization required flag
-                </>}
-                {!!(op.setFlags && (op.setFlags & 2)) && <>
-                    <br/>Set trustline authorization revocable flag
-                </>}
-                {!!(op.clearFlags && (op.clearFlags & 1)) && <>
-                    <br/>Clear trustline authorization required flag
-                </>}
-                {!!(op.clearFlags && (op.clearFlags & 2)) && <>
-                    <br/>Clear trustline authorization revocable flag
-                </>}
-                {op.homeDomain !== undefined && <>
-                    <br/>Set home domain {op.homeDomain ?
-                    <a href={'http://' + op.homeDomain} target="_blank">{op.homeDomain}</a> :
-                    'not set'}
-                </>}
-                {op.inflationDest !== undefined && <>
-                    <br/>Set inflation destination to <AccountAddress account={op.inflationDest}/>
-                </>}
-                {op.lowThreshold !== undefined && <>
-                    <br/>Set low threshold to {op.lowThreshold}
-                </>}
-                {op.medThreshold !== undefined && <>
-                    <br/>Set medium threshold to {op.medThreshold}
-                </>}
-                {op.highThreshold !== undefined && <>
-                    <br/>Set high threshold to {op.highThreshold}</>}
-                {!!op.signer && (op.signer.weight > 0 ? <>
-                    <br/>Add new signer <AccountAddress account={op.signer.ed25519PublicKey}/> with
-                    weight {op.signer.weight}
-                </> : <>
-                    <br/>Remove signer <AccountAddress account={op.signer.ed25519PublicKey}/>
-                </>)}}
-                {op.masterWeight !== undefined && <>
-                    <br/>Set master key weight to {op.masterWeight}
-                </>}
+                <div className="block-indent">
+                    {!!(op.setFlags && (op.setFlags & 1)) &&
+                        <SetOptionsTrait>Set trustline authorization required flag</SetOptionsTrait>}
+                    {!!(op.setFlags && (op.setFlags & 2)) &&
+                        <SetOptionsTrait>Set trustline authorization revocable flag</SetOptionsTrait>}
+                    {!!(op.clearFlags && (op.clearFlags & 1)) &&
+                        <SetOptionsTrait>Clear trustline authorization required flag</SetOptionsTrait>}
+                    {!!(op.clearFlags && (op.clearFlags & 2)) &&
+                        <SetOptionsTrait>Clear trustline authorization revocable flag</SetOptionsTrait>}
+                    {op.homeDomain !== undefined && <SetOptionsTrait>Set home domain {op.homeDomain ?
+                        <a href={'http://' + op.homeDomain} target="_blank">{op.homeDomain}</a> : 'not set'}</SetOptionsTrait>}
+                    {op.inflationDest !== undefined &&
+                        <SetOptionsTrait>Set inflation destination to <AccountAddress account={op.inflationDest}/></SetOptionsTrait>}
+                    {op.lowThreshold !== undefined &&
+                        <SetOptionsTrait>Set low threshold to {op.lowThreshold}</SetOptionsTrait>}
+                    {op.medThreshold !== undefined &&
+                        <SetOptionsTrait>Set medium threshold to {op.medThreshold}</SetOptionsTrait>}
+                    {op.highThreshold !== undefined &&
+                        <SetOptionsTrait>Set high threshold to {op.highThreshold}</SetOptionsTrait>}
+                    {!!op.signer && (op.signer.weight > 0 ? <SetOptionsTrait>
+                        Add new signer <AccountAddress account={op.signer.ed25519PublicKey}/> with weight {op.signer.weight}
+                    </SetOptionsTrait> : <SetOptionsTrait>
+                        Remove signer <AccountAddress account={op.signer.ed25519PublicKey}/>
+                    </SetOptionsTrait>)}
+                    {op.masterWeight !== undefined && <SetOptionsTrait>
+                        Set master key weight to {op.masterWeight}
+                    </SetOptionsTrait>}
+                </div>
             </>
         case 'changeTrust':
             const trustAsset = AssetDescriptor.parse(op.line)
