@@ -1,3 +1,5 @@
+import fetchExplorerApi from '@stellar-expert/ui-framework/api/explorer-api-call'
+
 class StoplistTracker {
     stopList = []
 
@@ -5,22 +7,30 @@ class StoplistTracker {
 
     lastFetched = 0
 
-    refreshTimeout = 1 * 60 * 1000 // every minute by default
+    refreshTimeout = 5 * 60 * 1000 // five minutes by default
 
+    /**
+     * @return {Boolean}
+     * @private
+     */
     get shouldUpdate() {
         return new Date().getTime() - this.lastFetched > this.refreshTimeout
     }
 
+    /**
+     * @return {Promise}
+     * @private
+     */
     fetchStopList() {
         if (!this.fetchPromise) {
             //check whether the cache is stale
-            if (!this.shouldUpdate) return Promise.resolve()
+            if (!this.shouldUpdate)
+                return Promise.resolve()
             //refetch fresh stoplist from Albedo
-            this.fetchPromise = fetch(`${albedoOrigin}/stoplist?q=${new Date().getTime()}`)
-                .then(res => res.text())
+            this.fetchPromise = fetchExplorerApi('directory/blocked-domains?limit=1000')
                 .then(data => {
                     //process data
-                    this.stopList = data.split('\n').map(d => d.trim().toLowerCase())
+                    this.stopList = data._embedded.records.map(m => m.domain)
                 })
                 .catch(e => {
                     console.error(e)
@@ -34,12 +44,12 @@ class StoplistTracker {
         return this.fetchPromise
     }
 
-    isDomainBlocked(domain) {
-        domain = domain.toLowerCase()
-        return this.fetchStopList()
-            .then(() => this.stopList.some(entry => this.matchDomain(domain, entry)))
-    }
-
+    /**
+     * @param {String} domain
+     * @param {String} possibleMatch
+     * @return {Boolean}
+     * @private
+     */
     matchDomain(domain, possibleMatch) {
         if (domain.endsWith(possibleMatch)) {
             const prefix = domain.replace(possibleMatch, '')
@@ -47,6 +57,17 @@ class StoplistTracker {
             return !prefix || prefix.endsWith('.')
         }
         return false
+    }
+
+    /**
+     * Check whether a domain is in the stoplist
+     * @param {String} domain
+     * @return {Promise<Boolean>}
+     */
+    isDomainBlocked(domain) {
+        domain = domain.toLowerCase()
+        return this.fetchStopList()
+            .then(() => this.stopList.some(entry => this.matchDomain(domain, entry)))
     }
 }
 
