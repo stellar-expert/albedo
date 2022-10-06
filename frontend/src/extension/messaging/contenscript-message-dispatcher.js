@@ -1,4 +1,4 @@
-import browser from 'webextension-polyfill'
+import browser from '../browser'
 
 const extensionOrigin = new URL(browser.runtime.getURL('')).origin
 
@@ -25,14 +25,14 @@ export const contentscriptMessageDispatcher = {
         if (handlers[eventType]) throw new Error(`Handler for event ${eventType} has been defined already.`)
         handlers[eventType] = handler
     },
+    sendToWindow(data) {
+        window.postMessage(data, window.origin)
+    },
     sendToBackgroundPage(type, data) {
         return browser.runtime.sendMessage({
             ...data,
             messageType: type
         })
-    },
-    sendToWindow(data) {
-        window.postMessage(data, window.origin)
     },
     proxyToBackgroundPage(type) {
         this.listen(type, (data, source) => {

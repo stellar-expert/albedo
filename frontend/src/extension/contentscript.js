@@ -1,5 +1,5 @@
-import browser from 'webextension-polyfill'
 import {contentscriptMessageDispatcher as dispatcher} from './messaging/contenscript-message-dispatcher'
+import browser from './browser'
 
 function executeInPageContext({source, file}) {
     const script = document.createElement('script')

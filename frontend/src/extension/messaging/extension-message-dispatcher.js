@@ -1,5 +1,4 @@
-import browser from 'webextension-polyfill'
-
+const browser = require('../browser')
 const handlers = {}
 
 browser.runtime.onMessage.addListener(function (request, sender) {
