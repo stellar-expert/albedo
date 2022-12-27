@@ -27,7 +27,7 @@ class WalletConnectAdapter {
      * @return {Promise<void>}
      * @private
      */
-    async processRequest(request, approved) {
+    async processRequest(request, result = {approved: false}) {
         const deviceId = await this.getDeviceId()
         //const signature = kp.sign(approveData).toString('hex')
         const res = await this.fetchApi('/request/' + request.id, {
@@ -35,8 +35,8 @@ class WalletConnectAdapter {
             body: JSON.stringify({
                 requestId: request.id,
                 result: {
+                    ...result,
                     pubkey: request.pubkey || accountManager.activeAccount.publicKey,
-                    approved,
                     deviceId
                 }
             })
@@ -48,6 +48,9 @@ class WalletConnectAdapter {
         if (request.method === 'pair' && !await ensureNotificationsEnabled())
             return
 
+        let result = {
+            approved: true
+        }
         if (request.xdr) {
             const txParams = {
                 intent: 'tx',
@@ -59,9 +62,14 @@ class WalletConnectAdapter {
                 txParams.submit = true
             }
             const actionContext = await setActionContext(txParams)
+            const intent = actionContext.intentRequests[0]
             await actionContext.confirmRequest(false)
+            if (!intent.result.submit)
+                result.signedXdr = intent.result.signed_envelope_xdr
+            else
+                result.status = 'success'
         }
-        await this.processRequest(request, true)
+        await this.processRequest(request, result)
         await wcPendingRequests.fetch()
         //wcPendingRequests.remove(request.id)
         navigation.navigate(redirectUrl)
