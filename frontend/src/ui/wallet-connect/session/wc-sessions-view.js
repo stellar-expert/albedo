@@ -16,7 +16,7 @@ export default observer(function WcSessionsView() {
                 {i > 0 && <hr/>}
                 <div className="column column-20 text-center">
                     <div style={{padding: '0.3em'}}>
-                        <a href={meta.link} rel="noreferrer nofollow" target="_blank">
+                        <a href={meta.url} rel="noreferrer nofollow" target="_blank">
                             <img src={meta.icon} style={{maxWidth: '100%'}} rel="noreferrer"/>
                             <div className="text-tiny">
                                 {meta.name}

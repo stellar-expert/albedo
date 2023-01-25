@@ -19,7 +19,7 @@ function resolveComponent(method) {
 
 function createEntry(request, order) {
     return React.createElement(resolveComponent(request.method), {
-        request: new WcRequestParser(request).processRequest(),
+        request,
         compact: order !== 0
     })
 }
@@ -46,17 +46,22 @@ export default observer(function WcPendingRequestsView() {
         refresh()
     }, [])
 
+    function createElement(request, i) {
+        const parsedRequest = new WcRequestParser(request).processRequest()
+        return (<div key={parsedRequest.id}>
+            {i > 0 && <hr />}
+            {createEntry(parsedRequest, i)}
+            {i === 0 && <WcRequestActionsView request={parsedRequest} className="micro-space" nextUrl={next} />}
+        </div>)
+    }
+
     return <div>
         <h2>WalletConnect requests</h2>
         <div className="space">
             {!requests.length && <div className="text-center dimmed text-small double-space">
                 (no pending WalletConnect requests)
             </div>}
-            {requests.map((request, i) => <div key={request.id}>
-                {i > 0 && <hr/>}
-                {createEntry(request, i)}
-                {i === 0 && <WcRequestActionsView request={request} className="micro-space" nextUrl={next}/>}
-            </div>)}
+            {requests.map((request, i) => createElement(request, i))}
         </div>
     </div>
 })
