@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import {navigation, parseQuery} from '@stellar-expert/navigation'
 import {Tabs} from '@stellar-expert/ui-framework'
-import walletConnect from '../wallet-connect-adapter'
 import {CameraQrReaderView} from '../../wallet/qr-reader/camera-qr-reader-view'
 import UploadQrReaderView from '../../wallet/qr-reader/upload-qr-reader-view'
 import WalletOperationsWrapperView from '../../wallet/shared/wallet-operations-wrapper-view'
+import walletConnect from '../wallet-connect-adapter'
+import {validateWCLink} from './wc-link-validator'
 import WcDirectLinkView from './wc-direct-link-view'
 import WcPairingConfirmationView from './wc-pairing-confirmation-view'
-import {validateWCLink} from './wc-link-validator'
 
 export default function WcPairView() {
     const [error, setError] = useState('')
