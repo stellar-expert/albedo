@@ -17,11 +17,16 @@ export default class WcRequestParser {
 
     processRequest() {
         this.execute(this.parseGeneralParams)
-        this.execute(this.parseMeta)
-        this.execute(this.parsePairingRequest)
-        this.execute(this.parseTxRequest)
+            .execute(this.parseMeta)
+            .execute(this.parsePairingRequest)
+            .execute(this.parseTxRequest)
 
-        return this.error ? this.error : this.result
+        if (this.error)
+            throw new Error(this.error)
+
+        return this.result
+
+        // return this.error ? this.error : this.result
     }
 
     /**
@@ -30,7 +35,7 @@ export default class WcRequestParser {
      */
     execute(method) {
         if (!this.error) {
-            method.call(this)
+            this.error = method.call(this) ?? null
         }
         return this
     }
