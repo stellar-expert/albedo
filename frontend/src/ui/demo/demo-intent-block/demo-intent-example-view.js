@@ -25,8 +25,8 @@ function generateExample(intent, allParams, selectedTab, inProgress, onExec) {
             return {
                 example: `<a href="${linkAddress}" target="_blank">${getIntentTitle(intent)}</a>`,
                 lang: 'html',
-                execButton: <a href={inProgress ? '#' : linkAddress} className="button button-block"
-                               disabled={inProgress} target={inProgress ? undefined : '_blank'}>Try it</a>
+                execButton: <Button block href={inProgress ? '#' : linkAddress} disabled={inProgress}
+                                    target={inProgress ? undefined : '_blank'}>Try it</Button>
             }
     }
 }
@@ -49,7 +49,7 @@ export default function DemoIntentExampleView({intent, allParams, selectedTab, i
                 <CopyToClipboard text={example} icon={false}>
                     <Button block outline={copied} onClick={() => setCopied(true)}
                             onMouseEnter={() => setCopied(false)}>
-                        <i className="icon-copy active-icon"/> {copied ? 'Copied to clipboard' : 'Copy to clipboard'}
+                        <i className={copied ? 'icon icon-ok' : 'icon-copy active-icon'}/> {copied ? 'Copied to clipboard' : 'Copy to clipboard'}
                     </Button>
                 </CopyToClipboard>
             </div>

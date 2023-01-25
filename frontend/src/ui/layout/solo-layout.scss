@@ -1,0 +1,17 @@
+.solo-layout {
+  min-height: calc(100vh - 12em);
+
+  &.no-title {
+    min-height: calc(100vh - 5em);
+  }
+
+  &.align-top {
+    justify-content: flex-start;
+  }
+
+  @media (min-height: 700px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}

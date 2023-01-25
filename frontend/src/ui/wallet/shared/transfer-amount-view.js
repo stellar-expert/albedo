@@ -2,13 +2,13 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import BigNumber from 'bignumber.js'
 import PropTypes from 'prop-types'
-import {useDependantState} from '@stellar-expert/ui-framework'
+import {useAutoFocusRef, useDependantState} from '@stellar-expert/ui-framework'
 import {isValidPoolId} from '@stellar-expert/asset-descriptor'
 import {stripTrailingZeros} from '@stellar-expert/formatter'
 import AssetSelector from './asset-selector-view'
 import './transfer-amount.scss'
 
-function TransferAmountView({settings, index, balances, filterBalances = 'assets', restricted, placeholder, error}) {
+function TransferAmountView({settings, index = 0, balances, filterBalances = 'assets', restricted, placeholder, autofocus = false, error}) {
     const amount = settings.amount[index],
         [inputAmount, setInputAmount] = useDependantState(() => {
             if (!amount || amount === '0') return ''
@@ -47,8 +47,8 @@ function TransferAmountView({settings, index, balances, filterBalances = 'assets
     }
 
     return <div className="transfer-amount relative">
-        <input type="text" value={inputAmount} onChange={change} placeholder={placeholder || '0'} style={style}
-               data-lpignore="true"/>
+        <input type="text" value={inputAmount} onChange={change} placeholder={placeholder || '0'} style={style} data-lpignore="true"
+               ref={autofocus ? useAutoFocusRef : undefined}/>
         <AssetSelector value={settings.asset[index]} onChange={onAssetChange} predefinedAssets={predefinedAssets} restricted={restricted}/>
     </div>
 }
@@ -60,15 +60,17 @@ TransferAmountView.propTypes = {
         amount: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
     //positional index of the transfer control
-    index: PropTypes.number.isRequired,
-    //existing accoutn balances
+    index: PropTypes.number,
+    //existing account balances
     balances: PropTypes.arrayOf(PropTypes.object),
     //balance filtering conditions
     filterBalances: PropTypes.oneOf(['all', 'assets', 'pools']),
-    //if set available assets list restricted to existing balances only
+    //if set available assets list restricted to existing trustlines only
     restricted: PropTypes.bool,
     //input placeholder text
     placeholder: PropTypes.string,
+    //automatically focus on this input when the control is loaded
+    autofocus: PropTypes.bool,
     error: PropTypes.bool
 }
 

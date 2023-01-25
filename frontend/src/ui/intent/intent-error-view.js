@@ -9,10 +9,10 @@ function IntentErrorView() {
     const text = err.message || err
 
     return <div>
-        <h2 style={{marginTop: '0.3em'}} className="color-danger">Error</h2>
+        <h2 className="color-danger">Error</h2>
         <hr className="flare"/>
-        <div className="error text-small">
-            <i className="icon-warning"/> {text}
+        <div className="error text-small space">
+            <i className="icon-warning-hexagon"/> {text}
             {(!err.code || err.code === -1) && <div className="micro-space">
                 It's likely an external application error. Please contact support team of {actionContext.origin}
             </div>}

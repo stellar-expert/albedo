@@ -1,8 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import {withRouter} from 'react-router'
 import {observer} from 'mobx-react'
 import actionContext, {ActionContextStatus} from '../../state/action-context'
+import SoloLayoutView from '../layout/solo-layout-view'
 import IntentDescription from './intent-details-view'
 import IntentActionView from './intent-action-view'
 import AuthSelectorView from '../authentication/auth-selector-view'
@@ -14,23 +14,23 @@ function IntentView({location}) {
         setActionContext(parseGetParams(location.search))
     }*/
     if (actionContext.intentErrors) {
-        return <div>
+        return <SoloLayoutView alignTop>
             <IntentDescription expanded={true}/>
             <IntentActionView/>
-        </div>
+        </SoloLayoutView>
     }
     if (actionContext.status < ActionContextStatus.dispatched) {
-        return <div>
+        return <SoloLayoutView alignTop>
             <IntentDescription expanded={true}/>
             <AuthSelectorView/>
             <AccountFundingStatusView/>
             <IntentActionView/>
-        </div>
+        </SoloLayoutView>
     }
-    return <div>
+    return <SoloLayoutView alignTop>
         <IntentDescription expanded={false}/>
         <div className="loader"/>
-    </div>
+    </SoloLayoutView>
 }
 
 export default withRouter(observer(IntentView))

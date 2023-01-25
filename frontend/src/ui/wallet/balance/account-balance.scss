@@ -4,10 +4,10 @@
   flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
+  line-height: 1;
 
   > * {
     display: block;
-    margin: 0.6em 0;
     font-size: 0.85em;
     width: 45%;
   }
@@ -19,29 +19,49 @@
     margin-right: 0.5em;
     background: transparent center center no-repeat;
     background-size: contain;
+    position: relative;
 
     &.icon {
-      width: 1.4em;
-      height: 1.4em;
+      width: 1.32em;
+      height: 1em;
       font-size: 2em;
-      margin: 0;
       text-align: left;
+      margin: 0 0 0 -0.08em;
+    }
+
+    .claimable-status {
+      position: absolute;
+      font-size: 1.8rem;
+      bottom: -0.4em;
+      left: 1em;
+      color: var(--color-highlight);
+      text-shadow: 0 0 1px var(--color-bg);
     }
   }
 
   .asset-issuer {
     color: var(--color-dimmed);
-    letter-spacing: 0;
+    white-space: nowrap;
   }
 
   .asset-amount {
-    font-size: 1.8em;
+    font-size: 1.3em;
+    text-align: right;
+    font-family: $font-face-header;
+  }
+
+  .estimated-amount {
     text-align: right;
     font-family: $font-face-header;
   }
 
   .asset-code {
-    font-size: 1.2em;
+    font-size: 1.3em;
+    font-family: $font-face-header;
+  }
+
+  .account-key {
+    white-space: nowrap;
   }
 
   &.liquidity-pool {
@@ -52,27 +72,33 @@
       opacity: 0.2;
       display: block;
       height: 2.2em;
-      width: 0.4em;
+      width: 0.2em;
       position: absolute;
-      left: 0.7em;
+      left: 1em;
     }
 
-    > div:not(:last-child) {
-      font-size: 0.75em;
+    > div:nth-child(2) {
+      font-size: 0.7em;
     }
   }
+}
 
-  &.claimable {
-    .claimable-status {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      font-size: 1.4em;
-      margin-top: -0.7em;
-      margin-left: 1.1em;
-      color: var(--color-highlight);
-      text-shadow: 0 0 1px var(--color-bg);
+.account-balance-actions {
+  visibility: hidden;
+  font-size: 0.85em;
+  text-align: right;
+}
+
+.account-balance-container {
+  padding-top: 0.4em;
+
+  .flare {
+    margin-top: 0.2em;
+  }
+
+  &:hover {
+    .account-balance-actions {
+      visibility: visible;
     }
   }
 }

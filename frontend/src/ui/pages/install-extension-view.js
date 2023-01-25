@@ -1,11 +1,12 @@
 import React from 'react'
+import {Button} from '@stellar-expert/ui-framework'
 import {isExtensionInstalled} from '../../extension/extension-detection'
+import SoloLayoutView from '../layout/solo-layout-view'
 
 //TODO: automatically detect browser runtime
 export default function InstallExtensionView() {
-    return <div>
-        <h2>Install browser extension</h2>
-        <div className="space">
+    return <SoloLayoutView title="Install browser extension">
+        <div>
             <p>
                 Albedo extension is a thin wrapper on top of albedo.link website. If you often use Albedo or other
                 Stellar services that support web+stellar links, you might want to install this extension.
@@ -23,18 +24,16 @@ export default function InstallExtensionView() {
                 </li>
             </ul>
         </div>
-        {isExtensionInstalled() && <div className="dimmed space text-small">
-            <i className="icon-info"/> Albedo extension has been already installed in this browser.
+        {isExtensionInstalled() && <div className="space text-small">
+            <i className="icon-ok"/> Albedo extension has been already installed in this browser.
         </div>}
         <div className="double-space">
-            <a href="https://chrome.google.com/webstore/detail/kbojmmmibkfijmjgnfgfpngmmgkkpncl"
-               className="button button-block" target="_blank">
+            <Button block target="_blank" href="https://chrome.google.com/webstore/detail/kbojmmmibkfijmjgnfgfpngmmgkkpncl">
                 Get Chrome extension
-            </a>
-            <a href="https://addons.mozilla.org/en-US/firefox/addon/albedo-signer-for-stellar/"
-               className="button button-block" target="_blank">
+            </Button>
+            <Button block target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/albedo-signer-for-stellar/">
                 Get Firefox add-on
-            </a>
+            </Button>
         </div>
-    </div>
+    </SoloLayoutView>
 }

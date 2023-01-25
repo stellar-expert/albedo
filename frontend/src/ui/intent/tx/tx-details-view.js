@@ -1,12 +1,12 @@
 import React, {useState} from 'react'
-import {TransactionBuilder} from 'stellar-sdk'
 import {observer} from 'mobx-react'
 import {AccountAddress, CopyToClipboard, Spoiler} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
-import OperationDescription from '../operation-description-view'
+import {parseTxDetails} from '../tx-operations/tx-details-parser'
 import TxSourceAccountView from './tx-source-account-view'
 import TxFormattedMemo, {hasMemo} from './tx-formatted-memo-view'
 import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
+import TxOperationsList from '../tx-operations/tx-operations-list'
 
 /**
  * Transaction details
@@ -17,30 +17,23 @@ import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
  */
 function TxDetailsView({xdr, network, account, compact = false}) {
     const [extended, setExtended] = useState(false)
-    let tx
+    let parsedTx
     try {
-        tx = TransactionBuilder.fromXDR(xdr, network)
+        parsedTx = parseTxDetails({
+            network,
+            txEnvelope: xdr
+        })
     } catch (e) {
-        console.error(e)
-        tx = null
+        return <div>
+            <span className="icon-warning color-danger"/> Transaction is invalid and cannot be signed.
+        </div>
     }
-
-    if (!tx) return <div>
-        <span className="icon-warning color-danger"/> Transaction is invalid and cannot be signed.
-    </div>
+    const {tx, txHash} = parsedTx
     const isFeeBump = !!tx.innerTransaction
     const feeSponsor = isFeeBump && tx.feeSource
-    const txHash = tx.hash().toString('hex')
     const sourceAccountDiffers = tx.source !== account?.publicKey
-    if (isFeeBump) {
-        tx = tx.innerTransaction
-    }
     return <div>
-        {tx.operations.length === 1 ?
-            <OperationDescription op={tx.operations[0]} source={tx.source}/> :
-            <>{tx.operations.map((op, i) => <div key={i}>
-                <i className="icon icon-angle-right"/><OperationDescription key={i} op={op} source={tx.source}/>
-            </div>)}</>}
+        <TxOperationsList parsedTx={parsedTx}/>
         {sourceAccountDiffers && <div>
             <span className="label">Source account: </span>
             <TxSourceAccountView tx={tx} selectedAccount={account}/>

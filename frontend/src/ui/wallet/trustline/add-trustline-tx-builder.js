@@ -24,7 +24,7 @@ export async function prepareAddTrustlineTx(asset, network) {
 
 export function validateAddTrustline(asset) {
     if (accountLedgerData.nonExisting)
-        return 'Account doesn\'t exist on the ledger\nYou need to create it first by sending at least 1.6 XLM to the account address.'
+        return 'Account doesn\'t exist on the ledger.\nYou need to create it first by sending at least 1.6 XLM to the account address.'
     if (!accountLedgerData.getAvailableBalance('XLM', 0.05))
         return 'Not enough funds for the transaction fee'
     if (!accountLedgerData.hasTrustline(asset) && !accountLedgerData.getAvailableBalance('XLM', 0.55))

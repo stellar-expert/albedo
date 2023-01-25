@@ -1,5 +1,14 @@
 .wallet-operations {
+  h3 {
+    font-size: 2.4rem;
+    text-transform: uppercase;
+
+    + .tabs.inline-right {
+      margin-top: -3.2em;
+    }
+  }
+
   input {
-    margin-bottom: 0!important;
+    margin-bottom: 0 !important;
   }
 }

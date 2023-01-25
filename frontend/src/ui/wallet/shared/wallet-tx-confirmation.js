@@ -37,7 +37,6 @@ export async function confirmTransaction(network, transaction) {
         successful = true
     } catch (e) {
         console.error(e)
-        accountLedgerData.history.addNewTx({...inProgressTx, inProgress: false, successful: false})
     }
     await accountLedgerData.loadAccountInfo()
     return successful

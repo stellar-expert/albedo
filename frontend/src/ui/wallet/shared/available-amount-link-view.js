@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import PropTypes from 'prop-types'
-import Bignumber from 'bignumber.js'
 import {useStellarNetwork} from '@stellar-expert/ui-framework'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import {formatWithPrecision} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {estimateFee} from '../../../util/fee-estimator'
+import {denominate} from '../../../util/denominate'
 
 function AvailableAmountLink({settings, index}) {
     const network = useStellarNetwork(),
@@ -18,8 +18,7 @@ function AvailableAmountLink({settings, index}) {
         if (asset !== 'XLM') return
         estimateFee(network)
             .then(fee => {
-                const adjustedFee = new Bignumber(fee).div(10000000).toFixed(7)
-                setAvailableBalance(accountLedgerData.getAvailableBalance(asset, adjustedFee))
+                setAvailableBalance(accountLedgerData.getAvailableBalance(asset, denominate(fee)))
             })
     }, [network, accountLedgerData.balances[asset]])
 

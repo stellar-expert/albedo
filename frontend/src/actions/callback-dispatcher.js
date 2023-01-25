@@ -37,11 +37,10 @@ function execSep7Callback(callback, data) {
  * @return {Promise}
  */
 function postMessage(res, actionContext) {
-    const target = locateCallerWindow(actionContext)
-    if (!target) {
-        return Promise.reject('Caller application browser window was not found.')
+    const target = locateCallerWindow()
+    if (target) {
+        target.postMessage({albedoIntentResult: res}, '*')
     }
-    target.postMessage({albedoIntentResult: res}, '*')
     return Promise.resolve()
 }
 
@@ -59,15 +58,20 @@ function locateCallerWindow() {
  * @return {Promise}
  */
 export async function dispatchIntentResponse(actionContext) {
-    const {callback} = actionContext.intentParams,
-        {result} = actionContext
+    const {callback, walletRedirect} = actionContext.intentParams
+    const {result} = actionContext
     result.__reqid = actionContext.requestId
 
     if (callback) {
         await execSep7Callback(callback, result)
     }
     const callerWindow = locateCallerWindow()
-    if (!callerWindow || callerWindow === window) return
+    if (!callerWindow || callerWindow === window) {
+        if (walletRedirect) {
+            window.location.href = walletRedirect
+        }
+        return
+    }
     if (actionContext.intent === 'implicit_flow') {
         await syncLocalStorage()
     }
@@ -80,13 +84,19 @@ export async function dispatchIntentResponse(actionContext) {
  * @param {ActionContext} actionContext - Current action context.
  */
 export function dispatchIntentError(error, actionContext) {
+    const {requestId, result, walletRedirect} = actionContext
     const errorResult = errors.prepareErrorDescription(error)
-    errorResult.__reqid = actionContext.requestId
-    if (actionContext.result) {
-        Object.assign(errorResult, actionContext.result)
+    errorResult.__reqid = requestId
+    if (result) {
+        Object.assign(errorResult, result)
     }
     /*//SEP-7 callback doesn't imply error handling - just show an error in UI
     alert(error.message || error)*/
+    if (walletRedirect) {
+        window.location.href = walletRedirect
+        return
+    }
+
     //post message back to a caller app
     return postMessage(errorResult, actionContext)
         .catch(e => console.error(e))

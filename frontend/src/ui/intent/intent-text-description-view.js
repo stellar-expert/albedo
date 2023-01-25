@@ -23,16 +23,16 @@ function NetworkInfo() {
 }
 
 function IntentDescriptionLayout({text, children, submit, multi}) {
-    return <div>
-        <div className="text-small micro-space">
+    return <>
+        <div className="micro-space">
             {!multi && <NetworkInfo/>}
-            <CallerOrigin/> {text}.
+            <CallerOrigin/> {text}
             {!!submit && <div className="dimmed">
                 <i className="icon icon-export"/>Transaction will be submitted automatically
             </div>}
         </div>
         {!!children && <>{children}</>}
-    </div>
+    </>
 }
 
 function IntentTextDescriptionView({intent, intentParams, expanded = true, multi = false}) {

@@ -1,9 +1,9 @@
 import React from 'react'
 import {BrowserQRCodeReader} from '@zxing/browser'
-import './wc-camera-qr-reader.scss'
-import './wc-connect.scss'
+import './upload-qr-overlay.scss'
+import WalletPageActionDescription from '../shared/wallet-page-action-description'
 
-export default function WcUploadQrView({onChange}) {
+export default function UploadQrReaderView({onChange}) {
     function selectFile(e) {
         const [file] = e.target.files
         if (file) {
@@ -18,9 +18,12 @@ export default function WcUploadQrView({onChange}) {
         }
     }
 
-    return <div>
-        <div className="wc-connect-overlay  text-center">
-            <div className="v-center-block" style={{height: '200px', border: '4px solid #ccc', cursor: 'pointer'}}>
+    return <>
+        <WalletPageActionDescription>
+            upload QR screenshot if camera is not available
+        </WalletPageActionDescription>
+        <div className="qr-overlay text-center space">
+            <div className="v-center-block upload-block">
                 <div>
                     <span className="icon icon-qr dimmed" style={{fontSize: '2em'}}/>
                     <div className="text-small dimmed">
@@ -30,6 +33,5 @@ export default function WcUploadQrView({onChange}) {
             </div>
             <input type="file" placeholder="Choose image" onChange={selectFile} className="overlay" style={{opacity: 0.01}}/>
         </div>
-        <p className="dimmed text-small text-center space">Upload a QR screenshot if camera is not available</p>
-    </div>
+    </>
 }

@@ -10,12 +10,13 @@ import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {prepareTransferTx} from './transfer-tx-builder'
 
 export default class TransferSettings {
-    constructor(network, mode = 'direct') {
+    constructor(network, mode = 'direct', selfPayment = false) {
         this.network = network
         this.mode = mode
         this.asset = ['XLM', 'XLM']
         this.amount = ['0', '0']
         this.conversionSlippage = 0.5
+        this.selfPayment = selfPayment
         makeAutoObservable(this)
 
         autorun(() => {
@@ -41,8 +42,9 @@ export default class TransferSettings {
     mode = 'direct'
     /**
      * @type {String}
+     * @private
      */
-    destination
+    _destination
     /**
      * @type {String}
      */
@@ -99,6 +101,10 @@ export default class TransferSettings {
      * @type {Number}
      */
     currentLedgerSequence
+    /**
+     * @type {Boolean}
+     */
+    isValid = false
 
     /**
      * @type {String}
@@ -107,8 +113,14 @@ export default class TransferSettings {
         return accountLedgerData.address
     }
 
-    get isSelfPayment() {
-        return this.source === this.destination
+    get destination() {
+        return this.selfPayment ? this.source : this._destination
+    }
+
+    set destination(value) {
+        if (this.selfPayment)
+            return
+        this._destination = value
     }
 
     get hasSufficientBalance() {
@@ -128,6 +140,7 @@ export default class TransferSettings {
         }
         this.asset[1] = this.asset[0]
         this.conversionDirection = 'source'
+        this.isValid = false
     }
 
     /**
@@ -142,6 +155,7 @@ export default class TransferSettings {
         this.destinationFederationAddress = null
         this.memo = null
         this.invalidMemo = false
+        this.isValid = false
         if (federationInfo) {
             this.destinationFederationAddress = federationInfo.link
             this.memo = encodeMemo(federationInfo)
@@ -181,6 +195,7 @@ export default class TransferSettings {
     setAsset(asset, index) {
         this.conversionPathLoaded = false
         this.createTrustline = false
+        this.isValid = false
         if (this.mode !== 'convert') {
             this.asset = [asset, asset]
             this.createDestination = false
@@ -208,6 +223,7 @@ export default class TransferSettings {
         this.createTrustline = false
         this.conversionPathLoaded = false
         this.createDestination = false
+        this.isValid = false
     }
 
     /**

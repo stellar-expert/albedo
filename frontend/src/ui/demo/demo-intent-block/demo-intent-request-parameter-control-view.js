@@ -1,5 +1,4 @@
 import React from 'react'
-import cn from 'classnames'
 import {useAutoFocusRef} from '@stellar-expert/ui-framework'
 
 function TextParamControl({value, description, param, inProgress, onChange}) {

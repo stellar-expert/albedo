@@ -3,8 +3,8 @@ import Bignumber from 'bignumber.js'
 import {AssetDescriptor, generateLiquidityPoolId} from '@stellar-expert/asset-descriptor'
 import {adjustPrecision} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
-import {prepareLiquidityDepositTx} from './liquidity-pool-deposit-tx-builder'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
+import {prepareLiquidityDepositTx} from './liquidity-pool-deposit-tx-builder'
 
 export default class LiquidityPoolDepositSettings {
     constructor(network) {
@@ -69,20 +69,27 @@ export default class LiquidityPoolDepositSettings {
         this.slippage = slippage
     }
 
-    loadPoolInfo(force = false) {
-        if (this._poolInfoPromise && !force) return this._poolInfoPromise
+    loadPoolInfo(force = false, poolId = null) {
+        if (this._poolInfoPromise && !force)
+            return this._poolInfoPromise
         this.poolInfo = {loaded: false}
         this.reverse = false
-        if (this.asset[0] === this.asset[1]) {
+        if (this.asset[0] === this.asset[1] && !poolId) {
             this.poolInfo = {loaded: true, invalidPair: true}
             return Promise.resolve()
         }
-
-        this._poolInfoPromise = resolvePoolParams(this.network, this.poolId, true)
+        if (!poolId) {
+            poolId = this.poolId
+        }
+        this._poolInfoPromise = resolvePoolParams(this.network, poolId, true)
             .then(res => runInAction(() => {
                 this.poolInfo = {loaded: true, parameters: res}
-                if (res && AssetDescriptor.parse(res.reserves[0].asset).toFQAN() !== AssetDescriptor.parse(this.asset[0]).toFQAN()) {
-                    this.reverse = true
+                if (res) {
+                    if (this.asset.join() === 'XLM,XLM' && this.amount.every(a => !a)) {
+                        this.asset = res.reserves.map(r => AssetDescriptor.parse(r.asset).toFQAN())
+                    } else if (AssetDescriptor.parse(res.reserves[0].asset).toFQAN() !== AssetDescriptor.parse(this.asset[0]).toFQAN()) {
+                        this.reverse = true
+                    }
                 }
                 this._poolInfoPromise = undefined
             }))

@@ -3,6 +3,7 @@ import {StrKey} from 'stellar-sdk'
 import {Button} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import {mnemonicWordsList, validateMnemonic, mnemonicToSecret} from '../../util/mnemonic'
+import SoloLayoutView from '../layout/solo-layout-view'
 import SignupView from '../signup/signup-view'
 
 function processImportedKey(value) {
@@ -53,10 +54,10 @@ function processImportedKey(value) {
 }
 
 export default function AccountImportView({onSuccess}) {
-    const [pastedValue, pasteValue] = useState(''),
-        [error, setError] = useState(null),
-        [secretToImport, setSecret] = useState(null),
-        inputRef = useRef(null)
+    const [pastedValue, pasteValue] = useState('')
+    const [error, setError] = useState(null)
+    const [secretToImport, setSecret] = useState(null)
+    const inputRef = useRef(null)
 
     useEffect(() => inputRef.current && inputRef.current.focus(), [])
 
@@ -66,33 +67,35 @@ export default function AccountImportView({onSuccess}) {
         setError({type, details: error})
     }
 
-    if (secretToImport) return <SignupView secret={secretToImport} skipSecretBackup/>
+    if (secretToImport)
+        return <SignupView secret={secretToImport} skipOnboarding skipSecretBackup/>
 
-    return <>
-        <h2>Import Account</h2>
-        <div className="text-small space">
+    return <SoloLayoutView title="Import Account">
+        <div className="segment text-small">
+            <p>
+                <i className="icon-warning-hexagon"/>{' '}
+                Before starting the import process, do not forget to double-check the URL (the domain should
+                be <code>albedo.link</code>) and SSL validity(a small lock icon on the left of the address bar).
+            </p>
             <p>
                 Use this tool to import keys from any Stellar wallet or transfer your Albedo account to another
                 browser/device.
             </p>
-            <p>
-                <i className="icon-warning"/>{' '}
-                Before starting the import process, do not forget to double-check the URL(the domain should
-                be <b>albedo.link</b>) and SSL validity(a small lock icon on the left of the address bar).
-            </p>
-            <p>
-                Copy-paste your key below. Supported formats:<br/>
+            <p>Copy-paste your key below:</p>
+            <div className="space">
+                <textarea value={pastedValue} className="condensed" style={{height: '5.2em'}} ref={c => inputRef.current = c}
+                          onChange={e => {
+                    pasteValue(e.target.value)
+                    setError(null)
+                }}/>
+            </div>
+            <div className="text-tiny dimmed space">
+                Supported formats:<br/>
                 - 24-word Albedo account passphrase backup<br/>
                 - Stellar account secret key (starts with "S…")
-            </p>
+            </div>
         </div>
-        <div className="micro-space"/>
-        <textarea value={pastedValue} style={{height: '5.2em', fontWeight: 'bold'}}
-                  ref={c => inputRef.current = c} onChange={e => {
-                      pasteValue(e.target.value)
-                      setError(null)
-                  }}/>
-        <div className="row">
+        <div className="row space">
             <div className="column column-50">
                 <Button block onClick={() => submit()}>Next</Button>
             </div>
@@ -106,5 +109,5 @@ export default function AccountImportView({onSuccess}) {
                 Error: {error.details}
             </>}
         </div>}
-    </>
+    </SoloLayoutView>
 }

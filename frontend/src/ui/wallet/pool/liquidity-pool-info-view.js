@@ -3,7 +3,7 @@ import Bignumber from 'bignumber.js'
 import {Amount} from '@stellar-expert/ui-framework'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import {formatPrice, formatWithAutoPrecision} from '@stellar-expert/formatter'
-import {estimateLiquidityPoolStakeValue} from'@stellar-expert/liquidity-pool-utils'
+import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-utils'
 
 export default function LiquidityPoolInfoView({poolInfo, stake}) {
     /*if (assets[0].toString() === assets[1].toString())
@@ -13,24 +13,8 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
         reserves = poolInfo.reserves.map(r => r.amount),
         price = parseFloat(reserves[0]) / parseFloat(reserves[1]),
         total = new Bignumber(poolInfo.total_shares).mul(new Bignumber(10000000)).toString(),
-        estimatedValue = estimateLiquidityPoolStakeValue(stake, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
-    return <div className="segment text-small">
-        {(!!estimatedValue || stake !== undefined) && <div>
-            <h4>Your current stake</h4>
-            <div>
-                {total} shares{' '}
-                {stake > 0 &&
-                <span className="dimmed condensed">({formatWithAutoPrecision(100 * stake / 10000000 / poolInfo.total_shares)}% of the pool liquidity)</span>}
-            </div>
-            {!!estimatedValue && <>
-                <div>
-                    &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]} adjust/>
-                </div>
-                <div>
-                    &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]} adjust/>
-                </div>
-            </>}
-        </div>}
+        estimatedValue = stake > 0 && estimateLiquidityPoolStakeValue(stake, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
+    return <div className="segment text-small space">
         <h4>Pool info</h4>
         <div>
             <div className="dimmed">Total liquidity locked:</div>
@@ -41,21 +25,35 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
                 &emsp;<Amount amount={reserves[1]} asset={assets[1]}/>
             </div>
         </div>
-        <table>
-            <tbody>
-            {!!price && <tr>
-                <td className="dimmed">Current pool price:</td>
-                <td>{formatPrice(price)} {assets[0].code}/{assets[1].code}</td>
-            </tr>}
-            <tr>
-                <td className="dimmed">Liquidity providers:</td>
-                <td>{poolInfo.total_trustlines}</td>
-            </tr>
-            <tr>
-                <td className="dimmed">Pool fee rate:</td>
-                <td>{poolInfo.fee_bp / 100}%</td>
-            </tr>
-            </tbody>
-        </table>
+        {!!price && <div>
+            <span className="dimmed">Price: </span>
+            {formatPrice(price)} {assets[0].code}/{assets[1].code}
+        </div>}
+        <div>
+            <span className="dimmed">Participants: </span>
+            {poolInfo.total_trustlines}
+        </div>
+        <div>
+            <span className="dimmed">Fee rate: </span>
+            {poolInfo.fee_bp / 100}%
+        </div>
+        {(!!estimatedValue || stake > 0) && <>
+            <hr className="flare"/>
+            <h4>Your current stake</h4>
+            <div>
+                {stake} <span className="dimmed">shares</span>
+            </div>
+            <div className="dimmed condensed">
+                &emsp;({formatWithAutoPrecision(100 * stake / (poolInfo.total_shares * 10000000))}% of the pool liquidity)
+            </div>
+            {!!estimatedValue && <>
+                <div>
+                    &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]} adjust/>
+                </div>
+                <div>
+                    &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]} adjust/>
+                </div>
+            </>}
+        </>}
     </div>
 }

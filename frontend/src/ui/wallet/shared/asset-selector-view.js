@@ -48,8 +48,7 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted, title
                      showToggle={!title} onChange={onChange} onScroll={e => e.rel === 'bottom' && loadNextPage?.call(this)} header={<>
         <h3>Select an asset</h3>
         <div className="relative">
-            <input type="text" value={search} ref={searchRef} onChange={e => setSearch(e.target.value)}
-                   placeholder="Search by asset code or website"/>
+            <input type="text" value={search} ref={searchRef} onChange={e => setSearch(e.target.value)} placeholder="Search by asset code or website"/>
             <i className="icon-search dimmed"/>
         </div>
     </>}/>

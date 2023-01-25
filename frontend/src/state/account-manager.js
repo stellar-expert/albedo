@@ -10,6 +10,7 @@ import {
     retrieveRecentAccount
 } from '../storage/account-storage'
 
+
 class AccountManager {
     /**
      * Whether account selector menu is open or not.
@@ -116,11 +117,11 @@ class AccountManager {
             .filter(name => !!name)
             .map(name => parseInt(name))
         if (!n.length) {
-            if (this.accounts.some(a => a.accountType === ACCOUNT_TYPES.STORED_ACCOUNT)) return 'Account 1'
-            return 'Default Account'
+            if (this.accounts.some(a => a.accountType === ACCOUNT_TYPES.STORED_ACCOUNT)) return 'Account1'
+            return 'MyAccount'
         }
         n.sort()
-        return 'Account ' + (1 + n.pop())
+        return 'Account' + (1 + n.pop())
     }
 
     async reload() {
@@ -130,5 +131,11 @@ class AccountManager {
 }
 
 const accountManager = new AccountManager()
+
+window.predefinedAccountDisplayNames = new Proxy({}, {
+    get(target, prop) {
+        return accountManager.get(prop)?.friendlyName
+    }
+})
 
 export default accountManager

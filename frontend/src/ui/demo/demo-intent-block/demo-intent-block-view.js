@@ -105,7 +105,7 @@ export default function DemoIntentBlockView({intent}) {
     }
 
     return <div className="intent-block" style={{paddingBottom: '2em'}}>
-        <h2 id={intent}>{title} - <code>{intent}</code></h2>
+        <h2 className="condensed" id={intent}>{title} - <code>{intent}</code></h2>
         <div className="intent-description">{description}</div>
         <div className="space">
             <b>Parameters</b>
@@ -113,7 +113,7 @@ export default function DemoIntentBlockView({intent}) {
                 <DemoBatchParametersView {...{intent, inProgress}} onChange={params => setAllParams(params)}/>:
                 <DemoIntentRequestParametersView {...{intent, inProgress}} onChange={params => setAllParams(params)}/>}
         </div>
-        <Tabs tabs={getTabs(intent)} selectedTab={selectedTab} onChange={tab => selectTab(tab)}/>
+        <Tabs tabs={getTabs(intent)} selectedTab={selectedTab} onChange={tab => selectTab(tab)} right/>
         <DemoIntentExampleView {...{intent, allParams, selectedTab, inProgress}} onExec={exec}/>
         <DemoIntentResultsView {...{result, error}}/>
         <DemoExtraInfoView {...{intent, allParams, result}} />

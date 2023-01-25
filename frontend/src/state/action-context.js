@@ -158,7 +158,8 @@ class ActionContext {
             runtimeErrors: null,
             implicitSession: null,
             result: null,
-            requestId: null
+            requestId: null,
+            walletRedirect: undefined
         })
     }
 
@@ -224,7 +225,7 @@ class ActionContext {
             this.setStatus(ActionContextStatus.dispatched)
 
             if (autoRedirect) {
-                navigation.navigate('/result')
+                navigation.navigate(this.walletRedirect || '/result')
             }
             this.reset()
         } catch (e) {

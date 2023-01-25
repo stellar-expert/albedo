@@ -9,7 +9,15 @@ const defaultState = {
     validationError: null
 }
 
-export default function CredentialsRequestView({confirmText = 'Confirm', onConfirm, onCancel, requestPasswordConfirmation, inProgress, noRegistrationLink, error}) {
+export default function CredentialsRequestView({
+                                                   confirmText = 'Confirm',
+                                                   onConfirm,
+                                                   onCancel,
+                                                   requestPasswordConfirmation,
+                                                   inProgress,
+                                                   noRegistrationLink,
+                                                   error
+                                               }) {
     const firstInputRef = useRef(null)
 
     const [{password, confirmation, validationError}, updateState] = useDependantState(() => {
@@ -64,7 +72,7 @@ export default function CredentialsRequestView({confirmText = 'Confirm', onConfi
     const errorsToShow = validationError || error
 
     return <>
-        <div className="space">
+        <div className="segment">
             <div>
                 <input type="password" name="password" placeholder="Password"
                        ref={firstInputRef} value={password || ''} onChange={e => setValue('password', e.target.value)}
@@ -76,7 +84,7 @@ export default function CredentialsRequestView({confirmText = 'Confirm', onConfi
                        onKeyDown={e => onKeyDown(e)}/>
             </div>}
         </div>
-        <div className="row actions">
+        <div className="row actions space">
             {onConfirm && <div className="column column-50">
                 <Button block disabled={!!inProgress} onClick={confirm}>{confirmText}</Button>
             </div>}
@@ -84,12 +92,14 @@ export default function CredentialsRequestView({confirmText = 'Confirm', onConfi
                 <Button block outline onClick={onCancel}>Cancel</Button>
             </div>}
         </div>
-        {errorsToShow && <div className="error space text-center text-small">Error: {errorsToShow}</div>}
+        {errorsToShow && <div className="error space text-center text-small">
+            <i className="icon-warning-hexagon"/> Error: {errorsToShow}
+        </div>}
         {!noRegistrationLink && <>
-            <hr title="Not registered yet?" className="flare"/>
+            <hr title="not registered yet?" className="flare"/>
             <div className="row">
                 <div className="column column-50 column-offset-25">
-                    <a href="/signup" className="button button-block">Create new account</a>
+                    <Button block href="/signup">Create new account</Button>
                 </div>
             </div>
         </>}

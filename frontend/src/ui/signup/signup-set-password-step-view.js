@@ -1,11 +1,12 @@
 import React, {useState} from 'react'
 import {Keypair} from 'stellar-sdk'
-import accountManager from '../../state/account-manager'
+import {Button} from '@stellar-expert/ui-framework'
 import Account, {ACCOUNT_TYPES} from '../../state/account'
+import accountManager from '../../state/account-manager'
 import Credentials from '../../state/auth/credentials'
-import errors from '../../util/errors'
-import {saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
 import actionContext from '../../state/action-context'
+import {saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
+import errors from '../../util/errors'
 import CredentialsRequest from '../authentication/credentials-request-view'
 import HardwareWalletSelectorView from '../authentication/hardware-wallet-selector-view'
 
@@ -63,17 +64,16 @@ export default function SignupSetPasswordStepView({secret, onSuccess}) {
                             requestPasswordConfirmation noRegistrationLink
                             onConfirm={data => saveAccount(data)} onCancel={() => actionContext.cancelAction()}/>
         <div className="space dimmed text-small text-justify">
-            We don't have access to your password or secret keys. Everything is encrypted and stored in the
-            browser.
+            We don't have access to your password or secret keys. Everything is encrypted and stored in the browser.
         </div>
         {!secret && <>
-            <hr title="already have account?" className="flare"/>
+            <hr title="already have an account?" className="flare"/>
             <div className="row micro-space">
                 <div className="column column-50">
-                    <a href="/login" className="button button-outline button-block">Log in</a>
+                    <Button block outline href="/login">Log in</Button>
                 </div>
                 <div className="column column-50">
-                    <a href="/import" className="button button-outline button-block">Import account</a>
+                    <Button block outline href="/import">Import account</Button>
                 </div>
             </div>
             <hr title="or use hardware wallet" className="flare"/>

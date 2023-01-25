@@ -1,9 +1,9 @@
 import {Operation, TransactionBuilder} from 'stellar-sdk'
-import Bignumber from 'bignumber.js'
 import {getLiquidityPoolAsset} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'
 import {estimateFee} from '../../../util/fee-estimator'
+import {denominate} from '../../../util/denominate'
 
 /**
  *
@@ -21,9 +21,7 @@ export async function prepareLiquidityWithdrawTx(withdraw) {
 
     builder.addOperation(Operation.liquidityPoolWithdraw({
         liquidityPoolId: withdraw.poolId,
-        amount: new Bignumber(withdraw.amount)
-            .div(10000000)
-            .toFixed(7),
+        amount: denominate(withdraw.amount),
         minAmountA,
         minAmountB
     }))

@@ -69,7 +69,9 @@ export default observer(function AuthorizationRequestView() {
         <div className="space text-small dimmed">
             Please provide your password
         </div>
-        <CredentialsRequest confirmText="Confirm" noRegistrationLink {...{inProgress, error}} onConfirm={submit}
-                            onCancel={cancel}/>
+        <div className="space">
+            <CredentialsRequest confirmText="Confirm" noRegistrationLink {...{inProgress, error}} onConfirm={submit}
+                                onCancel={cancel}/>
+        </div>
     </div>
 })

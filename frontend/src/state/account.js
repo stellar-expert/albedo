@@ -4,6 +4,7 @@ import {shortenString} from '@stellar-expert/formatter'
 import {encryptAccountSecret, decryptAccountSecret, persistAccountInBrowser} from '../storage/account-storage'
 import {currentStorageVersion} from '../storage/storage-version'
 import {extractDeviceId} from '../util/device-id-generator'
+import {ClaimableBalanceFilter} from '../util/claimable-balance-filter'
 
 export const ACCOUNT_TYPES = {
     STORED_ACCOUNT: 0,
@@ -31,8 +32,8 @@ export default class Account {
             shortDisplayName: computed,
             requestAccountSecret: action
         })
-
         Object.assign(this, params)
+        this.cbFilter = new ClaimableBalanceFilter(params.cbFilter)
     }
 
     /**
@@ -78,6 +79,12 @@ export default class Account {
      * @type {Object}
      */
     seen
+
+    /**
+     * Filter instance
+     * @type {ClaimableBalanceFilter}
+     */
+    cbFilter
 
     /**
      * Title to display in UI
@@ -178,6 +185,17 @@ export default class Account {
     }
 
     /**
+     * Add claimable balance id to the filter and save account
+     * @param {String} cbid - Claimable balance id
+     * @return {Promise<Account>}
+     */
+    async hideClaimableBalance(cbid) {
+        this.cbFilter.hideClaimableBalance(cbid)
+        await persistAccountInBrowser(this)
+        return this
+    }
+
+    /**
      * Prepare account data for serialization
      * @return {Object}
      */
@@ -202,6 +220,10 @@ export default class Account {
         }
         if (this.seen) {
             res.seen = this.seen
+        }
+        const {snapshot} = this.cbFilter
+        if (snapshot) {
+            res.cbFilter = snapshot
         }
         return res
     }

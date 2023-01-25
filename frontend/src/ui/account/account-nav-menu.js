@@ -4,24 +4,27 @@ import cn from 'classnames'
 import {useStellarNetwork} from '@stellar-expert/ui-framework'
 
 function NavLink({link, icon, title, current}) {
-    return <a href={link} className={cn({current})}>
-        <i className={icon}/>
-        {title}</a>
+    return <a href={link} className={cn('condensed', {current})}>
+        <i className={icon}/>{title}
+    </a>
 }
 
+const links = [
+    {link: '/wallet/transfer', icon: 'icon-send-circle', title: 'Send'},
+    {link: '/wallet/receive', icon: 'icon-receive-circle', title: 'Receive'},
+    {link: '/wallet/swap', icon: 'icon-trade', title: 'Trade'},
+    {link: '/wallet/scan', icon: 'icon-scan-qr-code', title: 'Scan'},
+    {link: '/', icon: 'icon-coins', title: 'Balance'}
+]
+
 export default function AccountNavMenu() {
-    useLocation()
     useStellarNetwork()
-
-    const links = [
-        {link: '/account', icon: 'icon-coins', title: 'Balance'},
-        {link: '/wallet/swap', icon: 'icon-switch', title: 'Swap'},
-        {link: '/wallet/transfer', icon: 'icon-flash', title: 'Transfer'},
-        {link: '/wallet/liquidity-pool', icon: 'icon-liquidity-pool', title: 'Liquidity'},
-        {link: '/account-settings', icon: 'icon-settings', title: 'Settings'}
-    ]
-
-    return <div className="micro-space navigation">
-        {links.filter(link => !!link).map(link => <NavLink key={link.link} {...link}/>)}
-    </div>
+    const {pathname} = useLocation()
+    return <>
+        {/*this div is a placeholder that adds scroll to the window to prevent covering the content with navigation*/}
+        <div style={{paddingTop: '6em'}}/>
+        <div className="container navigation">
+            {links.map(item => <NavLink key={item.icon} {...item} current={pathname === item.link}/>)}
+        </div>
+    </>
 }

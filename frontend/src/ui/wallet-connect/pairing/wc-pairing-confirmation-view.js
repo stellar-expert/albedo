@@ -6,7 +6,7 @@ import WcRequestParser from '../request/wc-request-parser'
 
 export default function WcPairingConfirmationView({pairingRequest}) {
     const parsedRequest = new WcRequestParser(pairingRequest).processRequest()
-    return <AccountContextView actionMode>
+    return <AccountContextView>
         <WcPendingPairingRequestView request={parsedRequest}/>
         <WcRequestActionsView request={parsedRequest} className="space" nextUrl="/wallet-connect/connect/success"/>
     </AccountContextView>

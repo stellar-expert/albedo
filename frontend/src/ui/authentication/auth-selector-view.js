@@ -59,14 +59,15 @@ function AuthSelectorView() {
             'Direct secret key input' :
             selectedAccount ?
                 <><AccountIdenticon address={selectedAccount.publicKey}/> {selectedAccount.displayName}</> :
-                'Choose account'
+                <>Choose account</>
     }]
 
     for (let account of allAccounts) {
         if (!directKeyInput && account === selectedAccount) continue
         dropdownOptions.push({
             value: account.id,
-            title: <>Switch to&nbsp;<AccountIdenticon address={account.publicKey}/> {account.displayName}</>
+            title: <>Switch to&nbsp;<AccountIdenticon address={account.publicKey}/> {account.displayName}</>,
+            disabled: !!requestedPubkey && account.publicKey !== requestedPubkey
         })
     }
 
@@ -97,7 +98,7 @@ function AuthSelectorView() {
                        value={directKeyInputSecret} onChange={e => setSecret(e.target.value)} className="key"/>
             </div>
         </> : <>
-            {!!requestedPubkey && !accountManager.get(requestedPubkey) && <div className="space">
+            {!!requestedPubkey && !selectedAccount && <div className="space">
                 The application requested specific key (<AccountAddress account={requestedPubkey}/>).
                 Either <AuthActionLink action="signup">add another Albedo account</AuthActionLink> or
                 provide the requested secret key <AuthActionLink action="direct-input">directly</AuthActionLink>.

@@ -1,26 +1,17 @@
 @import '~@stellar-expert/ui-framework/index.scss';
 
-.container {
-  max-width: 50rem;
+$container-width: 60rem;
+
+.container:not(.wide) {
+  max-width: $container-width;
 }
 
 .page-container {
-  min-height: calc(100vh - 8rem);
+  min-height: auto;
   display: flex;
   flex-direction: column;
 
   > .no-center {
     margin-bottom: auto;
-  }
-}
-
-.row {
-  @media (min-width: $responsive-mobile-browser-width) {
-    &.wide {
-      margin-left: -20rem;
-      margin-right: -20rem;
-      width: auto;
-      max-width: 100vw;
-    }
   }
 }

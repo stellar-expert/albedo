@@ -1,13 +1,14 @@
 import React, {useState} from 'react'
-import CredentialsRequest from './credentials-request-view'
-import {Dropdown} from '@stellar-expert/ui-framework'
+import {Button, Dropdown} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import accountManager from '../../state/account-manager'
 import {ACCOUNT_TYPES} from '../../state/account'
-import Credentials from '../../state/auth/credentials'
 import actionContext from '../../state/action-context'
+import Credentials from '../../state/auth/credentials'
+import SoloLayoutView from '../layout/solo-layout-view'
 import errors from '../../util/errors'
 import HardwareWalletSelectorView from './hardware-wallet-selector-view'
+import CredentialsRequest from './credentials-request-view'
 
 export default function LoginPageView() {
     const allAccounts = accountManager.accounts.filter(a => a.accountType === ACCOUNT_TYPES.STORED_ACCOUNT),
@@ -46,19 +47,18 @@ export default function LoginPageView() {
 
     const accountSelectorOptions = allAccounts.map(a => ({value: a.id, title: a.displayName}))
 
-    if (!accountSelectorOptions.length) return <>
-        <div className="space">
-            <h2>Log In</h2>
+    if (!accountSelectorOptions.length)
+        return <SoloLayoutView title="Log In">
             No stored accounts available. Looks like you are using Albedo for the first time on this device.
             <div className="row">
                 <div className="column column-50 space">
-                    <a href="/signup" className="button button-block">Create new account</a>
+                    <Button block href="/signup">Create new account</Button>
                     <div className="dimmed text-tiny text-center">
                         Create new empty account and start using Albedo right away.
                     </div>
                 </div>
                 <div className="column column-50 space">
-                    <a href="/import" className="button button-block">Import existing</a>
+                    <Button block href="/import">Import existing</Button>
                     <div className="dimmed text-tiny text-center">
                         Use Albedo paper key or secret key from another Stellar wallet.
                     </div>
@@ -66,15 +66,15 @@ export default function LoginPageView() {
             </div>
             <hr style={{margin: '3rem 0'}} title="or use hardware wallet" className="flare"/>
             <HardwareWalletSelectorView requirePublicKey onConfirm={login}/>
-        </div>
-    </>
-    return <>
-        <h2>Log In</h2>
+        </SoloLayoutView>
+    return <SoloLayoutView title="Log In">
         <div className="space">
             <Dropdown value={selectedAccount} onChange={value => setSelectedAccount(value)}
                       options={accountSelectorOptions}/>
         </div>
-        <CredentialsRequest confirmText="Log in" inProgress={inProgress || accountSelectorOptions.length}
-                            onConfirm={login} onCancel={() => navigation.navigate('/')}/>
-    </>
+        <div className="space">
+            <CredentialsRequest confirmText="Log in" inProgress={inProgress || accountSelectorOptions.length}
+                                onConfirm={login} onCancel={() => navigation.navigate('/')}/>
+        </div>
+    </SoloLayoutView>
 }

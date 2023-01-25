@@ -13,17 +13,18 @@ export default function LiquidityPoolNonexistentView({assets}) {
         setPrice(null)
         resolveOrderbookInfo(network, assets, 2)
             .then(orderbook => {
-                const [bestBid] = orderbook.bids,
-                    [bestAsk] = orderbook.asks
+                const [bestBid] = orderbook.bids
+                const [bestAsk] = orderbook.asks
                 if (!bestBid || !bestAsk) return
                 const price = new Bignumber(bestBid.price_r.n).div(bestBid.price_r.d)
                     .plus(new Bignumber(bestAsk.price_r.n).div(bestAsk.price_r.d))
+                    .div(2)
                     .toNumber()
                 setPrice(price)
             })
     }, [network, assets.map(a => a.toString()).join()])
 
-    return <div className="segment text-small">
+    return <div className="segment text-small space">
         <div className="dimmed">This liquidity pool doesn't exist.
             You can deposit assets to create the pool.
         </div>

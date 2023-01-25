@@ -1,12 +1,13 @@
 import React, {useState} from 'react'
 import {observer} from 'mobx-react'
+import {Button} from '@stellar-expert/ui-framework'
 import accountManager from '../../state/account-manager'
-import {registerProtocolHandler} from '../../util/protocol-handler'
-import './intro.scss'
 import {isInsideFrame} from '../../util/frame-utils'
-import UserFeaturesView from './user-features-view'
+import {registerProtocolHandler} from '../../util/protocol-handler'
+import SoloLayoutView from '../layout/solo-layout-view'
 import DeveloperFeaturesView from './developer-features-view'
-
+import UserFeaturesView from './user-features-view'
+import './intro.scss'
 
 function IntroView() {
     const loggedIn = !!accountManager.accounts.length
@@ -19,8 +20,8 @@ function IntroView() {
             </a>
     }
 
-    return <div className="double-space">
-        <div className="v-center-block text-center" style={{minHeight: '50vh'}}>
+    return <SoloLayoutView>
+        <div className="v-center-block text-center" style={{minHeight: '60vh'}}>
             <div>
                 <h2>Single access point to Stellar universe</h2>
                 <div className="double-space">
@@ -29,8 +30,8 @@ function IntroView() {
                 </div>
                 <div className="double-space">
                     {loggedIn ?
-                        <a className="button button-outline" href="/account">Manage your account</a> :
-                        <a className="button button-outline" href="/signup">Create Albedo account</a>}
+                        <Button outline href="/account">Manage your account</Button> :
+                        <Button outline href="/signup">Create Albedo account</Button>}
                 </div>
             </div>
         </div>
@@ -48,17 +49,13 @@ function IntroView() {
         <div className="double-space"/>
         <div>
             {!isInsideFrame() && <>
-                <a href="/install-extension" className="button button-outline button-block">Get browser
-                    extension</a>
-                <a href="#" onClick={() => registerProtocolHandler()}
-                   className="button button-outline button-block">Install as web+stellar handler</a>
+                <Button block outline href="/install-extension">Get browser extension</Button>
+                <Button block outline href="#" onClick={() => registerProtocolHandler()}>Install as web+stellar handler</Button>
             </>}
-            <a href="/playground" target="_blank" className="button button-outline button-block">
-                Developer playground
-            </a>
+            <Button block outline href="/playground" target="_blank">Developer playground </Button>
         </div>
         <div className="double-space"/>
-    </div>
+    </SoloLayoutView>
 }
 
 export default observer(IntroView)

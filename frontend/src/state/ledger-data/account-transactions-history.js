@@ -1,6 +1,6 @@
-import {action, computed, makeObservable, observable, runInAction} from 'mobx'
+import {action, observable, runInAction, makeObservable} from 'mobx'
 import {createHorizon} from '../../util/horizon-connector'
-import {retrieveOperations} from './tx-operations'
+import {parseTxDetails} from '../../ui/intent/tx-operations/tx-details-parser'
 
 export default class AccountTransactionHistory {
     constructor(network, address) {
@@ -9,81 +9,131 @@ export default class AccountTransactionHistory {
         this.records = []
         makeObservable(this, {
             records: observable,
-            loadingNextPagePromise: observable.ref,
+            loading: observable,
+            hasMore: observable,
             loadNextPage: action,
             startStreaming: action,
             addInProgressTx: action,
             addNewTx: action,
-            removeInProgressTx: action,
-            loading: computed
+            removeInProgressTx: action
         })
     }
 
     /**
      * Stellar account public key
      * @type {String}
+     * @readonly
      */
     address = ''
-
     /**
-     * Stelalr network identifier
+     * Stellar network identifier
      * @type {'public'|'testnet'}
+     * @readonly
      */
     network = 'public'
-
     /**
      * Transactions history for current account
-     * @type {Array<Transaction>}
+     * @type {Array<ParsedTxDetails>}
+     * @readonly
      */
     records = []
-
-    maxRecentEntries = 15
-
-    loadingNextPagePromise = null
-
+    /**
+     * Loaded records paging token
+     * @type {String}
+     * @private
+     */
+    cursor
+    /**
+     * Recent entries to load
+     * @type {Number}
+     * @private
+     */
+    maxRecentEntries = 20
+    /**
+     * In the process of loading
+     * @type {Boolean}
+     * @readonly
+     */
+    loading = false
+    /**
+     * Has more records to load
+     * @type {Boolean}
+     * @readonly
+     */
     hasMore = undefined
-
+    /**
+     * Finalize stream handler
+     * @private
+     */
     finalizeStream = null
-
-    get loading() {
-        return !!this.loadingNextPagePromise
-    }
 
     /**
      * Load transactions history
      * @return {Promise}
      */
-    loadNextPage() {
-        if (!this.loadingNextPagePromise && this.hasMore !== false) {
-            //extract paging token from the last available history record
-            const cursor = this.records.length ? this.records[this.records.length - 1].paging_token : null
-            this.loadingNextPagePromise = loadAccountTransactions({
-                network: this.network,
-                address: this.address,
-                cursor,
-                count: this.maxRecentEntries
-            })
-                .then(newBatch => {
+    async loadNextPage() {
+        if (this.loading || this.hasMore === false)
+            return
+        let recordsToLoad = this.maxRecentEntries
+        try {
+            this.loading = true
+            while (recordsToLoad > 0) {
+                //fetch account transactions
+                const count = Math.min(recordsToLoad * 3, 100)
+                let newBatch = await loadAccountTransactions({
+                    network: this.network,
+                    address: this.address,
+                    cursor: this.cursor,
+                    count
+                })
+                //if no records returned
+                if (!newBatch.length) {
                     runInAction(() => {
-                        this.removeInProgressTx(newBatch)
-                        this.records.replace([...this.records, ...newBatch])
-                        if (newBatch.length < this.maxRecentEntries)
-                            this.hasMore = false
-                    })
-                    return newBatch
-                })
-                .catch(e => {
-                    if (e.name !== 'NotFoundError') {
-                        console.error(e)
-                    } else {
                         this.hasMore = false
+                    })
+                    break
+                }
+
+                let hasMore = newBatch.length === count
+                //process records
+                const loadedRecords = []
+                for (let tx of newBatch) {
+                    this.cursor = tx.paging_token
+                    //retrieve only relevant transactions
+                    if (tx.unmatched)
+                        continue
+                    loadedRecords.push(tx)
+                    if (loadedRecords.length >= recordsToLoad) {
+                        hasMore = true
+                        break //stop if enough records loaded
                     }
+                }
+
+
+                if (!loadedRecords.length && hasMore)
+                    continue
+                //update records
+                runInAction(() => {
+                    if (loadedRecords.length) {
+                        this.removeInProgressTx(loadedRecords)
+                        this.records.replace([...this.records, ...loadedRecords])
+                    }
+                    if (!hasMore)
+                        this.hasMore = false
                 })
-                .finally(() => {
-                    this.loadingNextPagePromise = null
-                })
+                //remaining records number
+                recordsToLoad -= newBatch.length
+            }
+        } catch (e) {
+            if (e.name !== 'NotFoundError') {
+                console.error(e)
+            } else {
+                this.hasMore = false
+            }
         }
-        return this.loadingNextPagePromise
+        runInAction(() => {
+            this.loading = false
+        })
     }
 
     /**
@@ -120,39 +170,31 @@ export default class AccountTransactionHistory {
      * @param {Transaction} tx
      */
     addInProgressTx(tx) {
-        retrieveOperations(tx, this.network)
-        const hash = tx.hash().toString('hex'),
-            newItem = {
-                id: hash,
-                hash,
-                operations: tx.operations,
-                created_at: new Date().toISOString(),
-                source_account: tx.source,
-                successful: null,
-                inProgress: true
-            }
-        this.records.unshift(newItem)
-        return newItem
+        return this.addNewTx({envelope_xdr: tx.toXDR('base64')}, true)
     }
 
-    addNewTx(tx) {
-        retrieveOperations(tx, this.network)
+    addNewTx(tx, inProgress = false) {
+        const parsedTxDetails = tx.txHash ?
+            tx :
+            processTransactionRecord(this.network, this.address, tx, inProgress)
         this.removeInProgressTx([tx])
-        const newHistory = [tx, ...this.records]
-        while (newHistory.length > this.maxRecentEntries) {
-            newHistory.pop()
+        this.records.unshift(parsedTxDetails)
+        if (!inProgress) {
+            while (this.records.length > this.maxRecentEntries) {
+                this.records.pop()
+            }
         }
         this.hasMore = undefined
-        this.records.replace(newHistory)
+        return parsedTxDetails
     }
 
     /**
      * Remove pending in-progress transactions that match executed/failed transaction received from Horizon
-     * @param {Array<TransactionResponse>} newTransactions
+     * @param {ParsedTxDetails[]} newTransactions
      */
     removeInProgressTx(newTransactions) {
         for (let tx of newTransactions) {
-            const idx = this.records.findIndex(t => t.id === tx.id)
+            const idx = this.records.findIndex(existing => existing.txHash === tx.txHash)
             if (idx >= 0) {
                 this.records.splice(idx, 1)
             }
@@ -168,8 +210,9 @@ export default class AccountTransactionHistory {
  * @param {Function} onNewTx
  * @param {String} [cursor]
  * @return {Function}
+ * @internal
  */
-export function streamAccountTransactions({network, address, onNewTx, includeFailed = true, cursor}) {
+function streamAccountTransactions({network, address, onNewTx, includeFailed = true, cursor}) {
     return createHorizon({network})
         .transactions()
         .forAccount(address)
@@ -178,7 +221,12 @@ export function streamAccountTransactions({network, address, onNewTx, includeFai
         .order('asc')
         .cursor(cursor || 'now')
         .stream({
-            onmessage: tx => onNewTx(retrieveOperations(tx, network)),
+            onmessage: tx => {
+                const processed = processTransactionRecord(network, address, tx)
+                if (!processed.unmatched) {
+                    onNewTx(processed)
+                }
+            },
             reconnectTimeout: 60000
         })
 }
@@ -190,9 +238,10 @@ export function streamAccountTransactions({network, address, onNewTx, includeFai
  * @param {Boolean} includeFailed
  * @param {Number} count
  * @param {String} cursor
- * @return {Promise<Array<TransactionRecord>>}
+ * @return {Promise<ParsedTxDetails[]>}
+ * @internal
  */
-export function loadAccountTransactions({network, address, includeFailed = true, count = 15, cursor}) {
+function loadAccountTransactions({network, address, includeFailed = true, count = 20, cursor}) {
     return createHorizon({network})
         .transactions()
         .forAccount(address)
@@ -201,5 +250,29 @@ export function loadAccountTransactions({network, address, includeFailed = true,
         .cursor(cursor)
         .includeFailed(true)
         .call()
-        .then(data => data.records.map(tx => retrieveOperations(tx, network)))
+        .then(data => data.records.map(tx => processTransactionRecord(network, address, tx)))
+}
+
+/**
+ * @param {String} network
+ * @param {String} address
+ * @param {TransactionRecord} txRecord
+ * @param {Boolean} inProgress
+ * @returns {ParsedTxDetails}
+ * @internal
+ */
+function processTransactionRecord(network, address, txRecord, inProgress = false) {
+    const details = parseTxDetails({
+        network,
+        txEnvelope: txRecord.envelope_xdr,
+        result: txRecord.result_xdr,
+        meta: txRecord.result_meta_xdr,
+        context: address,
+        skipUnrelated: true,
+        createdAt: inProgress ? new Date().toISOString() : txRecord.created_at
+    })
+    if (txRecord.paging_token) {
+        details.paging_token = txRecord.paging_token
+    }
+    return details
 }

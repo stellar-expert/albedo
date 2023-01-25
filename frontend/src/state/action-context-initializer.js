@@ -1,5 +1,5 @@
 import {StrKey, TransactionBuilder} from 'stellar-sdk'
-import {transaction} from 'mobx'
+import {action, transaction} from 'mobx'
 import {setStellarNetwork} from '@stellar-expert/ui-framework'
 import {intentInterface} from '@albedo-link/intent'
 import actionContext, {ActionContextStatus} from './action-context'
@@ -132,10 +132,13 @@ export async function setActionContext(params) {
         //first reset context properties
         actionContext.reset()
         //retrieve known parameters
-        const {intent, __albedo_intent_version, app_origin, __reqid, ...intentParams} = params
+        const {intent, app_origin, wallet_redirect, __albedo_intent_version, __reqid, ...intentParams} = params
         //resolve caller app origin
         actionContext.origin = (app_origin || '').toLowerCase().replace(/https?:\/\//, '')
         actionContext.requestId = __reqid
+        if (wallet_redirect) {
+            actionContext.walletRedirect = wallet_redirect
+        }
         //resolve Stellar network properties for provided intent parameters
         const networkParams = resolveNetworkParams(intentParams)
 

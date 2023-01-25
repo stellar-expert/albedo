@@ -16,14 +16,14 @@ export default function OnBoardingNotesStepView({onSuccess}) {
             Your information and funds are protected, but please remember:
             <ul className="list">
                 <li>You and only you control your account</li>
-                <li>Albedo is not a wallet, bank, or exchange</li>
+                <li>Albedo is not a custodian, bank, or exchange</li>
                 <li>We don't control your keys or you funds</li>
                 <li>We can't undo your transaction or recover keys/passwords</li>
             </ul>
         </p>
         <div className="row space">
             <div className="column column-50 column-offset-25">
-                <Button block onClick={onSuccess}>Proceed <i className="icon-angle-right"/></Button>
+                <Button block onClick={onSuccess}>Proceed <i className="icon-angle-double-right"/></Button>
             </div>
         </div>
     </>

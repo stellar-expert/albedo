@@ -8,13 +8,13 @@ import IntentTextDescription from './intent-text-description-view'
 import IntentErrorView from './intent-error-view'
 
 function IntentRequestDetailsView({intentRequest, expanded, multi = false}) {
-    const {intent, intentParams, txContext} = intentRequest,
-        title = intentInterface[intent].title
+    const {intent, intentParams, txContext} = intentRequest
+    const title = intentInterface[intent].title
 
     return <div>
         {multi ?
             <h3 style={{marginBottom: 0}}>{title}</h3> :
-            <h2 style={{margin: '0.3em 0 0'}}>{title}</h2>}
+            <h2>{title}</h2>}
         <IntentTextDescription intent={intent} intentParams={intentParams} expanded={expanded} multi={multi}/>
         <div className="space"/>
         {txContext && txContext.signatures.length > 0 && <div>

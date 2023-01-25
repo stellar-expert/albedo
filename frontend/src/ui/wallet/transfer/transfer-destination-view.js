@@ -15,7 +15,7 @@ export default function TransferDestinationView({address, federationAddress, onC
     function change(e) {
         const v = e.target.value.trim()
         setValue(v)
-        if (StrKey.isValidEd25519PublicKey(v)) {
+        if (StrKey.isValidEd25519PublicKey(v) || StrKey.isValidMed25519PublicKey(v)) {
             onChange(v)
             return
         }
@@ -32,7 +32,6 @@ export default function TransferDestinationView({address, federationAddress, onC
     }
 
     return <div>
-        <input type="text" value={value} onChange={change} placeholder="Recipient address or federation link"
-               className="key" data-lpignore="true"/>
+        <input type="text" value={value} onChange={change} placeholder="Recipient address or federation link" className="key"/>
     </div>
 }
