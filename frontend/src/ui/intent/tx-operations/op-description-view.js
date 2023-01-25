@@ -109,21 +109,25 @@ function PathPaymentDescriptionView({op, compact}) {
             <OpSourceAccount op={op}/>
         </>
     if (sendMax > 0) {
-        src = effects.find(e => e.type === 'accountDebited').amount
+        src = op.successful ?
+            effects.find(e => e.type === 'accountDebited').amount :
+            sendMax
     }
     if (destMin > 0) {
-        dst = effects.find(e => e.type === 'accountCredited').amount
+        dst = op.successful ?
+            effects.find(e => e.type === 'accountCredited').amount :
+            destMin
     }
     return <>
         <OpSourceAccount op={op}/> {isSwap ? 'swapped ' : 'sent '}
         <Amount amount={src} asset={sendAsset} issuer={!compact}/>{' '}
-        {!compact && sendMax > 0 && <><span className="dimmed nowrap">
+        {!compact && sendMax > 0 && op.successful && <><span className="dimmed nowrap">
             (max <Amount amount={sendMax} asset={AssetDescriptor.parse(sendAsset)}/>)
         </span> </>}
         {pathData}
-        <Amount amount={dst} asset={AssetDescriptor.parse(destAsset)} issuer={!compact}/>{' '}
-        {!compact && destMin > 0 && <><span className="dimmed nowrap">
-            (min <Amount amount={destMin} asset={AssetDescriptor.parse(destAsset)}/>)
+        <Amount amount={dst} asset={destAsset} issuer={!compact}/>{' '}
+        {!compact && destMin > 0 && op.successful && <><span className="dimmed nowrap">
+            (min <Amount amount={destMin} asset={destAsset}/>)
         </span> </>}
         {!isSwap && <>to <AccountAddress account={destination}/></>}
     </>
