@@ -36,7 +36,7 @@ function IntentActionView() {
         selectedPublicKey = selectedAccount?.publicKey,
         alreadySigned = txContext && selectedAccount && txContext.findSignatureByKey(selectedPublicKey),
         [signingInProgress, setSigningInProgress] = useDependantState(() => false, [selectedPublicKey, alreadySigned]),
-        accountUnavailable = !selectedPublicKey || (requiresExistingAccount && intent !== 'tx') && (!selectedAccountInfo || selectedAccountInfo.error),
+        accountUnavailable = !selectedPublicKey || (requiresExistingAccount && intent !== 'tx' && (!selectedAccountInfo || selectedAccountInfo.error)),
         inProgress = [ActionContextStatus.confirmed, ActionContextStatus.processed].includes(status) && !intentErrors && !alreadySigned && signingInProgress,
         externalSignatureRequested = status >= ActionContextStatus.confirmed && status < ActionContextStatus.processed && selectedAccount?.isHWAccount && !txContext?.isFullySigned,
         pendingHorizonSubmission = status >= ActionContextStatus.processed && status < ActionContextStatus.submitted && autoSubmitToHorizon && txContext?.isFullySigned && !response

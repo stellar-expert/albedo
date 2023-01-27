@@ -272,6 +272,9 @@ class ActionContext {
     }
 
     loadSelectedAccountInfo() {
+        this.selectedAccountInfo = null
+        if (!this.selectedAccount)
+            return
         return loadSelectedAccountInfo(this)
             .then(info => runInAction(() => {
                 this.selectedAccountInfo = info

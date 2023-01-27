@@ -33,7 +33,7 @@ export default class Account {
             requestAccountSecret: action
         })
         Object.assign(this, params)
-        this.cbFilter = new ClaimableBalanceFilter(params.cbFilter)
+        this.cbFilter = new ClaimableBalanceFilter(params?.cbFilter)
     }
 
     /**
