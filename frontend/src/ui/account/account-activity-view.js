@@ -3,6 +3,7 @@ import {observer} from 'mobx-react'
 import {throttle} from 'throttle-debounce'
 import {ElapsedTime, TxLink} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
+import AccountTransactionHistory from '../../state/ledger-data/account-transactions-history'
 import TxOperationsList from '../intent/tx-operations/tx-operations-list'
 import ActionLoaderView from '../wallet/shared/action-loader-view'
 
@@ -14,27 +15,40 @@ function getScrollParent(node) {
 
 function AccountActivityView() {
     const [compact, setCompact] = useState(true)
+    const [history, setHistory] = useState(null)
     const txHistoryRef = useRef()
-    const {loaded, nonExisting, history, address} = accountLedgerData
+    const {nonExisting, address, network} = accountLedgerData
     useEffect(() => {
+        let newHistory = accountLedgerData.history
+        if (!newHistory) {
+            newHistory = accountLedgerData.history = new AccountTransactionHistory(network, address)
+            if (!nonExisting) {
+                newHistory.loadNextPage()
+            }
+        }
+        newHistory.startStreaming()
+        setHistory(newHistory)
         const container = document.scrollingElement
         const handler = throttle(200, function () {
             //const container = txHistoryRef.current
             const scrolledToBottom = Math.ceil(container.scrollHeight - container.scrollTop - 70) < container.clientHeight
             if (scrolledToBottom) {
-                accountLedgerData.history.loadNextPage()
+                newHistory.loadNextPage()
             }
         }, {noLeading: true})
         document.addEventListener('scroll', handler)
-        return () => document.removeEventListener('scroll', handler)
-    }, [address, loaded, history])
+        return () => {
+            newHistory.stopStreaming()
+            document.removeEventListener('scroll', handler)
+        }
+    }, [address, network, nonExisting])
 
-    if (!loaded || !nonExisting && !history.records.length)
+    if (!nonExisting && (!history || history.loading && !history.records.length))
         return <ActionLoaderView message="loading history"/>
 
-    setTimeout(()=>accountLedgerData.notificationCounters?.resetOperationsCounter(), 200)
+    setTimeout(() => accountLedgerData.notificationCounters?.resetOperationsCounter(), 200)
 
-    if (!history.records.length) {
+    if (!history?.records.length) {
         return <div className="dimmed text-small text-center space">
             (no transactions so far)
         </div>

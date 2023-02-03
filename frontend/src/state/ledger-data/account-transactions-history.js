@@ -8,7 +8,7 @@ export default class AccountTransactionHistory {
         this.network = network
         this.records = []
         makeObservable(this, {
-            records: observable,
+            records: observable.shallow,
             loading: observable,
             hasMore: observable,
             loadNextPage: action,
@@ -109,7 +109,7 @@ export default class AccountTransactionHistory {
                     }
                 }
 
-
+                //jump to next iteration if no relevant history records were found
                 if (!loadedRecords.length && hasMore)
                     continue
                 //update records
@@ -122,7 +122,7 @@ export default class AccountTransactionHistory {
                         this.hasMore = false
                 })
                 //remaining records number
-                recordsToLoad -= newBatch.length
+                recordsToLoad -= loadedRecords.length
             }
         } catch (e) {
             if (e.name !== 'NotFoundError') {

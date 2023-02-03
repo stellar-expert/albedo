@@ -6,7 +6,6 @@ import {formatWithAutoPrecision} from '@stellar-expert/formatter'
 import {resolveNetworkParams} from '../../util/network-resolver'
 import {resolveAccountInfo} from '../../util/account-info-resolver'
 import AccountNotificationCounter from '../account-notification-counter'
-import AccountTransactionHistory from './account-transactions-history'
 import {fetchAssetPrices} from './asset-price'
 
 const defaultThresholds = {low: 1, med: 1, high: 1}
@@ -20,7 +19,6 @@ class AccountLedgerData {
         makeObservable(this, {
             address: observable,
             network: observable,
-            history: observable,
             accountData: observable.ref,
             balances: observable.ref,
             balancesWithPriority: observable.ref,
@@ -98,15 +96,14 @@ class AccountLedgerData {
     init(address, network) {
         this.address = address
         this.network = network
-        this.history = new AccountTransactionHistory(network, address)
         this.notificationCounters = new AccountNotificationCounter(network, address)
         this.reset()
         this.loadAccountInfo()
-        this.history.startStreaming()
     }
 
     reset() {
         this.balances = {}
+        this.history = null
         this.nonExisting = false
         this.error = undefined
         this.loaded = false
@@ -161,7 +158,7 @@ class AccountLedgerData {
      * Stop pulling data from Horizon and free all resources
      */
     finalize() {
-        this.history?.stopStreaming()
+        this.notificationCounters.disposed = true
     }
 }
 
