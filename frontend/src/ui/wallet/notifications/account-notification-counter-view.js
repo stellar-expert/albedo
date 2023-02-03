@@ -5,12 +5,10 @@ import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import './noification-counter.scss'
 
 function AccountNotificationCounterView({type}) {
-    const {notificationCounters = {}} = accountLedgerData,
-        {counters = {}} = notificationCounters,
-        counter = counters[type]
-    if (!(counter > 0)) return null
-
-    return <span className="notification-counter">{counter > 99 ? '99+' : counter}</span>
+    const counter = accountLedgerData?.notificationCounters?.counters?.[type] || 0
+    if (counter === 0)
+        return null
+    return <span className="notification-counter icon-bell-notifications"/>
 }
 
 AccountNotificationCounterView.propTypes = {

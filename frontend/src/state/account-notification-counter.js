@@ -26,7 +26,7 @@ export default class AccountNotificationCounter {
         this.network = network
         this.address = address
         makeAutoObservable(this)
-        this.initCounters()
+        setTimeout(() => this.initCounters(), 1000)
     }
 
     network
@@ -35,15 +35,9 @@ export default class AccountNotificationCounter {
 
     counters = {}
 
-    get claimableBalanceCounter() {
-        return this.counters.cb || 0
-    }
-
-    get operationsCounter() {
-        return this.counters.op || 0
-    }
-
     initCounters() {
+        if (this.disposed)
+            return
         return Promise.all(['cb', 'op'].map(type => {
             const from = getLastCheckedLedger(this.address, this.network, type)
             return resolveCounterLoader(type)(this.network, this.address, from)

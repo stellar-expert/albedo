@@ -12,7 +12,7 @@ export function getNewClaimableBalancesSince(network, account, ledger) {
     return createHorizon(network).claimableBalances()
         .claimant(account)
         .order('asc')
-        .limit(100)
+        .limit(1)
         .cursor((1 + ledger) + '-000000000000000000000000000000000000000000000000000000000000000000000000')
         .call()
         .then(({records}) => records.length)
@@ -33,12 +33,13 @@ export function getNewPaymentsSince(network, account, ledger) {
         return createHorizon(network).payments()
             .forAccount(account)
             .order('asc')
-            .limit(200)
+            .limit(100)
             .cursor(cursor)
             .call()
             .then(({records}) => {
                 payments += records.filter(r => r.source_account !== account).length
-                if (payments >= 100 || iterations > 4 || records.length < 200) return payments
+                if (payments >= 100 || iterations > 4 || records.length < 200)
+                    return payments
                 iterations++
                 return fetchPayments(records[records.length - 1].paging_token)
             })

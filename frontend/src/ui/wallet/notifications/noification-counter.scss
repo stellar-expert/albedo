@@ -1,12 +1,10 @@
 .notification-counter {
   position: absolute;
-  margin-top: 0.5em;
+  margin-top: 0.6em;
+  margin-left: -0.3em;
   display: inline-block;
-  font-weight: bold;
-  font-size: 0.65em;
-  line-height: 1;
-  padding: 0.2em 0.4em;
-  border-radius: 1em;
-  background-color: var(--color-primary);
-  color: var(--color-bg);
+  font-size: 0.7em;
+  line-height: 1.2;
+  color: var(--color-background);
+  opacity: 0.7;
 }
