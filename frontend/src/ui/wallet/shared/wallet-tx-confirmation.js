@@ -29,7 +29,7 @@ export async function confirmTransaction(network, transaction) {
         }
     }
     //add a pending transaction record to the account tx history
-    const inProgressTx = accountLedgerData.history.addInProgressTx(transaction)
+    accountLedgerData.history?.addInProgressTx(transaction)
     let successful = false
     try {
         //submit to the network
