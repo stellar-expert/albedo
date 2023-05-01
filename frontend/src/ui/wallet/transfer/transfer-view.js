@@ -68,7 +68,7 @@ function TransferView() {
                 {transfer.mode !== 'convert' ?
                     <AvailableAmountLink settings={transfer} index={0}/> :
                     <>
-                        <SwapBandView settings={transfer}/>
+                        <SwapBandView settings={transfer} balances={balances}/>
                         <TransferAmountView settings={transfer} index={1} balances={balances} placeholder="Amount received"/>
                     </>}
             </div>

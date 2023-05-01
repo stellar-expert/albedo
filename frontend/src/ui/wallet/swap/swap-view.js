@@ -29,7 +29,7 @@ function SwapView() {
         <div className="swap segment micro-space">
             <div className="params">
                 <TransferAmountView settings={swap} index={0} balances={balancesWithPriority} restricted/>
-                <SwapBandView settings={swap}/>
+                <SwapBandView settings={swap} balances={balancesWithPriority}/>
                 <TransferAmountView settings={swap} index={1} balances={balancesWithPriority}/>
             </div>
             <SwapSlippageView title="Slippage tolerance" defaultValue={1} onChange={updateSlippage}/>
