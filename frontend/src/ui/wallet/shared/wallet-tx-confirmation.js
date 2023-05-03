@@ -37,6 +37,7 @@ export async function confirmTransaction(network, transaction) {
         successful = true
     } catch (e) {
         console.error(e)
+        return Promise.reject(e = {code: 400})
     }
     await accountLedgerData.loadAccountInfo()
     return successful

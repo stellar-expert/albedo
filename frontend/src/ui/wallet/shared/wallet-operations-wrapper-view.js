@@ -40,6 +40,10 @@ function WalletOperationsWrapperView({title, action, disabled, prepareTransactio
             await confirmTransaction(network, tx)
             onFinalize()
         } catch (e) {
+            if (e.code === 400) {
+              alert('Transaction failed')
+              return 
+            }
             if (e.code === -4)
                 return
             console.error('Failed to prepare transaction', e)
