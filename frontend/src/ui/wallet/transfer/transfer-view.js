@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
-import {Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AccountAddress, Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {parseQuery, navigation} from '@stellar-expert/navigation'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
@@ -63,7 +63,11 @@ function TransferView() {
             <div className="params">
                 <TransferDestinationView address={transfer.destination} onChange={transfer.setDestination.bind(transfer)}
                                          federationAddress={transfer.destinationFederationAddress}/>
-                <div className="space"/>
+                {!transfer.destination ? 
+                    <div className="space"/> :
+                    <div className="dimmed condensed text-tiny text-right" style={{paddingTop: '0.2em'}}>
+                        <AccountAddress account={transfer.destination}/>
+                    </div>}
                 <TransferAmountView settings={transfer} index={0} balances={balances} restricted placeholder="Amount to send"/>
                 {transfer.mode !== 'convert' ?
                     <AvailableAmountLink settings={transfer} index={0}/> :
