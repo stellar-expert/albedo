@@ -3,7 +3,7 @@ import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {AccountAddress, Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {parseQuery, navigation} from '@stellar-expert/navigation'
-import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
+import accountLedgerData, { useDestinationAccountLedgerData } from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import SwapSlippageView from '../shared/slippage-view'
 import TransferAmountView from '../shared/transfer-amount-view'
@@ -33,6 +33,8 @@ function TransferView() {
     const destinationDirectoryInfo = useDirectory(transfer.destination)
     const disabled = !transfer.isValid || parseFloat(transfer.sourceAmount) <= 0
     const balances = accountLedgerData.balancesWithPriority
+    const selfTransfer = transfer.source === transfer.destination
+    const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
     useEffect(() => {
         const {fromAsset, destination} = parseQuery()
         if (fromAsset) {
@@ -63,11 +65,11 @@ function TransferView() {
             <div className="params">
                 <TransferDestinationView address={transfer.destination} onChange={transfer.setDestination.bind(transfer)}
                                          federationAddress={transfer.destinationFederationAddress}/>
-                {!transfer.destination ? 
-                    <div className="space"/> :
+                {(transfer.destination && destinationInfo && !destinationInfo?.nonExisting) ? 
                     <div className="dimmed condensed text-tiny text-right" style={{paddingTop: '0.2em'}}>
                         <AccountAddress account={transfer.destination}/>
-                    </div>}
+                    </div> :
+                    <div className="space"/>}
                 <TransferAmountView settings={transfer} index={0} balances={balances} restricted placeholder="Amount to send"/>
                 {transfer.mode !== 'convert' ?
                     <AvailableAmountLink settings={transfer} index={0}/> :
