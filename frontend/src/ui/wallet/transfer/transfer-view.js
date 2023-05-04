@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {AccountAddress, Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
@@ -54,9 +54,16 @@ function TransferView() {
         transfer.setMode(tab)
     }
 
+    function onFinalize() {
+      const reuseDestination = transfer.destination
+      transfer.resetOperationAmount()
+      transfer.setDestination('')
+      transfer.setDestination(reuseDestination)
+    }
+
     return <WalletOperationsWrapperView title="Transfer" action="Transfer" disabled={disabled}
                                         prepareTransaction={() => transfer.prepareTransaction()}
-                                        onFinalize={() => transfer.resetOperationAmount()}>
+                                        onFinalize={onFinalize}>
         <Tabs tabs={tabOptions} onChange={updateMode} selectedTab={transfer.mode} queryParam="mode" right/>
         <WalletPageActionDescription>
             {transferModeDescription[transfer.mode]} another Stellar account
