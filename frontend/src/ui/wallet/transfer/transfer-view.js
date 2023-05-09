@@ -35,6 +35,7 @@ function TransferView() {
     const balances = accountLedgerData.balancesWithPriority
     const selfTransfer = transfer.source === transfer.destination
     const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
+    const destinationName = getAccountPredefinedDisplayName(transfer.destination)
     useEffect(() => {
         const {fromAsset, destination} = parseQuery()
         if (fromAsset) {
@@ -54,11 +55,16 @@ function TransferView() {
         transfer.setMode(tab)
     }
 
+    function getAccountPredefinedDisplayName(address) {
+        if (!window.predefinedAccountDisplayNames) return undefined
+        return window.predefinedAccountDisplayNames[address]
+    }
+
     function onFinalize() {
-      const reuseDestination = transfer.destination
-      transfer.resetOperationAmount()
-      transfer.setDestination('')
-      transfer.setDestination(reuseDestination)
+        const reuseDestination = transfer.destination
+        transfer.resetOperationAmount()
+        transfer.setDestination('')
+        transfer.setDestination(reuseDestination)
     }
 
     return <WalletOperationsWrapperView title="Transfer" action="Transfer" disabled={disabled}
@@ -72,9 +78,9 @@ function TransferView() {
             <div className="params">
                 <TransferDestinationView address={transfer.destination} onChange={transfer.setDestination.bind(transfer)}
                                          federationAddress={transfer.destinationFederationAddress}/>
-                {(transfer.destination && destinationInfo && !destinationInfo?.nonExisting) ? 
-                    <div className="dimmed condensed text-tiny text-right" style={{paddingTop: '0.2em'}}>
-                        <AccountAddress account={transfer.destination}/>
+                {(destinationName && destinationInfo && !destinationInfo?.nonExisting) ? 
+                    <div className="dimmed condensed text-tiny" style={{paddingTop: '0.2em'}}>
+                        [{destinationName}]
                     </div> :
                     <div className="space"/>}
                 <TransferAmountView settings={transfer} index={0} balances={balances} restricted placeholder="Amount to send"/>

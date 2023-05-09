@@ -48,7 +48,7 @@ function TransferAmountView({settings, index = 0, balances, filterBalances = 'as
 
     return <div className="transfer-amount relative">
         <input type="text" value={inputAmount} onChange={change} placeholder={placeholder || '0'} style={style} data-lpignore="true"
-               ref={autofocus ? useAutoFocusRef : undefined}/>
+               ref={autofocus ? useAutoFocusRef : undefined} maxLength="21"/>
         <AssetSelector value={settings.asset[index]} onChange={onAssetChange} predefinedAssets={predefinedAssets} restricted={restricted}/>
     </div>
 }

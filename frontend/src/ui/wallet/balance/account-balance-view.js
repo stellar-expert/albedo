@@ -14,7 +14,6 @@ export default function AccountBalanceView({balance, account}) {
     const asset = parseAssetFromObject(balance)
     const component = resolveBalanceComponent(balance, asset)
     const balanceToRender = React.createElement(component, {asset, balance, account})
-    if (new Bignumber(balance.balance).toString() === new Bignumber(0).toString()) return <></>
     return <div className="account-balance-container">
         {balanceToRender}
         <hr className="flare"/>
