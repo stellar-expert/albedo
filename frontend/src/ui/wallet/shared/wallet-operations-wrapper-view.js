@@ -6,6 +6,7 @@ import {requestFriendbotFunding} from '../../../util/horizon-connector'
 import {confirmTransaction} from './wallet-tx-confirmation'
 import ActionLoaderView from './action-loader-view'
 import './wallet.scss'
+import {addNotify} from '../../../ui/notifications/add-notify'
 
 /**
  * @param {String} title
@@ -38,16 +39,18 @@ function WalletOperationsWrapperView({title, action, disabled, prepareTransactio
             if (!tx)
                 return
             await confirmTransaction(network, tx)
+            addNotify('success', 'Transaction is successful')
             onFinalize()
         } catch (e) {
-            if (e.code === 400) {
-              alert('Transaction failed')
-              return 
+            setInProgress(false)
+            if (e.status === 400) {
+                addNotify('error', e.data.title)
+                return 
             }
             if (e.code === -4)
                 return
             console.error('Failed to prepare transaction', e)
-            alert('Transaction execution failed')
+            addNotify('error', 'Transaction execution failed')
         }
         setInProgress(false)
     }

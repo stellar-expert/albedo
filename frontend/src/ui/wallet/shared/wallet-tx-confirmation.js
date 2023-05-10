@@ -36,8 +36,7 @@ export async function confirmTransaction(network, transaction) {
         await createHorizon(network).submitTransaction(transaction)
         successful = true
     } catch (e) {
-        console.error(e)
-        return Promise.reject(e = {code: 400})
+        return Promise.reject(e.response)
     }
     await accountLedgerData.loadAccountInfo()
     return successful

@@ -61,11 +61,9 @@ $padding: 1rem;
 
 @keyframes slideIn {
   from {
-    max-height: 0;
     transform: translateX(100%);
   }
   to {
-    max-height: 200px;
     transform: translateX(0%);
   }
 }
