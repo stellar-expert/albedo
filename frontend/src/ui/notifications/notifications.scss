@@ -1,0 +1,80 @@
+$padding: 1rem;
+
+#notification-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: $padding;
+  max-width: 35rem;
+  z-index: 999;
+
+  .notification {
+    width: 100%;
+    padding: $padding;
+    overflow: hidden;
+    transition: transform 0.3s ease-out;
+  }
+  
+  .container-smoothly {
+    overflow: hidden;
+  }
+  
+  .container-smoothly:not(:first-child) {
+    margin-bottom: 8px;
+  }
+  
+  .container-smoothly.grow {
+    animation-name: slideInHeight;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-in;
+  }
+  
+  .notification.info {
+    background-color: var(--color-modal-bg)
+  }
+  
+  .notification.success {
+    background-color: var(--color-success-bg)
+  }
+  
+  .notification.warning {
+    background-color: var(--color-warning-bg)
+  }
+  
+  .notification.error {
+    background-color: var(--color-alert-bg)
+  }
+  
+  .notification.slideIn {
+    animation-name: slideIn;
+    animation-duration: 0.3s;
+    animation-timing-function: ease-in-out;
+  }
+  
+  .notification.slideOut {
+    transform: translateX(150%);
+    flex: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    max-height: 0;
+    transform: translateX(100%);
+  }
+  to {
+    max-height: 200px;
+    transform: translateX(0%);
+  }
+}
+
+@keyframes slideInHeight {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 200px;
+  }
+}
