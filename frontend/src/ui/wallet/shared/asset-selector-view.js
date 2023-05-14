@@ -27,12 +27,12 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted, title
         }
         if (!options.filter(opt => !opt.hidden).length) {
             if (loading) {
-                options.push({value: '...', disabled: true, title: <div className="loader"/>})
+                options.push({value: '...', disabled: true, title: <div className="loader" style={{fontSize: '0.72em', margin: '0 auto'}}/>})
             } else {
                 options.push({
                     value: 'no',
                     disabled: true,
-                    title: <div className="dimmed text-center text-small">(not found)</div>
+                    title: <div className="dimmed text-center text-small" style={{lineHeight: '23px', minHeight: '23px'}}>(not found)</div>
                 })
             }
         }
