@@ -139,6 +139,7 @@ export default class TransferSettings {
             this.createTrustline = false
         }
         this.asset[1] = this.asset[0]
+        this.amount[1] = this.amount[0]
         this.conversionDirection = 'source'
         this.isValid = false
     }
