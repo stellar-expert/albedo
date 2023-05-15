@@ -28,7 +28,7 @@ function AllAccountBalancesView() {
         })}
         {!hideEmptyBalances && emptyBalances.map(balance => <AccountBalanceView balance={balance} key={parseAssetFromObject(balance).toFQAN()}/>)}
         {!!hideEmptyBalances && <div className='text-center space'>
-            <a className='dimmed' onClick={() => setHideEmptyBalances(!setHideEmptyBalances)}>
+            <a className='dimmed text-small' onClick={() => setHideEmptyBalances(!setHideEmptyBalances)}>
                 Show {emptyBalances.length} more empty balances
             </a>
         </div>}

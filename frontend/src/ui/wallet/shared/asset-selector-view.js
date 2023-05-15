@@ -4,8 +4,11 @@ import {Dropdown, AssetLink, useAssetList} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import './asset-selector.scss'
 
+let debounceInput
+
 function AssetSelectorView({value, predefinedAssets, onChange, restricted, title}) {
     const [search, setSearch] = useState(''),
+        [searchValue, setSearchValue] = useState(''),
         searchRef = useRef(),
         options = []
     if (predefinedAssets) {
@@ -44,11 +47,19 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted, title
         setTimeout(() => searchRef.current?.focus(), 200)
     }
 
+    function handleSearch(value) {
+        if (!restricted) {
+            clearInterval(debounceInput)
+            debounceInput = setTimeout(()=>setSearch(value), 400)
+        }
+        setSearchValue(value)
+    }
+
     return <Dropdown solo className="asset-selector" options={options} value={value} onOpen={focusSearch} title={title}
                      showToggle={!title} onChange={onChange} onScroll={e => e.rel === 'bottom' && loadNextPage?.call(this)} header={<>
         <h3>Select an asset</h3>
         <div className="relative">
-            <input type="text" value={search} ref={searchRef} onChange={e => setSearch(e.target.value)} placeholder="Search by asset code or website"/>
+            <input type="text" value={searchValue} ref={searchRef} onChange={e => handleSearch(e.target.value)} placeholder="Search by asset code or website"/>
             <i className="icon-search dimmed"/>
         </div>
     </>}/>
