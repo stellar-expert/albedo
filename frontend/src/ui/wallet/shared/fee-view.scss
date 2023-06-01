@@ -1,0 +1,18 @@
+.transaction-fee {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  > div:last-child {
+    width: 50%;
+    display: flex;
+    align-items: flex-end;
+    line-height: 42px;
+    input {
+      text-align: right;
+      padding-right: 0;
+      margin: 0;
+      flex-grow: 1;
+      font-size: 1.36rem;
+    }
+  }
+}

@@ -9,13 +9,13 @@ import {estimateFee} from '../../../util/fee-estimator'
  * @param {TransferSettings} transfer
  * @return {Promise<Transaction>}
  */
-export async function prepareTransferTx(transfer) {
+export async function prepareTransferTx(transfer, customerFee) {
     if (!transfer.hasSufficientBalance) return null
     const {accountData, address} = accountLedgerData
 
     const builder = new TransactionBuilder(accountData, {
         networkPassphrase: resolveNetworkParams({network: transfer.network}).network,
-        fee: await estimateFee(transfer.network)
+        fee: customerFee && customerFee >= 100 ? customerFee : await estimateFee(transfer.network)
     }).setTimeout(60)
 
     if (transfer.memo) {

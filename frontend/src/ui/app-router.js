@@ -12,6 +12,7 @@ import CreateAccount from './signup/signup-view'
 import Login from './authentication/login-page-view'
 import ImportAccount from './account/account-import-view'
 import AccountSettings from './account/settings/account-settings-view'
+import AccountAddressBook from './account/addressBook/account-addressbook-view'
 import IntroView from './pages/intro-view'
 import InstallExtensionView from './pages/install-extension-view'
 import BlockedPageView from './pages/blocked-page-view'
@@ -39,6 +40,7 @@ export default function AppRouter({history}) {
                             <Route path="/confirm" component={Intent}/>
                             <Route path="/result" component={TxResultView}/>
                             <Route path="/account-settings" component={AccountSettings}/>
+                            <Route path="/addressbook" component={AccountAddressBook}/>
                             <Route path="/blocked" component={BlockedPageView}/>
                             <Route path="/install-extension" component={InstallExtensionView}/>
                             <Route path="/web-stellar-handler" component={WebStellarLinkHandler}/>

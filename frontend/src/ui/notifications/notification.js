@@ -5,7 +5,12 @@ import cn from 'classnames'
 import {createContainer} from './add-notify'
 
 const containerNotification = createContainer()
-
+const iconDepends = {
+    'info': 'icon-info',
+    'success': 'icon-ok',
+    'warning': 'icon-warning',
+    'error': 'icon-warning',
+}
 let timeToClose = 1000 * 5 // 5 sec
 
 export default function Notification({type = 'info', message = '', onDelete}) {
@@ -27,8 +32,12 @@ export default function Notification({type = 'info', message = '', onDelete}) {
 
     return createPortal(
         <div className={cn(['container-smoothly', { grow: !isClosing }])}>
-            <div className={cn(['notification', type, {slideIn: !isClosing}, {slideOut: isClosing}])} >
-                {message}
+            <div className={cn(['segment notification', type, {slideIn: !isClosing}, {slideOut: isClosing}])} >
+                <i className={`icon ${iconDepends[type]}`}/>
+                <div className='text-small'>{message}</div>
+                <div className='delete' onClick={() => setIsClosing(true)}>
+                    <i className='icon icon-cancel'/>
+                </div>
             </div>
         </div>,
         containerNotification
@@ -37,7 +46,7 @@ export default function Notification({type = 'info', message = '', onDelete}) {
 
 
 Notification.propTypes = {
-    type: PropTypes.oneOf(['info','success','warning','error']),
+    type: PropTypes.oneOf(Object.keys(iconDepends)),
     message: PropTypes.string,
     onDelete: PropTypes.func.isRequired
 };

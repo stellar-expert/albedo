@@ -81,6 +81,12 @@ export default class Account {
     seen
 
     /**
+     * The most recent checked ledger markers for notifications
+     * @type {Object}
+     */
+    addressBook = null
+
+    /**
      * Filter instance
      * @type {ClaimableBalanceFilter}
      */
@@ -106,6 +112,10 @@ export default class Account {
         }
     }
 
+    get addressBook() {
+        return this.addressBook
+    }
+
     get isHWAccount() {
         return this.accountType === ACCOUNT_TYPES.LEDGER_ACCOUNT || this.accountType === ACCOUNT_TYPES.TREZOR_ACCOUNT
     }
@@ -119,14 +129,16 @@ export default class Account {
      * @param {Credentials} credentials - User credentials
      * @param {String} [secret] - Stellar account secret
      * @param {String} [friendlyName] - Friendly account name to display
+     * @param {Object} [addressBook] - Address book for this account
      * @return {Promise<Account>}
      */
-    static async createNew(credentials, secret, friendlyName) {
+    static async createNew(credentials, secret, friendlyName, addressBook = {}) {
         if (!credentials.encryptionKey) throw new Error(`Invalid credentials`)
         const pubkey = Keypair.fromSecret(secret).publicKey()
         const account = new Account({
             id: extractDeviceId(pubkey),
             friendlyName,
+            addressBook,
             publicKey: pubkey,
             encryptedSecret: encryptAccountSecret(credentials, secret)
         })
@@ -220,6 +232,9 @@ export default class Account {
         }
         if (this.seen) {
             res.seen = this.seen
+        }
+        if (this.addressBook) {
+            res.addressBook = this.addressBook
         }
         const {snapshot} = this.cbFilter
         if (snapshot) {

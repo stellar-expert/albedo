@@ -313,8 +313,16 @@ export default class TransferSettings {
      * Build transfer transaction
      * @return {Promise<Transaction>}
      */
-    prepareTransaction() {
-        return prepareTransferTx(this)
+    prepareTransaction(customerFee) {
+        return prepareTransferTx(this, customerFee)
+    }
+
+    /**
+     * Swap value for Muxed Address
+     * @return {Boolean}
+     */
+    toggleMuxed() {
+        this.encodeMuxedAddress = !this.encodeMuxedAddress
     }
 }
 
