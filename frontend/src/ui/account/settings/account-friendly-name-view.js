@@ -1,7 +1,6 @@
 import React, {useState} from 'react'
 
 export default function AccountFriendlyNameView({credentials}) {
-    console.log(credentials)
     if (!credentials) return null
     const {account} = credentials,
         [name, setName] = useState(account.friendlyName)

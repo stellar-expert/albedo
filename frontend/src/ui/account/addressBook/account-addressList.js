@@ -5,9 +5,9 @@ import {shortenString} from '@stellar-expert/formatter';
 function AccountAddressList({addressBook, addEditAddress, removeAddress}) {
     return <>
         {Object.keys(addressBook).map(address => {
-            return <div key={address} className='space'>
+            return <div key={address} className="space">
                 <div className="dual-layout">
-                    <span className='account-address'>
+                    <span className="account-address">
                         [{addressBook[address].name || 'Address'}]&nbsp;
                         <span className="account-key">{shortenString(address, 8)}</span>
                         <CopyToClipboard text={address} title="Copy public key to clipboard"/>

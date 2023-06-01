@@ -34,9 +34,9 @@ export default function Notification({type = 'info', message = '', onDelete}) {
         <div className={cn(['container-smoothly', { grow: !isClosing }])}>
             <div className={cn(['segment notification', type, {slideIn: !isClosing}, {slideOut: isClosing}])} >
                 <i className={`icon ${iconDepends[type]}`}/>
-                <div className='text-small'>{message}</div>
-                <div className='delete' onClick={() => setIsClosing(true)}>
-                    <i className='icon icon-cancel'/>
+                <div className="text-small">{message}</div>
+                <div className="delete" onClick={() => setIsClosing(true)}>
+                    <i className="icon icon-cancel"/>
                 </div>
             </div>
         </div>,

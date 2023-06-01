@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {AccountAddress, Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {parseQuery, navigation} from '@stellar-expert/navigation'
-import accountLedgerData, { useDestinationAccountLedgerData } from '../../../state/ledger-data/account-ledger-data'
+import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import SwapSlippageView from '../shared/slippage-view'
 import TransferAmountView from '../shared/transfer-amount-view'
@@ -16,9 +16,9 @@ import TransferValidationView from './transfer-validation-view'
 import TransferSettings from './transfer-settings'
 import FeeView from '../shared/fee-view'
 import {estimateFee} from '../../../util/fee-estimator'
-import { persistAccountInBrowser } from '../../../storage/account-storage'
+import {persistAccountInBrowser} from '../../../storage/account-storage'
 import accountManager from '../../../state/account-manager'
-import { FederationServer } from 'stellar-sdk';
+import {FederationServer} from 'stellar-sdk';
 
 const tabOptions = [
     {name: 'direct', title: 'Direct', isDefault: true},
@@ -128,7 +128,7 @@ function TransferView() {
             </div>
             {transfer.mode === 'convert' &&
                 <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
-                {(!showFee) ? <div className='space'><a className="text-small dimmed" onClick={() => setShowFree(true)}>Adjust transaction fee</a></div> :
+                {(!showFee) ? <div className="space"><a className="text-small dimmed" onClick={() => setShowFree(true)}>Adjust transaction fee</a></div> :
                     <FeeView defaultValue={actualFee * 0.0000001} onChange={v => setActualFee((v / 0.0000001).toFixed(0))}/>
                 }
             <TxMemoView transfer={transfer}/>

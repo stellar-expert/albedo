@@ -10,7 +10,7 @@ import ActionLoaderView from '../../wallet/shared/action-loader-view'
 import DialogView from '../../layout/dialog-view'
 import AccountAddressbookForm from './account-addressbook-form'
 import AccountAddressList from './account-addressList'
-import { StrKey } from 'stellar-sdk'
+import {StrKey} from 'stellar-sdk'
 
 function finish() {
     if (!actionContext.intent) {

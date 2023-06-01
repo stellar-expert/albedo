@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { getPlaceholder, memoTypes } from './../../wallet/tx/tx-memo-view';
-import { Dropdown, useAutoFocusRef } from '@stellar-expert/ui-framework';
+import React, {useState} from 'react'
+import {getPlaceholder, memoTypes} from './../../wallet/tx/tx-memo-view';
+import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework';
 
 function AccountAddressBookForm({addressSettings, setAddressSettings}) {
     const [memo, setMemo] = useState(addressSettings?.memo)

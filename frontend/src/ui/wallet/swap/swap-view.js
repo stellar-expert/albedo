@@ -39,7 +39,7 @@ function SwapView() {
                 <TransferAmountView settings={swap} index={1} balances={balancesWithPriority}/>
             </div>
             <SwapSlippageView title="Slippage tolerance" defaultValue={1} onChange={updateSlippage}/>
-            {(!showFee) ? <div className='space'><a className="text-small dimmed" onClick={() => setShowFree(true)}>Adjust transaction fee</a></div> :
+            {(!showFee) ? <div className="space"><a className="text-small dimmed" onClick={() => setShowFree(true)}>Adjust transaction fee</a></div> :
                 <FeeView defaultValue={actualFee * 0.0000001} onChange={v => setActualFee((v / 0.0000001).toFixed(0))}/>
             }
             <TransferValidationView transfer={swap}/>

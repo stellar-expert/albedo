@@ -6,9 +6,9 @@ import accountManager from '../../../state/account-manager'
 import {shortenString} from '@stellar-expert/formatter'
 import './transfer-destination.scss'
 import {setMemo} from './../tx/tx-memo-view'
-import { observer } from 'mobx-react'
-import { addressBlank } from '../../account/addressBook/account-addressbook-view'
-import { runInAction } from 'mobx'
+import {observer} from 'mobx-react'
+import {addressBlank} from '../../account/addressBook/account-addressbook-view'
+import {runInAction} from 'mobx'
 
 const checkFederationAddress = debounce(500, function (fed, callback) {
     FederationServer.resolve(fed, {timeout: 10000})
@@ -118,9 +118,9 @@ export default observer(function TransferDestinationView({transfer, federationAd
                     onClick={() => setProposal('addName')}>
                         Add this address to your Address Book?
                     </a>}
-                {proposal === 'addName' && <div className='add-name-address'>
+                {proposal === 'addName' && <div className="add-name-address">
                     <input type="text" value={name} onChange={e => saveName(e.target.value)} placeholder="Name"/>
-                    <div className='dimmed condensed text-tiny text-right' style={{paddingTop: '0.2em'}}>The name will be saved automatically</div>
+                    <div className="dimmed condensed text-tiny text-right" style={{paddingTop: '0.2em'}}>The name will be saved automatically</div>
                 </div>}
             </div>
         </>}
