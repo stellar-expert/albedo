@@ -1,14 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react'
-import {StrKey, FederationServer} from 'stellar-sdk'
-import {debounce} from 'throttle-debounce'
-import {useDependantState} from '@stellar-expert/ui-framework'
-import accountManager from '../../../state/account-manager'
-import {shortenString} from '@stellar-expert/formatter'
-import './transfer-destination.scss'
-import {setMemo} from './../tx/tx-memo-view'
 import {observer} from 'mobx-react'
-import {addressBlank} from '../../account/addressBook/account-addressbook-view'
 import {runInAction} from 'mobx'
+import {StrKey, FederationServer} from 'stellar-sdk'
+import {useDependantState} from '@stellar-expert/ui-framework'
+import {shortenString} from '@stellar-expert/formatter'
+import {debounce} from 'throttle-debounce'
+import accountManager from '../../../state/account-manager'
+import {setMemo} from './../tx/tx-memo-view'
+import {addressBlank} from '../../account/address-book/account-address-book-view'
+import './transfer-destination.scss'
 
 const checkFederationAddress = debounce(500, function (fed, callback) {
     FederationServer.resolve(fed, {timeout: 10000})
@@ -16,7 +16,7 @@ const checkFederationAddress = debounce(500, function (fed, callback) {
         .catch(e => callback(null))//ignore resolution errors
 })
 
-export default observer(function TransferDestinationView({transfer, federationAddress, onChange, favorites}) {
+export default observer(function TransferDestinationView({transfer, destinationName, federationAddress, onChange, favorites}) {
     const [value, setValue] = useDependantState((_, prev) => federationAddress || transfer.destination || prev || '', [transfer.destination])
     const {activeAccount} = accountManager
     const addresses = Object.keys(activeAccount.addressBook || {})
@@ -25,21 +25,22 @@ export default observer(function TransferDestinationView({transfer, federationAd
     const [name, setName] = useState('')
     const addressListBlock = useRef()
     const addressListWrap = useRef(null)
+    const inputName = useRef()
 
     function change(e) {
         const v = e.target.value.trim()
         setValue(v)
         favorites && searchAddress(v)
         if (StrKey.isValidEd25519PublicKey(v) || StrKey.isValidMed25519PublicKey(v)) {
-            setProposal(v)
             onChange(v)
+            setProposal(v)
             return
         }
         if (/^.+\*\w+\.[\w\.]+$/.test(v)) {
             checkFederationAddress(v, resolved => {
                 if (resolved && resolved.account_id) {
-                    setProposal(resolved.account_id)
                     onChange(resolved.account_id, {link: v, ...resolved})
+                    setProposal(resolved.account_id)
                 } else {
                     onChange(null, {link: v})
                 }
@@ -69,8 +70,12 @@ export default observer(function TransferDestinationView({transfer, federationAd
         close()
     }
 
-    function saveName(name) {
-        setName(name)
+    function onKeyDown(e) {
+        [13,27].includes(e.keyCode) && close()
+    }
+
+    function saveName(e) {
+        debounce(300, setName(e.target.value))
     }
 
     function focus() {
@@ -92,11 +97,18 @@ export default observer(function TransferDestinationView({transfer, federationAd
     };
 
     useEffect(() => {
+        destinationName && setName(destinationName)
+
+        proposal === 'addName' && setTimeout(() => {
+            const input = inputName.current
+            input && input.focus()
+        }, 200)
+
         document.addEventListener('click', handleClickOutside, true);
         return () => {
             document.removeEventListener('click', handleClickOutside, true);
         };
-    }, [name, proposal]);
+    }, [proposal]);
 
     return <div ref={addressListWrap} className={favorites && 'address-list-wrap'}>
         <input type="text" value={value} className="destination-input"
@@ -119,7 +131,7 @@ export default observer(function TransferDestinationView({transfer, federationAd
                         Add this address to your Address Book?
                     </a>}
                 {proposal === 'addName' && <div className="add-name-address">
-                    <input type="text" value={name} onChange={e => saveName(e.target.value)} placeholder="Name"/>
+                    <input ref={inputName} type="text" defaultValue={name} onChange={saveName} onKeyDown={onKeyDown} placeholder="Name"/>
                     <div className="dimmed condensed text-tiny text-right" style={{paddingTop: '0.2em'}}>The name will be saved automatically</div>
                 </div>}
             </div>

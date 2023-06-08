@@ -1,39 +1,49 @@
-import React, {useState} from 'react'
-import {getPlaceholder, memoTypes} from './../../wallet/tx/tx-memo-view';
-import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework';
+import React, {useCallback, useEffect, useState} from 'react'
+import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework'
+import {getPlaceholder, memoTypes} from '../../wallet/tx/tx-memo-view'
+import {getFederationAddress} from '../../wallet/transfer/transfer-view'
+import {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
 
 function AccountAddressBookForm({addressSettings, setAddressSettings}) {
     const [memo, setMemo] = useState(addressSettings?.memo)
+    const destinationInfo = useDestinationAccountLedgerData(addressSettings?.address || '')
+
+    useEffect(() => {destinationInfo && checkAddress()}, [destinationInfo])
     
     const networkOptions = [
         {value: 'public', title: 'public network'},
         {value: 'testnet', title: 'test network'}
     ]
 
-    function changeMemo(newMemo) {
-        const newAddressSettings = {
-            ...addressSettings,
-            memo: {...newMemo}
-        }
-        setMemo(newMemo)
-        setAddressSettings(newAddressSettings)
-    }
+    const setMemoType = useCallback((type) => {
+        setMemo({...memo, type: type})
+        setNewValue({...addressSettings, memo: {...memo, type: type}})
+    }, [memo, addressSettings])
 
-    function setNewMemo(value, key) {
-        const newMemo = {
-            ...memo,
-            [key]: value
-        }
-        changeMemo(newMemo)
-    }
+    const setMemoValue = useCallback((e) => {
+        setMemo({...memo, value: e.target.value})
+        setNewValue({...memo, value: e.target.value}, "memo")
+    }, [memo, addressSettings])
 
-    function setNewValue(value, key) {
+    const setNewValue = useCallback((value, key) => {
+        console.log(value)
         setAddressSettings({...addressSettings, [key]: value})
-    }
+    }, [memo, addressSettings])
+
+    const checkAddress = useCallback(async () => {
+        const federationAddress = await getFederationAddress(destinationInfo)
+        if (federationAddress) {
+            setAddressSettings({
+                ...addressSettings, 
+                name: federationAddress.split('*')[0],
+                federation_address: federationAddress
+            })
+        }
+    }, [destinationInfo])
 
     return <>
         {!addressSettings?.editMode && <div className="space">
-            <input type="text" placeholder="Public key"
+            <input type="text" placeholder="Address"
                 value={addressSettings?.address || ''} 
                 onChange={e => setNewValue(e.target.value.trim(), 'address')}/>
         </div>}
@@ -52,18 +62,18 @@ function AccountAddressBookForm({addressSettings, setAddressSettings}) {
                 onChange={network => setNewValue(network, 'network')} />
         </div>
         {memo && <div className="text-small space">
-            Transaction memo: <Dropdown options={memoTypes} value={memo.type} onChange={val => setNewMemo(val, 'type')}/> (optional)
+            Transaction memo: <Dropdown options={memoTypes} value={memo.type} onChange={setMemoType}/> (optional)
             {memo.type !== 'none' && <div className="micro-space">
                 <input type="text" value={memo.value} 
-                    onChange={e => setNewMemo(e.target.value, 'value')} 
+                    onChange={setMemoValue} 
                     placeholder={getPlaceholder(memo.type)} 
                     ref={useAutoFocusRef}/>
             </div>}
-            {memo.type === 'id' && <label className="micro-space text-tiny">
+            {/* {memo.type === 'id' && <label className="micro-space text-tiny">
                 <input type="checkbox" defaultChecked={!!memo?.encodeMuxedAddress} 
                     onChange={e => setNewMemo(!!e.target.value, 'encodeMuxedAddress')}/>{' '}
                 Encode as multiplexed address <span className="dimmed">(starting with M...)</span>
-            </label>}
+            </label>} */}
         </div>}
     </>
 }

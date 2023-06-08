@@ -81,10 +81,10 @@ export default class Account {
     seen
 
     /**
-     * The most recent checked ledger markers for notifications
+     * The address book for account
      * @type {Object}
      */
-    addressBook = null
+    addressBook = {}
 
     /**
      * Filter instance
@@ -112,10 +112,6 @@ export default class Account {
         }
     }
 
-    get addressBook() {
-        return this.addressBook
-    }
-
     get isHWAccount() {
         return this.accountType === ACCOUNT_TYPES.LEDGER_ACCOUNT || this.accountType === ACCOUNT_TYPES.TREZOR_ACCOUNT
     }
@@ -132,7 +128,7 @@ export default class Account {
      * @param {Object} [addressBook] - Address book for this account
      * @return {Promise<Account>}
      */
-    static async createNew(credentials, secret, friendlyName, addressBook = {}) {
+    static async createNew(credentials, secret, friendlyName, addressBook) {
         if (!credentials.encryptionKey) throw new Error(`Invalid credentials`)
         const pubkey = Keypair.fromSecret(secret).publicKey()
         const account = new Account({

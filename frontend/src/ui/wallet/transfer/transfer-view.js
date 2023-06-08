@@ -3,6 +3,7 @@ import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {AccountAddress, Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {parseQuery, navigation} from '@stellar-expert/navigation'
+import {FederationServer} from 'stellar-sdk'
 import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import SwapSlippageView from '../shared/slippage-view'
@@ -18,7 +19,6 @@ import FeeView from '../shared/fee-view'
 import {estimateFee} from '../../../util/fee-estimator'
 import {persistAccountInBrowser} from '../../../storage/account-storage'
 import accountManager from '../../../state/account-manager'
-import {FederationServer} from 'stellar-sdk';
 
 const tabOptions = [
     {name: 'direct', title: 'Direct', isDefault: true},
@@ -32,6 +32,23 @@ const transferModeDescription = {
     claimable: 'create pending payment for'
 }
 
+async function getAccountPredefinedDisplayName(destinationInfo) {
+    const federationAddress = await getFederationAddress(destinationInfo)
+    if (federationAddress) return federationAddress.split('*')[0]
+    if (!window.predefinedAccountDisplayNames) return undefined
+    return window.predefinedAccountDisplayNames[destinationInfo.account_id]
+}
+
+export async function getFederationAddress(destinationInfo) {
+    if(destinationInfo?.home_domain) {
+        return await FederationServer.createForDomain(destinationInfo?.home_domain, {timeout: 3000})
+        .then(async server => {
+            const result = await server.resolveAccountId(destinationInfo.account_id)
+            return result.stellar_address || ''
+        }).catch(() => '')
+    }
+}
+
 function TransferView() {
     const network = useStellarNetwork()
     const [transfer] = useDependantState(() => new TransferSettings(network), [network, accountLedgerData.address])
@@ -40,13 +57,16 @@ function TransferView() {
     const balances = accountLedgerData.balancesWithPriority
     const selfTransfer = transfer.source === transfer.destination
     const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
-    const destinationName = getAccountPredefinedDisplayName(transfer.destination)
+    const [destinationName, setDestinationName] = useState(null)
     const [showFee, setShowFree] = useState(false)
     const [actualFee, setActualFee] = useState(100)
     const [newAddress, setNewAddress] = useState(null)
     const {activeAccount} = accountManager
 
     useEffect(() => estimateFee(network).then(estimatedFee => setActualFee(estimatedFee)), [network])
+    useEffect(() => {
+        destinationInfo && getAccountPredefinedDisplayName(destinationInfo).then(name => setDestinationName(name))
+    }, [destinationInfo])
 
     useEffect(() => {
         const {fromAsset, destination} = parseQuery()
@@ -67,30 +87,15 @@ function TransferView() {
         transfer.setMode(tab)
     }
 
-    function getAccountPredefinedDisplayName(address) {
-        if (!window.predefinedAccountDisplayNames) return undefined
-        return window.predefinedAccountDisplayNames[address]
-    }
-
     async function saveNewAddress() {
         const {address, ...predefinedAddress} = newAddress
         predefinedAddress['network'] = network
-        predefinedAddress['federation_address'] = await getFederationAddress(transfer.destination)
+        predefinedAddress['federation_address'] = await getFederationAddress(destinationInfo)
         predefinedAddress.memo.type = transfer.memo?.type || 'none'
         predefinedAddress.memo.value = transfer.memo?.value || ''
         predefinedAddress.memo.encodeMuxedAddress = transfer.encodeMuxedAddress || false
         activeAccount.addressBook = {...activeAccount.addressBook, [address]: predefinedAddress}
         persistAccountInBrowser(activeAccount)
-    }
-
-    async function getFederationAddress(destination) {
-        if(destinationInfo?.home_domain) {
-            return await FederationServer.createForDomain(destinationInfo?.home_domain, {timeout: 3000})
-            .then(async server => {
-                const result = await server.resolveAccountId(destination)
-                return result.stellar_address || ''
-            }).catch(() => '')
-        }
     }
 
     function onFinalize() {
@@ -111,7 +116,7 @@ function TransferView() {
         </WalletPageActionDescription>
         <div className="segment micro-space">
             <div className="params">
-                <TransferDestinationView transfer={transfer} onChange={transfer.setDestination.bind(transfer)}
+                <TransferDestinationView transfer={transfer} destinationName={destinationName} onChange={transfer.setDestination.bind(transfer)}
                                          federationAddress={transfer.destinationFederationAddress} favorites={setNewAddress}/>
                 {(destinationName && destinationInfo && !destinationInfo?.nonExisting) ? 
                     <div className="dimmed condensed text-tiny" style={{paddingTop: '0.2em'}}>

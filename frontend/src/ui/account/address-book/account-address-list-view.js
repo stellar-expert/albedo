@@ -1,14 +1,14 @@
 import React from 'react'
 import {CopyToClipboard} from '@stellar-expert/ui-framework'
-import {shortenString} from '@stellar-expert/formatter';
+import {shortenString} from '@stellar-expert/formatter'
 
-function AccountAddressList({addressBook, addEditAddress, removeAddress}) {
+function AccountAddressListView({addressBook, addEditAddress, removeAddress}) {
     return <>
-        {Object.keys(addressBook).map(address => {
+        {Object.entries(addressBook).map(([address, addressProps]) => {
             return <div key={address} className="space">
                 <div className="dual-layout">
                     <span className="account-address">
-                        [{addressBook[address].name || 'Address'}]&nbsp;
+                        [{addressProps.name || 'Address'}]&nbsp;
                         <span className="account-key">{shortenString(address, 8)}</span>
                         <CopyToClipboard text={address} title="Copy public key to clipboard"/>
                     </span>
@@ -18,9 +18,9 @@ function AccountAddressList({addressBook, addEditAddress, removeAddress}) {
                     </div>
                 </div>
                 <p className="text-small dimmed" style={{textAlign: "initial"}}>
-                    Network: {addressBook[address].network}&emsp;
-                    {addressBook[address].memo?.value && <span>Memo: {addressBook[address].memo.value}</span>}&emsp;
-                    {addressBook[address]?.federation_address && <span>Federation address: {addressBook[address].federation_address}</span>}
+                    Network: {addressProps.network}&emsp;
+                    {addressProps.memo?.value && <span>Memo: {addressProps.memo.value}</span>}&emsp;
+                    {addressProps?.federation_address && <span>Federation address: {addressProps.federation_address}</span>}
                 </p>
                 <hr/>
             </div>
@@ -28,4 +28,4 @@ function AccountAddressList({addressBook, addEditAddress, removeAddress}) {
     </>
 }
 
-export default AccountAddressList
+export default AccountAddressListView
