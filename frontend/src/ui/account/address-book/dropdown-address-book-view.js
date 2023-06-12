@@ -6,9 +6,10 @@ import {useDependantState} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
 import {debounce} from 'throttle-debounce'
 import accountManager from '../../../state/account-manager'
-import {setMemo} from './../../wallet/tx/tx-memo-view'
+import {setMemo} from '../../wallet/tx/tx-memo-view'
 import {addressBlank} from '../../account/address-book/account-address-book-view'
 import TransferDestinationView from '../../wallet/transfer/transfer-destination-view'
+import './dropdown-address-book-view.scss'
 
 export default observer(function DropdownAddressBookView({transfer, destinationName}) {
     const {activeAccount} = accountManager
