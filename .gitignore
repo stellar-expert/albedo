@@ -37,3 +37,4 @@ node_modules/
 
 # Source map files
 *.js.map
+.vscode/extensions.json

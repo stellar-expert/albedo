@@ -3,10 +3,10 @@ import {observer} from 'mobx-react'
 import {Button, useStellarNetwork} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
+import {addNotify} from '../../../ui/notifications/add-notify'
 import {confirmTransaction} from './wallet-tx-confirmation'
 import ActionLoaderView from './action-loader-view'
 import './wallet.scss'
-import {addNotify} from '../../../ui/notifications/add-notify'
 
 /**
  * @param {String} title

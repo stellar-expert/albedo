@@ -16,6 +16,7 @@ export default class TransferSettings {
         this.asset = ['XLM', 'XLM']
         this.amount = ['0', '0']
         this.conversionSlippage = 0.5
+        this.fee = 100
         this.selfPayment = selfPayment
         makeAutoObservable(this)
 
@@ -27,7 +28,8 @@ export default class TransferSettings {
                 amount,
                 conversionDirection,
                 conversionSlippage,
-                currentLedgerSequence
+                currentLedgerSequence,
+                fee
             } = this
             this.recalculateSwap()
         })
@@ -105,6 +107,14 @@ export default class TransferSettings {
      * @type {Boolean}
      */
     isValid = false
+    /**
+     * @type {Number}
+     */
+    fee
+    /**
+     * @type {Boolean}
+     */
+    resetFee = false
 
     /**
      * @type {String}
@@ -186,6 +196,15 @@ export default class TransferSettings {
     setSlippage(slippage) {
         this.conversionPathLoaded = false
         this.conversionSlippage = slippage
+    }
+
+    /**
+     * Set fee transfer
+     * @param {Number} fee
+     */
+    setFee(fee) {
+        this.fee = fee
+        this.resetFee = false
     }
 
     /**
@@ -307,14 +326,15 @@ export default class TransferSettings {
         this.createTrustline = false
         this.amount = ['0', '0']
         this.setAmount('0', 0)
+        this.resetFee = true
     }
 
     /**
      * Build transfer transaction
      * @return {Promise<Transaction>}
      */
-    prepareTransaction(customerFee) {
-        return prepareTransferTx(this, customerFee)
+    prepareTransaction() {
+        return prepareTransferTx(this)
     }
 
     /**

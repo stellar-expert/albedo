@@ -4,13 +4,13 @@ import {Button} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import {StrKey, decodeAddressToMuxedAccount, encodeMuxedAccountToAddress} from 'stellar-sdk'
 import DialogView from '../../layout/dialog-view'
-import AccountAddressbookForm from './account-address-book-form'
-import AccountAddressListView from './account-address-list-view'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import authorizationService from '../../../state/auth/authorization'
 import SoloLayoutView from '../../layout/solo-layout-view'
 import ActionLoaderView from '../../wallet/shared/action-loader-view'
+import AccountAddressbookForm from './account-address-book-form'
+import AccountAddressListView from './account-address-list-view'
 
 export const addressBlank = {
     "name": "",
@@ -68,7 +68,7 @@ function AccountAddressBookView() {
     const addEditAddress = useCallback((address) => {
         const curAddress = address ? {...addressBook[address]} : addressBlank
         setAddressSettings({
-            address: address,
+            address,
             editMode: address ? true : false,
             ...curAddress
         })
@@ -119,7 +119,6 @@ function AccountAddressBookView() {
         {Object.keys(addressBook).length ? 
             <AccountAddressListView addressBook={addressBook} addEditAddress={addEditAddress} removeAddress={removeAddress}/> : 
             <div className="double-space text-small text-center dimmed">You have not yet added any address to your address book</div>}
-        {/* <hr className="double-space flare"/> */}
         <div className="space row">
             <div className="column column-50 column-offset-25">
                 <Button block outline onClick={finish}>Back</Button>

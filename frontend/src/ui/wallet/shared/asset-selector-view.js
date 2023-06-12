@@ -23,7 +23,7 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted, title
     let loadNextPage
     if (!restricted) {
         const {assets, loadPage, loading} = useAssetList({search: search?.trim() || undefined})
-        for (let {asset} of assets) {
+        for (const {asset} of assets) {
             if (!predefinedAssets || !predefinedAssets.includes(asset)) {
                 options.push({value: asset, title: <AssetLink link={false} asset={asset}/>})
             }
@@ -50,7 +50,7 @@ function AssetSelectorView({value, predefinedAssets, onChange, restricted, title
     function handleSearch(value) {
         if (!restricted) {
             clearInterval(debounceInput)
-            debounceInput = setTimeout(()=>setSearch(value), 400)
+            debounceInput = setTimeout(() => setSearch(value), 400)
         }
         setSearchValue(value)
     }
