@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {StrKey, FederationServer} from 'stellar-sdk'
 import {debounce} from 'throttle-debounce'
 import {useDependantState} from '@stellar-expert/ui-framework'
@@ -9,12 +9,17 @@ const checkFederationAddress = debounce(500, function (fed, callback) {
         .catch(e => callback(null))//ignore resolution errors
 })
 
-export default function TransferDestinationView({address, federationAddress, onChange}) {
+export default function TransferDestinationView({address, federationAddress, onChange, searchAddress, focus}) {
     const [value, setValue] = useDependantState((_, prev) => federationAddress || address || prev || '', [address])
+
+    useEffect(() => {
+        setValue(address || '')
+    }, [address])
 
     function change(e) {
         const v = e.target.value.trim()
         setValue(v)
+        if (searchAddress) searchAddress(v)
         if (StrKey.isValidEd25519PublicKey(v) || StrKey.isValidMed25519PublicKey(v)) {
             onChange(v)
             return
@@ -32,6 +37,6 @@ export default function TransferDestinationView({address, federationAddress, onC
     }
 
     return <div>
-        <input type="text" value={value} onChange={change} placeholder="Recipient address or federation link" className="key"/>
+        <input type="text" value={value} onChange={change} onFocus={focus} placeholder="Recipient address or federation link" className="key"/>
     </div>
 }

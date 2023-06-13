@@ -14,6 +14,8 @@ import SwapBandView from '../swap/swap-band-view'
 import FeeView from '../shared/fee-view'
 import {getFederationAddress} from '../../../util/get-federation-address'
 import DropdownAddressBookView from '../../account/address-book/dropdown-address-book-view'
+import {persistAccountInBrowser} from '../../../storage/account-storage'
+import accountManager from '../../../state/account-manager'
 import TransferValidationView from './transfer-validation-view'
 import TransferSettings from './transfer-settings'
 
@@ -69,22 +71,22 @@ function TransferView() {
         transfer.setMode(tab)
     }
 
-    // async function saveNewAddress() {
-    //     const {address, ...predefinedAddress} = newAddress
-    //     predefinedAddress.network = network
-    //     predefinedAddress.federation_address = await getFederationAddress(destinationInfo)
-    //     predefinedAddress.memo.type = transfer.memo?.type || 'none'
-    //     predefinedAddress.memo.value = transfer.memo?.value || ''
-    //     predefinedAddress.memo.encodeMuxedAddress = transfer.encodeMuxedAddress || false
-    //     activeAccount.addressBook = {...activeAccount.addressBook, [address]: predefinedAddress}
-    //     persistAccountInBrowser(activeAccount)
-    // }
+    function updateAddressInfo() {
+        const {activeAccount} = accountManager
+        const currentAddress = activeAccount.addressBook[transfer.destination]
+
+        if (currentAddress && !currentAddress.memo && transfer.memo?.type !== 'none') {
+            currentAddress.memo = {
+                type: transfer.memo.type,
+                value: transfer.memo.value
+            }
+            persistAccountInBrowser(activeAccount)
+        }
+    }
 
     function onFinalize() {
-        const reuseDestination = transfer.destination
+        updateAddressInfo()
         transfer.resetOperationAmount()
-        transfer.setDestination('')
-        transfer.setDestination(reuseDestination)
     }
 
     return <WalletOperationsWrapperView title="Transfer" action="Transfer" disabled={disabled}
@@ -96,7 +98,7 @@ function TransferView() {
         </WalletPageActionDescription>
         <div className="segment micro-space">
             <div className="params">
-                <DropdownAddressBookView transfer={transfer} destinationName={destinationName}
+                <DropdownAddressBookView transfer={transfer} destinationName={destinationName} destinationInfo={destinationInfo}
                                          onChange={transfer.setDestination.bind(transfer)}/>
                 {(destinationName && destinationInfo && !destinationInfo?.nonExisting) ? 
                     <div className="dimmed condensed text-tiny" style={{paddingTop: '0.2em'}}>
