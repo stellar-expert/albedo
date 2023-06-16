@@ -13,7 +13,7 @@ export default function TransferDestinationView({address, federationAddress, onC
     const [value, setValue] = useDependantState((_, prev) => federationAddress || address || prev || '', [address])
 
     useEffect(() => {
-        setValue(address || '')
+        if (address) setValue(address)
     }, [address])
 
     function change(e) {

@@ -24,6 +24,7 @@ function SwapView() {
     const updateSlippage = v => swap.setSlippage(v)
 
     return <WalletOperationsWrapperView title="Trade" action="Swap" disabled={!swap.isValid || !swap.conversionFeasible}
+                                        transfer={swap}
                                         prepareTransaction={() => swap.prepareTransaction()}
                                         onFinalize={() => swap.resetOperationAmount()}>
         <WalletPageActionDescription>exchange your tokens</WalletPageActionDescription>

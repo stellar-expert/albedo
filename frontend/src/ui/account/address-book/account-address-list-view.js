@@ -18,8 +18,7 @@ function AccountAddressListView({addressBook, addEditAddress, removeAddress}) {
                     </div>
                 </div>
                 <p className="text-small dimmed" style={{textAlign: "initial"}}>
-                    Network: {addressProps.network}&emsp;
-                    {addressProps.memo?.value && <span>Memo: {addressProps.memo.value}</span>}&emsp;
+                    {addressProps.memo?.type !== 'none' && addressProps.memo?.value && <span>Memo: {addressProps.memo.value}&emsp;</span>}
                     {addressProps?.federation_address && <span>Federation address: {addressProps.federation_address}</span>}
                 </p>
                 <hr/>

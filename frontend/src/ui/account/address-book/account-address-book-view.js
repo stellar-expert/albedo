@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import {Button} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
-import {StrKey, decodeAddressToMuxedAccount, encodeMuxedAccountToAddress} from 'stellar-sdk'
+import {StrKey} from 'stellar-sdk'
 import DialogView from '../../layout/dialog-view'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
@@ -14,12 +14,9 @@ import AccountAddressListView from './account-address-list-view'
 
 export const addressBlank = {
     "name": "",
-    "network": "public",
-    "federation_address": "",
     "memo": {
         "type": "none",
-        "value": "",
-        "encodeMuxedAddress": false
+        "value": ""
     }
 }
 
@@ -32,24 +29,19 @@ function finish() {
 }
 
 function isValid(addressSettings) {
-    if (!addressSettings) return false 
-    if (!addressSettings.name) return false 
+    if (!addressSettings) return false
+    if (!addressSettings.name) return false
     if (!StrKey.isValidEd25519PublicKey(addressSettings.address) && !StrKey.isValidMed25519PublicKey(addressSettings.address)) return false
-    if (addressSettings.memo && addressSettings.memo.type !== 'none' && !addressSettings.memo.value) return false
+    if (addressSettings.memo?.type !== 'none' && !addressSettings.memo?.value) return false
     return true
 }
 
 function AccountAddressBookView() {
     const {activeAccount} = accountManager
-    const [dialogOpen, setDialogOpen] = useState(true)
+    const [dialogOpen, setDialogOpen] = useState(false)
     const [addressBook, setAddressBook] = useState(activeAccount.addressBook || {})
     const [addressSettings, setAddressSettings] = useState()
-    
-    // console.log('GA6H66VCFV2IFSERGV6VBH2UXQHDN4ZDY2G7EMIPITRYPNUH6R6COOLN')
-    // console.log(StrKey.encodeMed25519PublicKey('GA6H66VCFV2IFSERGV6VBH2UXQHDN4ZDY2G7EMIPITRYPNUH6R6COOLN'))
-    // // console.log(decodeAddressToMuxedAccount('MBDUCNSIGY3FMQ2GKYZESRSTIVJEOVRWKZBEQMSVLBIUQRCOGRNEIWJSI43UKTKJKBEVIUSZKBHFKSBWKI3EGT2PJRHKSSQ'))
-    // console.log(decodeAddressToMuxedAccount('GA6H66VCFV2IFSERGV6VBH2UXQHDN4ZDY2G7EMIPITRYPNUH6R6COOLN'))
-    // console.log(StrKey.isValidMed25519PublicKey(StrKey.encodeMed25519PublicKey('GA6H66VCFV2IFSERGV6VBH2UXQHDN4ZDY2G7EMIPITRYPNUH6R6COOLN')))
+    const [editAction, setEditAction] = useState(false)
 
     if (!activeAccount) window.location.href = '/'
     //account credentials
@@ -64,16 +56,16 @@ function AccountAddressBookView() {
                 }
             })
     })
-    
+
     const addEditAddress = useCallback((address) => {
         const curAddress = address ? {...addressBook[address]} : addressBlank
         setAddressSettings({
             address,
-            editMode: address ? true : false,
             ...curAddress
         })
+        setEditAction(!!address)
         setDialogOpen(true)
-    })
+    }, [addressBook])
 
     const saveAddress = useCallback(() => {
         const copyAddressBook = {...addressBook}
@@ -81,16 +73,16 @@ function AccountAddressBookView() {
         copyAddressBook[address] = otherSettings
         copyAddressBook[address].name = addressSettings.name.trim()
         saveAddressBook(copyAddressBook)
-    })
+    }, [addressSettings, addressBook, saveAddressBook])
 
     const removeAddress = useCallback((address) => {
-        let confirmation = `Do you really want to remove this address?`
+        const confirmation = `Do you really want to remove this address?`
         if (confirm(confirmation)) {
             const copyAddressBook = {...addressBook}
             delete copyAddressBook[address]
             saveAddressBook(copyAddressBook)
         }
-    })
+    }, [addressBook, saveAddressBook])
 
     function saveAddressBook(copyAddressBook) {
         delete copyAddressBook.editMode
@@ -108,16 +100,16 @@ function AccountAddressBookView() {
 
     return <SoloLayoutView title="Address book" alignTop>
         <div className="text-small dimmed">
-            Your address book where you can add/edit/delete addresses, also set the network type and memo for each of them
+            Your address book where you can add/edit/delete addresses, also set memo for each of them
         </div>
         <div className="row space">
             <div className="column column-50 column-offset-25">
-                <Button block outline onClick={() => addEditAddress()}><i className="icon-add-circle"/> Add new address</Button>
+                <Button block outline onClick={() => addEditAddress(null)}><i className="icon-add-circle"/> Add new address</Button>
             </div>
         </div>
         <h3>Address Book</h3>
-        {Object.keys(addressBook).length ? 
-            <AccountAddressListView addressBook={addressBook} addEditAddress={addEditAddress} removeAddress={removeAddress}/> : 
+        {Object.keys(addressBook).length ?
+            <AccountAddressListView addressBook={addressBook} addEditAddress={addEditAddress} removeAddress={removeAddress}/> :
             <div className="double-space text-small text-center dimmed">You have not yet added any address to your address book</div>}
         <div className="space row">
             <div className="column column-50 column-offset-25">
@@ -125,7 +117,7 @@ function AccountAddressBookView() {
             </div>
         </div>
         {addressSettings && <DialogView dialogOpen={dialogOpen}>
-            <h2>{addressSettings?.editMode ? 'Edit' : 'Add new'} address</h2>
+            <h2>{editAction ? 'Edit' : 'Add new'} address</h2>
             <AccountAddressbookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
             <div className="row actions space">
                 <div className="column column-50">

@@ -14,8 +14,6 @@ import SwapBandView from '../swap/swap-band-view'
 import FeeView from '../shared/fee-view'
 import {getFederationAddress} from '../../../util/get-federation-address'
 import DropdownAddressBookView from '../../account/address-book/dropdown-address-book-view'
-import {persistAccountInBrowser} from '../../../storage/account-storage'
-import accountManager from '../../../state/account-manager'
 import TransferValidationView from './transfer-validation-view'
 import TransferSettings from './transfer-settings'
 
@@ -71,25 +69,12 @@ function TransferView() {
         transfer.setMode(tab)
     }
 
-    function updateAddressInfo() {
-        const {activeAccount} = accountManager
-        const currentAddress = activeAccount.addressBook[transfer.destination]
-
-        if (currentAddress && !currentAddress.memo && transfer.memo?.type !== 'none') {
-            currentAddress.memo = {
-                type: transfer.memo.type,
-                value: transfer.memo.value
-            }
-            persistAccountInBrowser(activeAccount)
-        }
-    }
-
     function onFinalize() {
-        updateAddressInfo()
         transfer.resetOperationAmount()
     }
 
     return <WalletOperationsWrapperView title="Transfer" action="Transfer" disabled={disabled}
+                                        transfer={transfer}
                                         prepareTransaction={() => transfer.prepareTransaction()}
                                         onFinalize={onFinalize}>
         <Tabs tabs={tabOptions} onChange={updateMode} selectedTab={transfer.mode} queryParam="mode" right/>
@@ -100,7 +85,7 @@ function TransferView() {
             <div className="params">
                 <DropdownAddressBookView transfer={transfer} destinationName={destinationName} destinationInfo={destinationInfo}
                                          onChange={transfer.setDestination.bind(transfer)}/>
-                {(destinationName && destinationInfo && !destinationInfo?.nonExisting) ? 
+                {(destinationName && destinationInfo && !destinationInfo?.nonExisting) ?
                     <div className="dimmed condensed text-tiny" style={{paddingTop: '0.2em'}}>
                         [{destinationName}]
                     </div> :

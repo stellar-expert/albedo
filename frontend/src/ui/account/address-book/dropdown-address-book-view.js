@@ -47,15 +47,12 @@ export default observer(function DropdownAddressBookView({transfer, destinationN
     }
 
     function onKeyDown(e) {
-        if ([13].includes(e.keyCode)) saveName()
+        if (e.keyCode === 13) saveName()
     }
 
     async function saveName() {
         const federationAddress = await getFederationAddress(destinationInfo)
-        const newAddress = {
-            name,
-            network: transfer.network
-        }
+        const newAddress = {name}
         if (federationAddress) newAddress.federation_address = federationAddress
         activeAccount.addressBook = {...activeAccount.addressBook, [transfer.destination]: newAddress}
         addresses.push(transfer.destination)
@@ -96,9 +93,8 @@ export default observer(function DropdownAddressBookView({transfer, destinationN
         <div ref={addressListBlock} className="address-list-block">
             {!!addresses.length && searchList.map(address => {
                 return <a key={address} onClick={() => chooseAddress(address)}>
-                    {activeAccount.addressBook[address].name ? `[${activeAccount.addressBook[address].name}]` : `[Address]`}&nbsp;
-                    {shortenString(address, 8)}&nbsp;
-                    <span className="dimmed text-small">Network: {activeAccount.addressBook[address].network}</span>
+                    {activeAccount.addressBook[address]?.name ? `[${activeAccount.addressBook[address].name}]` : `[Address]`}&nbsp;
+                    {shortenString(address, 8)}
                 </a>
             })}
             {!proposal && !searchList.length && <div className="dimmed text-center" style={{padding: '.4em .6em'}}>
