@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react'
-import {shortenString} from "@stellar-expert/formatter"
 import {fetchAssetPrices} from "../../../state/ledger-data/asset-price"
+import { AccountAddress } from '@stellar-expert/ui-framework'
 
 export function ConfirmIntentionView({transfer}) {
     const selfTransfer = transfer.source === transfer.destination
     const [estimatedText, setEstimatedText] = useState('')
+    const accountName = window.predefinedAccountDisplayNames[transfer.source]
 
     useEffect(() => {
         (async () => {
@@ -21,12 +22,12 @@ export function ConfirmIntentionView({transfer}) {
 
     if (selfTransfer)
         return <div className="double-space">
-            You are about to swap {transfer.amount[0]} {transfer.asset[0].split('-')[0]} {estimatedText} to&nbsp;
+            You are about to swap {transfer.amount[0]} {transfer.asset[0].split('-')[0]} {estimatedText} for&nbsp;
             {transfer.amount[1]} {transfer.asset[1].split('-')[0]}
         </div>
     return <div className="double-space">
-        You are about to transfer {transfer.amount[0]} {transfer.asset[0].split('-')[0]} {estimatedText} to the account <span className='nowrap'>
-            {shortenString(transfer.destination, 8)}
-        </span> {(!!transfer.memo && transfer.memo !== 'none') && <span className='nowrap'>{`(memo: ${transfer.memo.value})`}</span>}
+        Transfer {transfer.amount[0]} {transfer.asset[0].split('-')[0]} {estimatedText} from [{accountName}] to&nbsp;
+        <span className='nowrap inline-block'><AccountAddress account={transfer.destination}/>&nbsp;</span>
+        {(!!transfer.memo && transfer.memo !== 'none') && <span className='nowrap'>{`(memo: ${transfer.memo.value})`}</span>}
     </div>
 }

@@ -91,7 +91,7 @@ function WalletOperationsWrapperView({title, action, disabled, transfer, prepare
                 </div>}
                 {inProgress && <ActionLoaderView message="processing transaction"/>}
                 <DialogView dialogOpen={showConfirmIntention}>
-                    <h2>Confirm intention</h2>
+                    <h2>Confirm transaction</h2>
                     <ConfirmIntentionView transfer={transfer}/>
                     <div className="row actions double-space">
                         <div className="column column-50">

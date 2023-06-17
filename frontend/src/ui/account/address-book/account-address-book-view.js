@@ -11,6 +11,9 @@ import SoloLayoutView from '../../layout/solo-layout-view'
 import ActionLoaderView from '../../wallet/shared/action-loader-view'
 import AccountAddressbookForm from './account-address-book-form'
 import AccountAddressListView from './account-address-list-view'
+import WalletPageActionDescription from '../../wallet/shared/wallet-page-action-description'
+import WalletOperationsWrapperView from '../../wallet/shared/wallet-operations-wrapper-view'
+import AccountContextView from '../account-context-view'
 
 export const addressBlank = {
     "name": "",
@@ -94,41 +97,40 @@ function AccountAddressBookView() {
     }
 
     if (!credentials)
-        return <SoloLayoutView title="Address book">
+        return <AccountContextView>
             <ActionLoaderView message="waiting for authorization"/>
-        </SoloLayoutView>
+        </AccountContextView>
 
-    return <SoloLayoutView title="Address book" alignTop>
-        <div className="text-small dimmed">
-            Your address book where you can add/edit/delete addresses, also set memo for each of them
-        </div>
-        <div className="row space">
-            <div className="column column-50 column-offset-25">
-                <Button block outline onClick={() => addEditAddress(null)}><i className="icon-add-circle"/> Add new address</Button>
-            </div>
-        </div>
-        <h3>Address Book</h3>
-        {Object.keys(addressBook).length ?
-            <AccountAddressListView addressBook={addressBook} addEditAddress={addEditAddress} removeAddress={removeAddress}/> :
-            <div className="double-space text-small text-center dimmed">You have not yet added any address to your address book</div>}
-        <div className="space row">
-            <div className="column column-50 column-offset-25">
-                <Button block outline onClick={finish}>Back</Button>
-            </div>
-        </div>
-        {addressSettings && <DialogView dialogOpen={dialogOpen}>
-            <h2>{editAction ? 'Edit' : 'Add new'} address</h2>
-            <AccountAddressbookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
-            <div className="row actions space">
+    return <AccountContextView>
+        <WalletOperationsWrapperView title="Address book" allowNonExisting>
+            <hr className="flare"/>
+            <WalletPageActionDescription>frequently used addresses and trusted contacts</WalletPageActionDescription>
+            <div className="double-space"/>
+            {Object.keys(addressBook).length ?
+                <AccountAddressListView addressBook={addressBook} addEditAddress={addEditAddress} removeAddress={removeAddress}/> :
+                <div className="double-space text-small text-center dimmed">You have not yet added any address to your address book</div>}
+            <div className="row actions double-space">
                 <div className="column column-50">
-                    <Button block disabled={!isValid(addressSettings)} onClick={saveAddress}>Save</Button>
+                    <Button block onClick={() => addEditAddress(null)}><i className="icon-add-circle"/> Add new address</Button>
                 </div>
                 <div className="column column-50">
-                    <Button block outline onClick={() => setDialogOpen(false)}>Cancel</Button>
+                    <Button block outline onClick={finish}>Back</Button>
                 </div>
             </div>
-        </DialogView>}
-    </SoloLayoutView>
+            {addressSettings && <DialogView dialogOpen={dialogOpen}>
+                <h2>{editAction ? 'Edit' : 'Add new'} address</h2>
+                <AccountAddressbookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
+                <div className="row actions space">
+                    <div className="column column-50">
+                        <Button block disabled={!isValid(addressSettings)} onClick={saveAddress}>Save</Button>
+                    </div>
+                    <div className="column column-50">
+                        <Button block outline onClick={() => setDialogOpen(false)}>Cancel</Button>
+                    </div>
+                </div>
+            </DialogView>}
+        </WalletOperationsWrapperView>
+    </AccountContextView>
 }
 
 export default observer(AccountAddressBookView)
