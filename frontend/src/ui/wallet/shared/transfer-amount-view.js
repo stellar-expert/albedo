@@ -2,10 +2,9 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import BigNumber from 'bignumber.js'
 import PropTypes from 'prop-types'
-import {useAutoFocusRef, useDependantState} from '@stellar-expert/ui-framework'
+import {useAutoFocusRef, useDependantState, AssetSelector} from '@stellar-expert/ui-framework'
 import {isValidPoolId} from '@stellar-expert/asset-descriptor'
 import {stripTrailingZeros} from '@stellar-expert/formatter'
-import AssetSelector from './asset-selector-view'
 import './transfer-amount.scss'
 
 function TransferAmountView({settings, index = 0, balances, filterBalances = 'assets', restricted, placeholder, autofocus = false, error}) {

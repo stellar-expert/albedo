@@ -48,7 +48,7 @@
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.1",
     "@stellar-expert/tx-meta-effects-parser": "github:stellar-expert/tx-meta-effects-parser#v1.4.0",
     "@stellar-expert/tx-signers-inspector": "^1.5.0",
-    "@stellar-expert/ui-framework": "github:stellar-expert/ui-framework#v1.3.6",
+    "@stellar-expert/ui-framework": "github:stellar-expert/ui-framework#v1.5.5",
     "@stellar-expert/webpack-template": "github:stellar-expert/webpack-template#v1.3.0",
     "@stellar-expert/eslint-config-js": "github:stellar-expert/eslint-config-js",
     "@stellar-expert/eslint-config-react": "github:stellar-expert/eslint-config-react",
