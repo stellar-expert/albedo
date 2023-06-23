@@ -16,6 +16,7 @@ export default class TransferSettings {
         this.asset = ['XLM', 'XLM']
         this.amount = ['0', '0']
         this.conversionSlippage = 0.5
+        this.fee = 100
         this.selfPayment = selfPayment
         makeAutoObservable(this)
 
@@ -27,7 +28,8 @@ export default class TransferSettings {
                 amount,
                 conversionDirection,
                 conversionSlippage,
-                currentLedgerSequence
+                currentLedgerSequence,
+                fee
             } = this
             this.recalculateSwap()
         })
@@ -105,6 +107,14 @@ export default class TransferSettings {
      * @type {Boolean}
      */
     isValid = false
+    /**
+     * @type {Number}
+     */
+    fee
+    /**
+     * @type {Boolean}
+     */
+    resetFee = false
 
     /**
      * @type {String}
@@ -139,6 +149,7 @@ export default class TransferSettings {
             this.createTrustline = false
         }
         this.asset[1] = this.asset[0]
+        this.amount[1] = this.amount[0]
         this.conversionDirection = 'source'
         this.isValid = false
     }
@@ -185,6 +196,15 @@ export default class TransferSettings {
     setSlippage(slippage) {
         this.conversionPathLoaded = false
         this.conversionSlippage = slippage
+    }
+
+    /**
+     * Set fee transfer
+     * @param {Number} fee
+     */
+    setFee(fee) {
+        this.fee = fee
+        this.resetFee = false
     }
 
     /**
@@ -306,6 +326,7 @@ export default class TransferSettings {
         this.createTrustline = false
         this.amount = ['0', '0']
         this.setAmount('0', 0)
+        this.resetFee = true
     }
 
     /**
@@ -314,6 +335,14 @@ export default class TransferSettings {
      */
     prepareTransaction() {
         return prepareTransferTx(this)
+    }
+
+    /**
+     * Swap value for Muxed Address
+     * @return {Boolean}
+     */
+    toggleMuxed() {
+        this.encodeMuxedAddress = !this.encodeMuxedAddress
     }
 }
 

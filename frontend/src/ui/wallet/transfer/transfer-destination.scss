@@ -1,0 +1,7 @@
+input.destination-input {
+  @media (max-width: $responsive-mobile-browser-width) {
+    letter-spacing: -0.05em;
+    font-size: 0.9em;
+    font-family: $font-face-mono;
+  }
+}

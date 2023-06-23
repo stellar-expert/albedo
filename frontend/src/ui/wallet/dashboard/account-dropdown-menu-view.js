@@ -12,6 +12,9 @@ export default function AccountDropdownMenuView() {
             case 'settings':
                 navigation.navigate('/account-settings')
                 break
+            case 'addressbook':
+                navigation.navigate('/addressbook')
+                break
             case 'explorer':
                 window.open(formatExplorerLink('account', current.publicKey))
                 break
@@ -50,6 +53,11 @@ export default function AccountDropdownMenuView() {
     dropdownOptions.push({
         value: 'settings',
         title: <>Manage settings for this account</>
+    })
+
+    dropdownOptions.push({
+        value: 'addressbook',
+        title: <>Address book</>
     })
 
     dropdownOptions.push({

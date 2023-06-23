@@ -1,10 +1,9 @@
 import React, {useState} from 'react'
 import {observer} from 'mobx-react'
 import {StrKey} from 'stellar-sdk'
-import {Button, AssetLink, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {Button, AssetLink, useStellarNetwork, AssetSelector} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
-import AssetSelectorView from '../shared/asset-selector-view'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
 import ActionLoaderView from '../shared/action-loader-view'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
@@ -56,7 +55,7 @@ Would you like to add this asset?`)) return
         </WalletPageActionDescription>
         <div>
             <div className="space segment">
-                <AssetSelectorView value={asset} onChange={select} title="Choose an asset"/>or provide
+                <AssetSelector value={asset} onChange={select} title="Choose an asset"/>or provide
                 asset parameters <a href="#" onClick={() => setDirect(true)}>manually</a>
                 {direct && <>
                     <hr className="flare"/>

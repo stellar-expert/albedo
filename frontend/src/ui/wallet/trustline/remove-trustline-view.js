@@ -1,11 +1,10 @@
 import React, {useState} from 'react'
 import {observer} from 'mobx-react'
-import {Button, AssetLink, useStellarNetwork} from '@stellar-expert/ui-framework'
+import {Button, AssetLink, useStellarNetwork, AssetSelector} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import {isValidPoolId} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
-import AssetSelectorView from '../shared/asset-selector-view'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
 import ActionLoaderView from '../shared/action-loader-view'
 import {prepareRemoveTrustlineTx, validateRemoveTrustline} from './remove-trustline-tx-builder'
@@ -55,8 +54,8 @@ function RemoveTrustlineView() {
                         <input type="checkbox" checked={!!convertAsset} onChange={e => setConvertAsset(e.target.checked ? 'XLM' : null)}/>
                         {' '}Convert remaining tokens to
                     </label>{' '}
-                    <AssetSelectorView value={convertAsset} onChange={setConvertAsset} restricted predefinedAssets={predefinedAssets}
-                                       title={convertAsset ? <AssetLink asset={convertAsset} link={false}/> : 'another asset'}/>
+                    <AssetSelector value={convertAsset} onChange={setConvertAsset} restricted predefinedAssets={predefinedAssets}
+                                   title={convertAsset ? <AssetLink asset={convertAsset} link={false}/> : 'another asset'}/>
                 </div>}
             </div>
             {!assetBalance ?

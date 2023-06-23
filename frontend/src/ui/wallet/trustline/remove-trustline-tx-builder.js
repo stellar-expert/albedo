@@ -20,20 +20,22 @@ export async function prepareRemoveTrustlineTx({asset, convertAsset, path, netwo
     }).setTimeout(60)
     const {balance} = accountLedgerData.balances[asset]
     asset = AssetDescriptor.parse(asset)
-    if (convertAsset) {
-        builder.addOperation(Operation.pathPaymentStrictSend({
-            destination: accountLedgerData.address,
-            sendAsset: asset.toAsset(),
-            sendAmount: balance,
-            destAsset: AssetDescriptor.parse(convertAsset).toAsset(),
-            destMin: '0.0000001'
-        }))
-    } else {
-        builder.addOperation(Operation.payment({
-            destination: asset.issuer,
-            amount: balance,
-            asset: asset.toAsset()
-        }))
+    if (parseFloat(balance) > 0) {
+        if (convertAsset) {
+            builder.addOperation(Operation.pathPaymentStrictSend({
+                destination: accountLedgerData.address,
+                sendAsset: asset.toAsset(),
+                sendAmount: balance,
+                destAsset: AssetDescriptor.parse(convertAsset).toAsset(),
+                destMin: '0.0000001'
+            }))
+        } else {
+            builder.addOperation(Operation.payment({
+                destination: asset.issuer,
+                amount: balance,
+                asset: asset.toAsset()
+            }))
+        }
     }
     builder.addOperation(Operation.changeTrust({
         asset: asset.toAsset(),

@@ -3,25 +3,30 @@ import {observer} from 'mobx-react'
 import {Button, useStellarNetwork} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
+import {addNotify} from '../../../ui/notifications/add-notify'
+import DialogView from '../../layout/dialog-view'
 import {confirmTransaction} from './wallet-tx-confirmation'
 import ActionLoaderView from './action-loader-view'
+import {ConfirmIntentionView} from './confirm-intention-view'
 import './wallet.scss'
 
 /**
  * @param {String} title
  * @param {String} action?
  * @param {Bool} disabled?
+ * @param {Object} transfer?
  * @param {Function} prepareTransaction
  * @param {Function} onFinalize
  * @param {Boolean} allowNonExisting?
  * @param {*} children
  * @constructor
  */
-function WalletOperationsWrapperView({title, action, disabled, prepareTransaction, onFinalize, allowNonExisting, children}) {
+function WalletOperationsWrapperView({title, action, disabled, transfer, prepareTransaction, onFinalize, allowNonExisting, children}) {
     const [inProgress, setInProgress] = useState(false)
     const renderChildren = !accountLedgerData.nonExisting || allowNonExisting
     const network = useStellarNetwork()
     const [fundingInProgress, setFundingInProgress] = useState(false)
+    const [showConfirmIntention, setShowConfirmIntention] = useState(false)
 
     function createTestnetAccount() {
         setFundingInProgress(true)
@@ -31,6 +36,11 @@ function WalletOperationsWrapperView({title, action, disabled, prepareTransactio
             .finally(() => setFundingInProgress(false))
     }
 
+    function confirmIntention() {
+        setShowConfirmIntention(false)
+        confirm()
+    }
+
     async function confirm() {
         try {
             setInProgress(true)
@@ -38,12 +48,18 @@ function WalletOperationsWrapperView({title, action, disabled, prepareTransactio
             if (!tx)
                 return
             await confirmTransaction(network, tx)
+            addNotify('success', 'Transaction is successful')
             onFinalize()
         } catch (e) {
+            setInProgress(false)
+            if (e.status === 400) {
+                addNotify('error', e.data.title)
+                return
+            }
             if (e.code === -4)
                 return
             console.error('Failed to prepare transaction', e)
-            alert('Transaction execution failed')
+            addNotify('error', 'Transaction execution failed')
         }
         setInProgress(false)
     }
@@ -67,13 +83,25 @@ function WalletOperationsWrapperView({title, action, disabled, prepareTransactio
                 {renderChildren && <>{children}</>}
                 {renderChildren && !!prepareTransaction && <div className="row space">
                     <div className="column column-50">
-                        <Button block disabled={disabled || inProgress} onClick={confirm}>{action}</Button>
+                        <Button block disabled={disabled || inProgress} onClick={() => setShowConfirmIntention(true)}>{action}</Button>
                     </div>
                     <div className="column column-50">
                         <Button href="/" block outline>Cancel</Button>
                     </div>
                 </div>}
                 {inProgress && <ActionLoaderView message="processing transaction"/>}
+                <DialogView dialogOpen={showConfirmIntention}>
+                    <h2>Confirm transaction</h2>
+                    <ConfirmIntentionView transfer={transfer}/>
+                    <div className="row actions double-space">
+                        <div className="column column-50">
+                            <Button block onClick={confirmIntention}>Confirm</Button>
+                        </div>
+                        <div className="column column-50">
+                            <Button block outline onClick={() => setShowConfirmIntention(false)}>Cancel</Button>
+                        </div>
+                    </div>
+                </DialogView>
             </> :
             <ActionLoaderView message="loading account info"/>}
     </div>

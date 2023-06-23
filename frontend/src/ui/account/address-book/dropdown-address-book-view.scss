@@ -1,0 +1,50 @@
+.address-list-wrap {
+  position: relative;
+  .address-list-block {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 180px;
+    overflow-y: auto;
+    background: var(--color-bg);
+    border: 1px solid var(--color-contrast-border);
+    border-top: none;
+    border-bottom-left-radius: 0.3rem;
+    border-bottom-right-radius: 0.3rem;
+    box-shadow: 2px 3px 6px -1px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    &.active {
+      display: flex;
+      flex-direction: column;
+      min-height: 23px;
+    }
+    > a {
+      padding: .4em .6em;
+      display: block;
+      color: inherit;
+      white-space: nowrap;
+
+      &:not(.add-address):hover {
+        background: var(--color-alt-bg)
+      }
+
+      &.add-address:hover {
+        color: var(--color-highlight);
+      }
+
+      &.selected {
+        cursor: default;
+        color: var(--color-text);
+        background: var(--color-alt-bg);
+      }
+    }
+    .add-name-address {
+      padding: .6em;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+}

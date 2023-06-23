@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  width: calc(100% + 1.6rem);
-  margin-left: -2.8rem;
+  width: calc(100% - 0.4rem);
+  margin-left: -0.8rem;
 
   &:after {
     content: '';

@@ -1,0 +1,109 @@
+$padding: 1rem;
+
+#notification-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: $padding;
+  max-width: 35rem;
+  z-index: 999;
+
+  .notification {
+    display: flex;
+    align-items: start;
+    width: 100%;
+    padding: $padding 2*$padding;
+    padding-right: 40px;
+    overflow: hidden;
+    transition: transform 0.3s ease-out;
+    > * {
+      line-height: 21px;
+    }
+    > .icon {
+      padding-right: $padding;
+    }
+    > div {
+      color: var(--color-text);
+    }
+    .delete {
+      color: var(--color-text);
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+  }
+  
+  .container-smoothly {
+    overflow: hidden;
+  }
+  
+  .container-smoothly:not(:first-child) {
+    margin-bottom: 8px;
+  }
+  
+  .container-smoothly.grow {
+    animation-name: slideInHeight;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-in;
+  }
+  
+  .notification.info {
+    &:before {
+      background-color: var(--color-modal-bg);
+    }
+    background-color: var(--color-modal-bg);
+  }
+  
+  .notification.success {
+    &:before {
+      background-color: var(--color-success-bg);
+    }
+    background-color: var(--color-success-bg);
+  }
+  
+  .notification.warning {
+    &:before {
+      background-color: var(--color-warning-bg);
+    }
+    background-color: var(--color-warning-bg);
+  }
+  
+  .notification.error {
+    &:before {
+      background-color: var(--color-alert-bg);
+    }
+    background-color: var(--color-alert-bg);
+  }
+  
+  .notification.slideIn {
+    animation-name: slideIn;
+    animation-duration: 0.3s;
+    animation-timing-function: ease-in-out;
+  }
+  
+  .notification.slideOut {
+    transform: translateX(150%);
+    flex: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes slideInHeight {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 200px;
+  }
+}

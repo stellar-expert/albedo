@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {parseQuery, navigation} from '@stellar-expert/navigation'
-import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
+import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import SwapSlippageView from '../shared/slippage-view'
 import TransferAmountView from '../shared/transfer-amount-view'
@@ -11,7 +11,9 @@ import AvailableAmountLink from '../shared/available-amount-link-view'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
 import TxMemoView from '../tx/tx-memo-view'
 import SwapBandView from '../swap/swap-band-view'
-import TransferDestinationView from './transfer-destination-view'
+import FeeView from '../shared/fee-view'
+import {getFederationAddress} from '../../../util/get-federation-address'
+import DropdownAddressBookView from '../../account/address-book/dropdown-address-book-view'
 import TransferValidationView from './transfer-validation-view'
 import TransferSettings from './transfer-settings'
 
@@ -27,12 +29,27 @@ const transferModeDescription = {
     claimable: 'create pending payment for'
 }
 
+async function getAccountPredefinedDisplayName(destinationInfo) {
+    if (window.predefinedAccountDisplayNames) return window.predefinedAccountDisplayNames[destinationInfo.account_id]
+    const federationAddress = await getFederationAddress(destinationInfo)
+    if (federationAddress) return federationAddress.split('*')[0]
+    return undefined
+}
+
 function TransferView() {
     const network = useStellarNetwork()
     const [transfer] = useDependantState(() => new TransferSettings(network), [network, accountLedgerData.address])
     const destinationDirectoryInfo = useDirectory(transfer.destination)
     const disabled = !transfer.isValid || parseFloat(transfer.sourceAmount) <= 0
     const balances = accountLedgerData.balancesWithPriority
+    const selfTransfer = transfer.source === transfer.destination
+    const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
+    const [destinationName, setDestinationName] = useState(null)
+
+    useEffect(() => {
+        if (destinationInfo) getAccountPredefinedDisplayName(destinationInfo).then(name => setDestinationName(name))
+    }, [destinationInfo])
+
     useEffect(() => {
         const {fromAsset, destination} = parseQuery()
         if (fromAsset) {
@@ -52,28 +69,37 @@ function TransferView() {
         transfer.setMode(tab)
     }
 
+    function onFinalize() {
+        transfer.resetOperationAmount()
+    }
+
     return <WalletOperationsWrapperView title="Transfer" action="Transfer" disabled={disabled}
+                                        transfer={transfer}
                                         prepareTransaction={() => transfer.prepareTransaction()}
-                                        onFinalize={() => transfer.resetOperationAmount()}>
+                                        onFinalize={onFinalize}>
         <Tabs tabs={tabOptions} onChange={updateMode} selectedTab={transfer.mode} queryParam="mode" right/>
         <WalletPageActionDescription>
             {transferModeDescription[transfer.mode]} another Stellar account
         </WalletPageActionDescription>
         <div className="segment micro-space">
             <div className="params">
-                <TransferDestinationView address={transfer.destination} onChange={transfer.setDestination.bind(transfer)}
-                                         federationAddress={transfer.destinationFederationAddress}/>
-                <div className="space"/>
+                <DropdownAddressBookView transfer={transfer} destinationName={destinationName} destinationInfo={destinationInfo}
+                                         onChange={transfer.setDestination.bind(transfer)}/>
+                {(destinationName && destinationInfo && !destinationInfo?.nonExisting) ?
+                    <div className="dimmed condensed text-tiny" style={{paddingTop: '0.2em'}}>
+                        [{destinationName}]
+                    </div> :
+                    <div className="space"/>}
                 <TransferAmountView settings={transfer} index={0} balances={balances} restricted placeholder="Amount to send"/>
                 {transfer.mode !== 'convert' ?
                     <AvailableAmountLink settings={transfer} index={0}/> :
                     <>
-                        <SwapBandView settings={transfer}/>
+                        <SwapBandView settings={transfer} balances={balances}/>
                         <TransferAmountView settings={transfer} index={1} balances={balances} placeholder="Amount received"/>
                     </>}
             </div>
-            {transfer.mode === 'convert' &&
-                <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
+            {transfer.mode === 'convert' && <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
+            <FeeView transfer={transfer}/>
             <TxMemoView transfer={transfer}/>
             {transfer.createDestination && <p className="success text-small micro-space">
                 <i className="icon-info"/> The recipient account will be created automatically.{' '}
