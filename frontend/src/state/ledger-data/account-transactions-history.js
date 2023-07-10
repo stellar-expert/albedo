@@ -1,12 +1,14 @@
+import React from 'react'
 import {action, observable, runInAction, makeObservable} from 'mobx'
+import {parseTxDetails} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../util/horizon-connector'
-import {parseTxDetails} from '../../ui/intent/tx-operations/tx-details-parser'
 
 export default class AccountTransactionHistory {
-    constructor(network, address) {
+    constructor(network, address, history) {
         this.address = address
         this.network = network
         this.records = []
+        this.history = history
         makeObservable(this, {
             records: observable.shallow,
             loading: observable,
@@ -17,8 +19,14 @@ export default class AccountTransactionHistory {
             addNewTx: action,
             removeInProgressTx: action
         })
+
     }
 
+    /**
+     * @type {PaginatedListViewModel}
+     * @readonly
+     */
+    history
     /**
      * Stellar account public key
      * @type {String}
@@ -37,12 +45,6 @@ export default class AccountTransactionHistory {
      * @readonly
      */
     records = []
-    /**
-     * Loaded records paging token
-     * @type {String}
-     * @private
-     */
-    cursor
     /**
      * Recent entries to load
      * @type {Number}
@@ -74,64 +76,25 @@ export default class AccountTransactionHistory {
     async loadNextPage() {
         if (this.loading || this.hasMore === false)
             return
-        let recordsToLoad = this.maxRecentEntries
-        try {
+        runInAction(() => {
             this.loading = true
-            while (recordsToLoad > 0) {
-                //fetch account transactions
-                const count = Math.min(recordsToLoad * 3, 100)
-                let newBatch = await loadAccountTransactions({
-                    network: this.network,
-                    address: this.address,
-                    cursor: this.cursor,
-                    count
-                })
-                //if no records returned
-                if (!newBatch.length) {
-                    runInAction(() => {
-                        this.hasMore = false
-                    })
-                    break
-                }
+        })
 
-                let hasMore = newBatch.length === count
-                //process records
-                const loadedRecords = []
-                for (let tx of newBatch) {
-                    this.cursor = tx.paging_token
-                    //retrieve only relevant transactions
-                    if (tx.unmatched)
-                        continue
-                    loadedRecords.push(tx)
-                    if (loadedRecords.length >= recordsToLoad) {
-                        hasMore = true
-                        break //stop if enough records loaded
-                    }
-                }
+        //fetch account transactions
+        const {data, loaded, canLoadNextPage} = await this.history.load(1)
+        if (!loaded)
+            return
+        let records = data.map(tx => processTransactionRecord(this.network, this.address, tx))
 
-                //jump to next iteration if no relevant history records were found
-                if (!loadedRecords.length && hasMore)
-                    continue
-                //update records
-                runInAction(() => {
-                    if (loadedRecords.length) {
-                        this.removeInProgressTx(loadedRecords)
-                        this.records.replace([...this.records, ...loadedRecords])
-                    }
-                    if (!hasMore)
-                        this.hasMore = false
-                })
-                //remaining records number
-                recordsToLoad -= loadedRecords.length
+        //update records
+        runInAction(() => {
+            if (records.length) {
+                this.removeInProgressTx(data)
+                this.records.replace([...this.records, ...data])
             }
-        } catch (e) {
-            if (e.name !== 'NotFoundError') {
-                console.error(e)
-            } else {
+            if (!canLoadNextPage.length) {
                 this.hasMore = false
             }
-        }
-        runInAction(() => {
             this.loading = false
         })
     }
@@ -232,28 +195,6 @@ function streamAccountTransactions({network, address, onNewTx, includeFailed = t
 }
 
 /**
- *
- * @param {'public'|'testnet'} network
- * @param {String} address
- * @param {Boolean} includeFailed
- * @param {Number} count
- * @param {String} cursor
- * @return {Promise<ParsedTxDetails[]>}
- * @internal
- */
-function loadAccountTransactions({network, address, includeFailed = true, count = 20, cursor}) {
-    return createHorizon({network})
-        .transactions()
-        .forAccount(address)
-        .limit(count)
-        .order('desc')
-        .cursor(cursor)
-        .includeFailed(true)
-        .call()
-        .then(data => data.records.map(tx => processTransactionRecord(network, address, tx)))
-}
-
-/**
  * @param {String} network
  * @param {String} address
  * @param {TransactionRecord} txRecord
@@ -264,12 +205,12 @@ function loadAccountTransactions({network, address, includeFailed = true, count 
 function processTransactionRecord(network, address, txRecord, inProgress = false) {
     const details = parseTxDetails({
         network,
-        txEnvelope: txRecord.envelope_xdr,
-        result: txRecord.result_xdr,
-        meta: txRecord.result_meta_xdr,
-        context: address,
+        txEnvelope: txRecord.envelope_xdr || txRecord.body,
+        result: txRecord.result_xdr || txRecord.result,
+        meta: txRecord.result_meta_xdr || txRecord.meta,
+        context: {account: [address]},
         skipUnrelated: true,
-        createdAt: inProgress ? new Date().toISOString() : txRecord.created_at
+        createdAt: inProgress ? new Date().toISOString() : (txRecord.created_at || new Date(txRecord.ts * 1000).toISOString())
     })
     if (txRecord.paging_token) {
         details.paging_token = txRecord.paging_token

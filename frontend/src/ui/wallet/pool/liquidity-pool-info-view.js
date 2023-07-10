@@ -12,7 +12,6 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
     const assets = poolInfo.reserves.map(r => AssetDescriptor.parse(r.asset)),
         reserves = poolInfo.reserves.map(r => r.amount),
         price = parseFloat(reserves[0]) / parseFloat(reserves[1]),
-        total = new Bignumber(poolInfo.total_shares).mul(new Bignumber(10000000)).toString(),
         estimatedValue = stake > 0 && estimateLiquidityPoolStakeValue(stake, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
     return <div className="segment text-small space">
         <h4>Pool info</h4>

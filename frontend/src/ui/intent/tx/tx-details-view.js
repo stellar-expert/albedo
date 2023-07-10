@@ -1,12 +1,10 @@
 import React, {useState} from 'react'
 import {observer} from 'mobx-react'
-import {AccountAddress, CopyToClipboard, Spoiler} from '@stellar-expert/ui-framework'
+import {AccountAddress, CopyToClipboard, Spoiler, TxOperationsList, parseTxDetails} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
-import {parseTxDetails} from '../tx-operations/tx-details-parser'
 import TxSourceAccountView from './tx-source-account-view'
 import TxFormattedMemo, {hasMemo} from './tx-formatted-memo-view'
 import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
-import TxOperationsList from '../tx-operations/tx-operations-list'
 
 /**
  * Transaction details

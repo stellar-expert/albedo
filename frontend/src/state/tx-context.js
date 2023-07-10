@@ -123,7 +123,7 @@ export default class TxContext {
             if (newSequence === undefined) {
                 const sourceAccount = await resolveAccountInfo(this.sourceAccount, this.networkParams)
                 //set incremented tx sequence
-                newSequence = new Bignumber(sourceAccount.sequenceNumber()).add(1).toString()
+                newSequence = new Bignumber(sourceAccount.sequenceNumber()).plus(1).toString()
             }
             substituteSourceSequence(this.tx, newSequence)
         } catch (err) {

@@ -142,7 +142,7 @@ class AccountLedgerData {
      * Get asset amount available for trade/transfer with respect to liabilities and reserves
      * @param {String} asset - Asset identifier
      * @param {Number|String} [additionalReserves] - Additional reserves required for the wallet operation
-     * @return {string}
+     * @return {String}
      */
     getAvailableBalance(asset, additionalReserves = 0) {
         const trustline = this.balances[asset]
@@ -196,8 +196,8 @@ async function fetchAccountHorizonData(network, address) {
 }
 
 export function useDestinationAccountLedgerData(address) {
-    const network = useStellarNetwork(),
-        [data, setData] = useState(null)
+    const network = useStellarNetwork()
+    const [data, setData] = useState(null)
     useEffect(() => {
         if (address) {
             fetchAccountHorizonData(network, address)

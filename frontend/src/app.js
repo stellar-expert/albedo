@@ -9,6 +9,7 @@ import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage
 import storageProvider from './storage/storage-provider'
 import accountManager from './state/account-manager'
 import {registerMessageListeners} from './util/message-listeners'
+import {createNotificationContainer} from './ui/notifications/notifications'
 import './ui/styles.scss'
 
 window.explorerFrontendOrigin = 'https://stellar.expert'
@@ -46,5 +47,6 @@ accountManager.reload()
         scheduleCleanupExpiredSessions()
     })
 
+createNotificationContainer()
 
 webPushNotificationsAdapter.initPushSubscription()

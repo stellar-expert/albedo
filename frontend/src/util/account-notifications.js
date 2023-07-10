@@ -45,5 +45,5 @@ export function getNewPaymentsSince(network, account, ledger) {
             })
     }
 
-    return fetchPayments(new Bignumber(ledger + 1).mul(new Bignumber(4294967295)).toString())
+    return fetchPayments(new Bignumber(ledger + 1).times(new Bignumber(4294967295)).toString())
 }

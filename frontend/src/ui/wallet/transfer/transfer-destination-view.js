@@ -1,42 +1,31 @@
-import React, {useEffect} from 'react'
-import {StrKey, FederationServer} from 'stellar-sdk'
+import React, {useCallback} from 'react'
+import {observer} from 'mobx-react'
 import {debounce} from 'throttle-debounce'
-import {useDependantState} from '@stellar-expert/ui-framework'
+import {StrKey} from 'stellar-sdk'
+import {resolveFederationAccount} from '../../../util/federation-address-resolver'
 
-const checkFederationAddress = debounce(500, function (fed, callback) {
-    FederationServer.resolve(fed, {timeout: 10000})
-        .then(res => callback(res || null))
-        .catch(e => callback(null))//ignore resolution errors
-})
+const checkFederationAddress = debounce(500, resolveFederationAccount)
 
-export default function TransferDestinationView({address, federationAddress, onChange, searchAddress, focus}) {
-    const [value, setValue] = useDependantState((_, prev) => federationAddress || address || prev || '', [address])
-
-    useEffect(() => {
-        if (address) setValue(address)
-    }, [address])
-
-    function change(e) {
+export default observer(function TransferDestinationView({transfer}) {
+    const textChange = useCallback(function (e) {
         const v = e.target.value.trim()
-        setValue(v)
-        if (searchAddress) searchAddress(v)
+        transfer.setDestinationInputValue(v)
         if (StrKey.isValidEd25519PublicKey(v) || StrKey.isValidMed25519PublicKey(v)) {
-            onChange(v)
+            transfer.setDestination(v)
             return
         }
-        if (/^.+\*\w+\.[\w\.]+$/.test(v)) {
+        if (/^.+\*\w+\.[\w.]+$/.test(v)) {
             checkFederationAddress(v, resolved => {
                 if (resolved && resolved.account_id) {
-                    onChange(resolved.account_id, {link: v, ...resolved})
+                    transfer.setDestination(resolved.account_id, {link: v, ...resolved})
                 } else {
-                    onChange(null, {link: v})
+                    transfer.setDestination(null, {link: v})
                 }
             })
         }
-        onChange(null)
-    }
+        transfer.setDestination(null)
+    }, [transfer])
 
-    return <div>
-        <input type="text" value={value} onChange={change} onFocus={focus} placeholder="Recipient address or federation link" className="key"/>
-    </div>
-}
+    return <input type="text" value={transfer.destinationInputValue || ''} onChange={textChange} className="key destination"
+                  placeholder="Recipient address or federation link"/>
+})

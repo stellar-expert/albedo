@@ -29,8 +29,8 @@ function LiquidityPoolWithdrawView() {
         if (withdraw.max === '0') return 0
         const v = new Bignumber(percentage || '0')
             .div(100)
-            .mul(new Bignumber(withdraw.max))
-            .round()
+            .times(new Bignumber(withdraw.max))
+            .dp()
             .toString()
         return withdraw.setAmount(stripTrailingZeros(v))
     }

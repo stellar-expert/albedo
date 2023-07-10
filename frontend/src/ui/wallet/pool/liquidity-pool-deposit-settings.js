@@ -37,7 +37,7 @@ export default class LiquidityPoolDepositSettings {
                 const additionalBalance = asset === 'XLM' ? (this.hasPoolTrustline ? 0.6 : 0.1) : 0
                 return new Bignumber(accountLedgerData.getAvailableBalance(asset, additionalBalance))
             })
-            .every((balance, i) => balance.greaterThanOrEqualTo(this.amount[i] || 0))
+            .every((balance, i) => balance.gte(this.amount[i] || 0))
     }
 
     get hasPoolTrustline() {
@@ -104,7 +104,7 @@ export default class LiquidityPoolDepositSettings {
             reserves = reserves.slice().reverse()
         }
         const counter = new Bignumber(this.amount[sourceIndex] || 0)
-            .mul(new Bignumber(reserves[1 - sourceIndex].amount))
+            .times(new Bignumber(reserves[1 - sourceIndex].amount))
             .div(new Bignumber(reserves[sourceIndex].amount))
         this.amount[1 - sourceIndex] = adjustPrecision(counter)
     }

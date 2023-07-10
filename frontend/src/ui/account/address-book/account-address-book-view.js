@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {observer} from 'mobx-react'
 import {Button} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
@@ -7,7 +7,6 @@ import DialogView from '../../layout/dialog-view'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import authorizationService from '../../../state/auth/authorization'
-import SoloLayoutView from '../../layout/solo-layout-view'
 import ActionLoaderView from '../../wallet/shared/action-loader-view'
 import AccountAddressbookForm from './account-address-book-form'
 import AccountAddressListView from './account-address-list-view'
@@ -105,10 +104,10 @@ function AccountAddressBookView() {
         <WalletOperationsWrapperView title="Address book" allowNonExisting>
             <hr className="flare"/>
             <WalletPageActionDescription>frequently used addresses and trusted contacts</WalletPageActionDescription>
-            <div className="double-space"/>
+            <div className="space"/>
             {Object.keys(addressBook).length ?
                 <AccountAddressListView addressBook={addressBook} addEditAddress={addEditAddress} removeAddress={removeAddress}/> :
-                <div className="double-space text-small text-center dimmed">You have not yet added any address to your address book</div>}
+                <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
             <div className="row actions double-space">
                 <div className="column column-50">
                     <Button block onClick={() => addEditAddress(null)}><i className="icon-add-circle"/> Add new address</Button>

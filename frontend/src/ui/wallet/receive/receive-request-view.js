@@ -44,7 +44,7 @@ export default observer(function ReceiveRequestView() {
                     <TxMemoView transfer={transfer}/>
                 </div>
                 <div className="space">
-                    <QrCodeView value={sep7link} size={300}/>
+                    <QrCodeView value={sep7link}/>
                 </div>
                 <div className="text-tiny text-center space">
                     <CopyToClipboard text={sep7link}>

@@ -24,7 +24,7 @@ function LiquidityPoolDepositView() {
     const [deposit] = useDependantState(() => new LiquidityPoolDepositSettings(network), [network])
     const disabled = !deposit.isValid
     const poolInfo = useLiquidityPoolInfo(deposit.poolId)
-    const currentStake = new Bignumber(accountLedgerData.balances[deposit.poolId]?.balance || '0').mul(10000000).toString()
+    const currentStake = (BigInt(accountLedgerData.balances[deposit.poolId]?.balance || '0') * 10000000n).toString()
     useEffect(() => {
         const {pool} = parseQuery()
         if (pool) {

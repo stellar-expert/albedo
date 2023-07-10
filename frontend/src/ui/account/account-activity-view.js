@@ -1,10 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {observer} from 'mobx-react'
 import {throttle} from 'throttle-debounce'
-import {ElapsedTime, TxLink} from '@stellar-expert/ui-framework'
+import {ElapsedTime, TxLink, TxOperationsList, useTxHistory} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
 import AccountTransactionHistory from '../../state/ledger-data/account-transactions-history'
-import TxOperationsList from '../intent/tx-operations/tx-operations-list'
 import ActionLoaderView from '../wallet/shared/action-loader-view'
 
 function getScrollParent(node) {
@@ -14,14 +13,15 @@ function getScrollParent(node) {
 }
 
 function AccountActivityView() {
+    const {nonExisting, address, network} = accountLedgerData
     const [compact, setCompact] = useState(true)
     const [history, setHistory] = useState(null)
+    const historyModel = useTxHistory({account: [address]}, 'desc', 200)
     const txHistoryRef = useRef()
-    const {nonExisting, address, network} = accountLedgerData
     useEffect(() => {
         let newHistory = accountLedgerData.history
         if (!newHistory) {
-            newHistory = accountLedgerData.history = new AccountTransactionHistory(network, address)
+            newHistory = accountLedgerData.history = new AccountTransactionHistory(network, address, historyModel)
             if (!nonExisting) {
                 newHistory.loadNextPage()
             }

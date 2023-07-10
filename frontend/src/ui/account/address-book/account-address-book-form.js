@@ -2,14 +2,16 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework'
 import {getPlaceholder, memoTypes} from '../../wallet/tx/tx-memo-view'
 import {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
-import {getFederationAddress} from '../../../util/get-federation-address'
+import {resolveFederationName} from '../../../util/federation-address-resolver'
 
 function AccountAddressBookForm({addressSettings, setAddressSettings}) {
     const [memo, setMemo] = useState(addressSettings?.memo)
     const destinationInfo = useDestinationAccountLedgerData(addressSettings?.address || '')
 
     useEffect(() => {
-        if (destinationInfo) checkAddress()
+        if (destinationInfo) {
+            checkAddress()
+        }
     }, [destinationInfo])
 
     const setMemoType = useCallback((type) => {
@@ -27,7 +29,7 @@ function AccountAddressBookForm({addressSettings, setAddressSettings}) {
     }, [addressSettings])
 
     const checkAddress = useCallback(async () => {
-        const federationAddress = await getFederationAddress(destinationInfo)
+        const federationAddress = await resolveFederationName(destinationInfo)
         const definedName = addressSettings.name !== '' ? addressSettings.name : federationAddress?.split('*')[0]
         const federationSettings = {
             name: definedName || '',
@@ -50,9 +52,9 @@ function AccountAddressBookForm({addressSettings, setAddressSettings}) {
         {memo && <div className="text-small space">
             Transaction memo: <Dropdown options={memoTypes} value={memo.type} onChange={setMemoType}/> (optional)
             {memo.type !== 'none' && <div className="micro-space">
-                <input type="text" value={memo.value} 
-                       onChange={setMemoValue} 
-                       placeholder={getPlaceholder(memo.type)} 
+                <input type="text" value={memo.value}
+                       onChange={setMemoValue}
+                       placeholder={getPlaceholder(memo.type)}
                        ref={useAutoFocusRef}/>
             </div>}
         </div>}

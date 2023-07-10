@@ -7,7 +7,8 @@ import {Memo} from 'stellar-sdk'
  * @return {Memo}
  */
 export function encodeMemo({memo_type, memo}) {
-    if (memo === undefined) return null
+    if (memo === undefined)
+        return null
     switch (memo_type) {
         case 'id':
             return Memo.id(memo)

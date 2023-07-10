@@ -50,6 +50,10 @@ export default class TransferSettings {
     /**
      * @type {String}
      */
+    destinationInputValue
+    /**
+     * @type {String}
+     */
     destinationFederationAddress
     /**
      * @type {Boolean}
@@ -135,7 +139,7 @@ export default class TransferSettings {
 
     get hasSufficientBalance() {
         return new BigNumber(accountLedgerData.getAvailableBalance(this.asset[0]))
-            .greaterThanOrEqualTo(this.amount[0] || 0)
+            .gte(this.amount[0] || 0)
     }
 
     /**
@@ -169,9 +173,19 @@ export default class TransferSettings {
         this.isValid = false
         if (federationInfo) {
             this.destinationFederationAddress = federationInfo.link
-            this.memo = encodeMemo(federationInfo)
-            this.invalidMemo = false
+            if (federationInfo.memo !== undefined) {
+                this.memo = encodeMemo(federationInfo)
+                this.invalidMemo = false
+            }
         }
+    }
+
+    /**
+     * Update destination input value
+     * @param {String} inputValue
+     */
+    setDestinationInputValue(inputValue) {
+        this.destinationInputValue = inputValue
     }
 
     /**
@@ -356,7 +370,7 @@ export default class TransferSettings {
 function adjustWithSlippage(value, direction, slippage) {
     return new BigNumber(value)
         .times((1 + direction * slippage / 100).toPrecision(15))
-        .round(7, direction < 0 ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP)
+        .dp(7, direction < 0 ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP)
         .toString()
 }
 

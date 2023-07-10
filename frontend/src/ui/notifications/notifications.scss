@@ -1,12 +1,10 @@
-$padding: 1rem;
-
-#notification-container {
+.notifications-container {
   position: fixed;
   top: 0;
   right: 0;
   display: flex;
   flex-direction: column-reverse;
-  padding: $padding;
+  padding: $space-micro;
   max-width: 35rem;
   z-index: 999;
 
@@ -14,19 +12,22 @@ $padding: 1rem;
     display: flex;
     align-items: start;
     width: 100%;
-    padding: $padding 2*$padding;
-    padding-right: 40px;
+    padding: $space-micro 4*$space-micro $space-micro 2*$space-micro;
     overflow: hidden;
     transition: transform 0.3s ease-out;
+
     > * {
       line-height: 21px;
     }
+
     > .icon {
-      padding-right: $padding;
+      padding-right: $space-micro;
     }
+
     > div {
       color: var(--color-text);
     }
+
     .delete {
       color: var(--color-text);
       position: absolute;
@@ -35,55 +36,59 @@ $padding: 1rem;
       cursor: pointer;
     }
   }
-  
+
   .container-smoothly {
     overflow: hidden;
   }
-  
+
   .container-smoothly:not(:first-child) {
     margin-bottom: 8px;
   }
-  
+
   .container-smoothly.grow {
     animation-name: slideInHeight;
     animation-duration: 0.2s;
     animation-timing-function: ease-in;
   }
-  
+
   .notification.info {
     &:before {
       background-color: var(--color-modal-bg);
     }
+
     background-color: var(--color-modal-bg);
   }
-  
+
   .notification.success {
     &:before {
       background-color: var(--color-success-bg);
     }
+
     background-color: var(--color-success-bg);
   }
-  
+
   .notification.warning {
     &:before {
       background-color: var(--color-warning-bg);
     }
+
     background-color: var(--color-warning-bg);
   }
-  
+
   .notification.error {
     &:before {
       background-color: var(--color-alert-bg);
     }
+
     background-color: var(--color-alert-bg);
   }
-  
+
   .notification.slideIn {
     animation-name: slideIn;
     animation-duration: 0.3s;
     animation-timing-function: ease-in-out;
   }
-  
+
   .notification.slideOut {
     transform: translateX(150%);
     flex: 0;

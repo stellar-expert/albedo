@@ -3,11 +3,10 @@ import {observer} from 'mobx-react'
 import {Button, useStellarNetwork} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
-import {addNotify} from '../../../ui/notifications/add-notify'
 import DialogView from '../../layout/dialog-view'
 import {confirmTransaction} from './wallet-tx-confirmation'
-import ActionLoaderView from './action-loader-view'
 import {ConfirmIntentionView} from './confirm-intention-view'
+import ActionLoaderView from './action-loader-view'
 import './wallet.scss'
 
 /**
@@ -48,18 +47,18 @@ function WalletOperationsWrapperView({title, action, disabled, transfer, prepare
             if (!tx)
                 return
             await confirmTransaction(network, tx)
-            addNotify('success', 'Transaction is successful')
+            notify('success', 'Transaction processed')
             onFinalize()
         } catch (e) {
             setInProgress(false)
             if (e.status === 400) {
-                addNotify('error', e.data.title)
+                notify('error', e.data.title)
                 return
             }
             if (e.code === -4)
                 return
             console.error('Failed to prepare transaction', e)
-            addNotify('error', 'Transaction execution failed')
+            notify('error', 'Transaction failed')
         }
         setInProgress(false)
     }
