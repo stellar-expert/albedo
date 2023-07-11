@@ -19,7 +19,6 @@ export default class AccountTransactionHistory {
             addNewTx: action,
             removeInProgressTx: action
         })
-
     }
 
     /**
@@ -89,8 +88,8 @@ export default class AccountTransactionHistory {
         //update records
         runInAction(() => {
             if (records.length) {
-                this.removeInProgressTx(data)
-                this.records.replace([...this.records, ...data])
+                this.removeInProgressTx(records)
+                this.records.replace([...this.records, ...records])
             }
             if (!canLoadNextPage.length) {
                 this.hasMore = false

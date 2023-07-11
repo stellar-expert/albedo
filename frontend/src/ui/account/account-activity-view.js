@@ -16,7 +16,7 @@ function AccountActivityView() {
     const {nonExisting, address, network} = accountLedgerData
     const [compact, setCompact] = useState(true)
     const [history, setHistory] = useState(null)
-    const historyModel = useTxHistory({account: [address]}, 'desc', 200)
+    const historyModel = useTxHistory({account: [address]}, 'desc', 50)
     const txHistoryRef = useRef()
     useEffect(() => {
         let newHistory = accountLedgerData.history
