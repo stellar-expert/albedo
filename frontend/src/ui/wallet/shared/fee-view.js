@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {debounce} from 'throttle-debounce'
 import {estimateFee} from '../../../util/fee-estimator'
 import './fee-view.scss'
@@ -19,14 +19,14 @@ export default function FeeView({transfer, ...otherProps}) {
         })
     }, [transfer.network, transfer.resetFee])
 
-    function change(e) {
+    const change = useCallback(e => {
         let v = e.target.value
         if (typeof v === 'string') {
             v = checkValueFee(parseFloat(v.replace(/(^[0-9]{0,1}\.?[0-9]{8,})/i, '')) || 0)
         }
         setFee(v)
         debounce(400, transfer.setFee((v / 0.0000001).toFixed(0)))
-    }
+    }, [transfer])
 
     if (!showFee) return <div className="space">
         <a className="text-small dimmed" onClick={() => setShowFee(true)}>Adjust transaction fee</a>
