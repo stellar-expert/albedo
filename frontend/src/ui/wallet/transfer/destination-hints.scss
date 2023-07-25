@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     opacity: 0;
+    visibility: hidden;
     position: absolute;
     z-index: 1;
     top: 100%;
@@ -14,7 +15,7 @@
     border: 1px solid var(--color-contrast-border);
     border-top: none;
     box-shadow: 2px 3px 6px -1px rgba(0, 0, 0, 0.3);
-    transition: opacity 0.2s ease 0.1s;
+    transition: opacity 0.2s ease 0.1s, visibility 0.2s 0.1s;
   }
 
   .account-address {
@@ -42,5 +43,6 @@
 
 .destination:focus + .address-list-block > div {
   opacity: 1;
+  visibility: visible;
   min-height: 2em;
 }

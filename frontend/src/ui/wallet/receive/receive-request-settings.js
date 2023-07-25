@@ -1,7 +1,7 @@
 import {makeAutoObservable} from 'mobx'
 import {Networks} from 'stellar-sdk'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
-import {isValidInt64Amount, safeParseBignumber} from '@stellar-expert/formatter'
+import {isValidInt64Amount} from '@stellar-expert/formatter'
 import {stringifyQuery} from '@stellar-expert/navigation'
 import {encodeMuxedAccount} from '@stellar-expert/ui-framework'
 
@@ -42,9 +42,8 @@ export default class ReceiveRequestSettings {
 
     generateSep7Link() {
         const args = {destination: this.address}
-        const parsedAmount = new safeParseBignumber(this.amount[0])
-        if (isValidInt64Amount(parsedAmount, false, true)) {
-            args.amount = parsedAmount.toString()
+        if (isValidInt64Amount(this.amount[0], true, true)) {
+            args.amount = this.amount[0].toString()
         }
         const asset = this.asset[0]
         if (asset && asset !== 'XLM') {
