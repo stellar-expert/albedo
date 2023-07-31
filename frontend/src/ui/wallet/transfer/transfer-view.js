@@ -12,10 +12,11 @@ import WalletPageActionDescription from '../shared/wallet-page-action-descriptio
 import TxMemoView from '../tx/tx-memo-view'
 import SwapBandView from '../swap/swap-band-view'
 import FeeView from '../shared/fee-view'
-import {getFederationAddress} from '../../../util/get-federation-address'
-import DropdownAddressBookView from '../../account/address-book/dropdown-address-book-view'
-import TransferValidationView from './transfer-validation-view'
 import TransferSettings from './transfer-settings'
+import TransferValidationView from './transfer-validation-view'
+import TransferDestinationView from './transfer-destination-view'
+import DestinationHintsView from './destination-hints-view'
+import TransferDestinationTitleView from './transfer-destination-title-view'
 
 const tabOptions = [
     {name: 'direct', title: 'Direct', isDefault: true},
@@ -29,13 +30,6 @@ const transferModeDescription = {
     claimable: 'create pending payment for'
 }
 
-async function getAccountPredefinedDisplayName(destinationInfo) {
-    if (window.predefinedAccountDisplayNames) return window.predefinedAccountDisplayNames[destinationInfo.account_id]
-    const federationAddress = await getFederationAddress(destinationInfo)
-    if (federationAddress) return federationAddress.split('*')[0]
-    return undefined
-}
-
 function TransferView() {
     const network = useStellarNetwork()
     const [transfer] = useDependantState(() => new TransferSettings(network), [network, accountLedgerData.address])
@@ -44,11 +38,6 @@ function TransferView() {
     const balances = accountLedgerData.balancesWithPriority
     const selfTransfer = transfer.source === transfer.destination
     const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
-    const [destinationName, setDestinationName] = useState(null)
-
-    useEffect(() => {
-        if (destinationInfo) getAccountPredefinedDisplayName(destinationInfo).then(name => setDestinationName(name))
-    }, [destinationInfo])
 
     useEffect(() => {
         const {fromAsset, destination} = parseQuery()
@@ -57,6 +46,7 @@ function TransferView() {
         }
         if (destination) {
             transfer.setDestination(destination)
+            transfer.setDestinationInputValue(destination)
         }
         navigation.updateQuery({fromAsset: undefined, destination: undefined})
         if (transfer.mode === 'convert') {
@@ -82,14 +72,11 @@ function TransferView() {
             {transferModeDescription[transfer.mode]} another Stellar account
         </WalletPageActionDescription>
         <div className="segment micro-space">
-            <div className="params">
-                <DropdownAddressBookView transfer={transfer} destinationName={destinationName} destinationInfo={destinationInfo}
-                                         onChange={transfer.setDestination.bind(transfer)}/>
-                {(destinationName && destinationInfo && !destinationInfo?.nonExisting) ?
-                    <div className="dimmed condensed text-tiny" style={{paddingTop: '0.2em'}}>
-                        [{destinationName}]
-                    </div> :
-                    <div className="space"/>}
+            <div className="params relative">
+                <TransferDestinationTitleView transfer={transfer}/>
+                <TransferDestinationView transfer={transfer}/>
+                <DestinationHintsView transfer={transfer}/>
+                <div className="space"/>
                 <TransferAmountView settings={transfer} index={0} balances={balances} restricted placeholder="Amount to send"/>
                 {transfer.mode !== 'convert' ?
                     <AvailableAmountLink settings={transfer} index={0}/> :
@@ -98,7 +85,8 @@ function TransferView() {
                         <TransferAmountView settings={transfer} index={1} balances={balances} placeholder="Amount received"/>
                     </>}
             </div>
-            {transfer.mode === 'convert' && <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
+            {transfer.mode === 'convert' &&
+                <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
             <FeeView transfer={transfer}/>
             <TxMemoView transfer={transfer}/>
             {transfer.createDestination && <p className="success text-small micro-space">

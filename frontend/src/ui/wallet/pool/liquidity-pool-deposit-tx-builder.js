@@ -27,17 +27,17 @@ export async function prepareLiquidityDepositTx(deposit) {
     if (deposit.reverse) {
         amount = amount.slice().reverse()
     }
-    const depositPrice = new Bignumber((amount[0] / amount[1]).toString())
+    const depositPrice = new Bignumber(amount[0] / amount[1])
 
     const slippageRate = deposit.slippage / 100
-    amount = amount.map(a => new Bignumber(a).mul(1 - slippageRate).toFixed(7, Bignumber.ROUND_DOWN))
+    amount = amount.map(a => new Bignumber(a).times(1 - slippageRate).toFixed(7, Bignumber.ROUND_DOWN))
 
     builder.addOperation(Operation.liquidityPoolDeposit({
         liquidityPoolId: deposit.poolId,
         maxAmountA: amount[0],
         maxAmountB: amount[1],
-        minPrice: depositPrice.mul(1 - slippageRate),
-        maxPrice: depositPrice.mul(1 + slippageRate)
+        minPrice: depositPrice.times(1 - slippageRate),
+        maxPrice: depositPrice.times(1 + slippageRate)
     }))
 
     return builder.build()

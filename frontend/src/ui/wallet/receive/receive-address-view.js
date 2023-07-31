@@ -12,7 +12,7 @@ export default observer(function ReceiveAddressView() {
             share your account address to receive a payment
         </WalletPageActionDescription>
         <div className="space">
-            <QrCodeView value={publicKey} size={300}/>
+            <QrCodeView value={publicKey}/>
         </div>
         <div className="text-center text-tiny space">
             <BlockSelect style={{overflow: 'hidden', maxWidth: '100%'}} className="text-monospace condensed">{publicKey}</BlockSelect>

@@ -13,7 +13,7 @@ function AllAccountBalancesView() {
         balances = {XLM: {asset_type: 'native', balance: 0}}
     }
     const emptyBalances = Object.values(balances)
-        .filter(balance => (new Bignumber(balance.balance).toString() === new Bignumber(0).toString()))
+        .filter(balance => balance.balance.toString() === '0')
     const [hideEmptyBalances, setHideEmptyBalances] = useState(emptyBalances.length)
 
     if (accountLedgerData.error && !nonExisting)

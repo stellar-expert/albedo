@@ -34,7 +34,7 @@ export default class LiquidityPoolWithdrawSettings {
     get max() {
         if (!this.poolInfo) return '0'
         return new Bignumber(accountLedgerData && accountLedgerData.balances[this.poolId]?.balance || '0')
-            .mul(new Bignumber(10000000))
+            .times(new Bignumber(10000000))
             .toString()
     }
 
@@ -51,7 +51,7 @@ export default class LiquidityPoolWithdrawSettings {
         const {poolInfo, amount} = this
         if (!poolInfo?.reserves) return ['0', '0']
         const slippage = 1 / 100,
-            amt = new Bignumber(amount || 0).div(10000000).mul(1 - slippage).toString()
+            amt = new Bignumber(amount || 0).div(10000000).times(1 - slippage).toString()
         return estimateLiquidityPoolStakeValue(amt, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares) || ['0', '0']
     }
 

@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {CopyToClipboard, Dropdown} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
 
-function AccountAddressListView({addressBook, addEditAddress, removeAddress}) {
+export default function AccountAddressListView({addressBook, addEditAddress, removeAddress}) {
     const [currentAddress, setCurrentAddress] = useState()
     const actionOptions = [
         {value: 'change', title: 'Change'},
@@ -40,5 +40,3 @@ function AccountAddressListView({addressBook, addEditAddress, removeAddress}) {
         })}
     </>
 }
-
-export default AccountAddressListView
