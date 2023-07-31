@@ -17,7 +17,7 @@ function AllAccountBalancesView() {
     const [hideEmptyBalances, setHideEmptyBalances] = useState(emptyBalances.length)
 
     if (accountLedgerData.error && !nonExisting)
-        return <div className="text-small error">
+        return <div className="text-small error segment">
             <i className="icon-warning"/> {accountLedgerData.error}
         </div>
 

@@ -61,7 +61,7 @@ function getTabs(intent) {
 export default function DemoIntentBlockView({intent}) {
     const intentDefinition = intentInterface[intent]
     if (!intentDefinition) return <div className="space">
-        <div className="text-center error">
+        <div className="text-center error segment">
             Unknown intent: "{intent}"
         </div>
     </div>

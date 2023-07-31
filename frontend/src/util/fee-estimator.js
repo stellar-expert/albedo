@@ -6,6 +6,15 @@ let baseFee = '100',
     lastFetched = 0,
     callPromise
 
+export const confidenceValues = ['Low', 'Normal', 'High']
+
+export function resolveConfidenceFee(value = 'Normal') {
+    const index = confidenceValues.findIndex(v => v === value)
+    if (index === -1) //Didn't find available value
+        return false
+    return baseFee + baseFee * index //resolve calculated value
+}
+
 export function estimateFee(network) {
     if (callPromise) return callPromise
     if (new Date().getTime() - lastFetched < 3000) return Promise.resolve(estimatedFee)

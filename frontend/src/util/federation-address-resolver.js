@@ -6,7 +6,7 @@ export function resolveFederationAccount(federationAddress, callback) {
         .catch(e => callback(null))//ignore resolution errors
 }
 
-export function resolveFederationName(homeDomain, account) {
+export function resolveFederationAddress(homeDomain, account) {
     if (!homeDomain)
         return Promise.resolve(null)
     return FederationServer.createForDomain(homeDomain, {timeout: 3000})

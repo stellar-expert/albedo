@@ -1,12 +1,9 @@
 .transaction-fee {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   > div:last-child {
-    width: 50%;
     display: flex;
     align-items: flex-end;
     line-height: 42px;
+    
     input {
       text-align: right;
       padding-right: 0;

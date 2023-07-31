@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {render} from 'react-dom'
 import cn from 'classnames'
 import './notifications.scss'
@@ -54,10 +54,14 @@ const iconDepends = {
     'warning': 'icon-warning',
     'error': 'icon-warning'
 }
-const timeToClose = 10 * 1000  //10 sec
+const timeToClose = 100 * 1000  //10 sec
 
 function Notification({id, type = 'info', message = '', onDelete}) {
     const [isClosing, setIsClosing] = useState(false)
+    const notification = useRef()
+    const start = useRef(Date.now())
+    const remain = useRef(timeToClose)
+    const timer = useRef()
 
     const close = useCallback(function () {
         setIsClosing(closing => {
@@ -66,17 +70,41 @@ function Notification({id, type = 'info', message = '', onDelete}) {
             setTimeout(() => onDelete(id), 300)
             return true
         })
-    }, [])
+    }, [id, onDelete])
+
+    const pauseTimer = useCallback(() => {
+        clearTimeout(timer.current)
+        timer.current = null
+        remain.current -= Date.now() - start.current
+    }, [start, remain])
+
+    const resumeTimer = useCallback(() => {
+        if (timer.current) {
+            return
+        }
+
+        start.current = Date.now()
+        timer.current = window.setTimeout(close, remain.current)
+    }, [start, remain, close])
 
     useEffect(() => {
-        setTimeout(close, timeToClose)
-    }, [])
+        timer.current = setTimeout(close, timeToClose)
 
-    return <div className={cn('container-smoothly', {grow: !isClosing})}>
-        <div className={cn('segment notification', type, {slideIn: !isClosing}, {slideOut: isClosing})}>
+        notification.current.addEventListener("mouseover", pauseTimer, true)
+        notification.current.addEventListener("mouseout", resumeTimer, true)
+        return () => {
+            notification.current?.removeEventListener('mousedown', pauseTimer, true)
+            notification.current?.removeEventListener("mouseout", resumeTimer, true)
+            notification.current = null
+        }
+    }, [close, pauseTimer, resumeTimer])
+
+    return <div className={cn('notification-wrap', `notification-${type}`, {grow: !isClosing})}>
+        <div ref={notification} className={cn('notification', {slideIn: !isClosing}, {slideOut: isClosing})}>
             <i className={cn('icon', iconDepends[type])}/>
             <div className="text-small">{message}</div>
             <div className="delete" onClick={close}><i className="icon icon-cancel"/></div>
+            <div className="lifetime" style={{animationDuration: timeToClose + 'ms'}}/>
         </div>
     </div>
 }

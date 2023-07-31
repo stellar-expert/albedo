@@ -42,7 +42,7 @@ export function getNewPaymentsSince(network, account, ledger) {
                     return payments
                 iterations++
                 return fetchPayments(records[records.length - 1].paging_token)
-            })
+            }).catch(e => console.log(e))
     }
 
     return fetchPayments(new Bignumber(ledger + 1).times(new Bignumber(4294967295)).toString())

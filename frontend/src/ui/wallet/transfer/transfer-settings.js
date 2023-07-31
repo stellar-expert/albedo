@@ -112,13 +112,9 @@ export default class TransferSettings {
      */
     isValid = false
     /**
-     * @type {Number}
+     * @type {Number | String}
      */
     fee
-    /**
-     * @type {Boolean}
-     */
-    resetFee = false
 
     /**
      * @type {String}
@@ -214,11 +210,10 @@ export default class TransferSettings {
 
     /**
      * Set fee transfer
-     * @param {Number} fee
+     * @param {Number | String} fee
      */
     setFee(fee) {
         this.fee = fee
-        this.resetFee = false
     }
 
     /**
@@ -340,7 +335,6 @@ export default class TransferSettings {
         this.createTrustline = false
         this.amount = ['0', '0']
         this.setAmount('0', 0)
-        this.resetFee = true
     }
 
     /**

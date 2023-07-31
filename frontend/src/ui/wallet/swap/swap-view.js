@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useCallback, useEffect} from 'react'
 import {observer} from 'mobx-react'
 import {useDependantState, useStellarNetwork} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
@@ -21,7 +21,7 @@ function SwapView() {
         return swap.stopLedgerStreaming
     }, [network, address])
 
-    const updateSlippage = v => swap.setSlippage(v)
+    const updateSlippage = useCallback(v => swap.setSlippage(v), [swap])
 
     return <WalletOperationsWrapperView title="Trade" action="Swap" disabled={!swap.isValid || !swap.conversionFeasible}
                                         transfer={swap}

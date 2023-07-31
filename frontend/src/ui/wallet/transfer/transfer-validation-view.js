@@ -128,9 +128,9 @@ function TransferValidationView({transfer, directoryInfo}) {
         return null
     }
 
-    return <p className="warning text-small micro-space">
+    return <div className="warning segment text-small space">
         <i className="icon-warning-hexagon"/> {validationResult}
-    </p>
+    </div>
 }
 
 export default observer(TransferValidationView)

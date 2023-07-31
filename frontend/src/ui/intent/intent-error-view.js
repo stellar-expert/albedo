@@ -11,7 +11,7 @@ function IntentErrorView() {
     return <div>
         <h2 className="color-danger">Error</h2>
         <hr className="flare"/>
-        <div className="error text-small space">
+        <div className="error segment text-small space">
             <i className="icon-warning-hexagon"/> {text}
             {(!err.code || err.code === -1) && <div className="micro-space">
                 It's likely an external application error. Please contact support team of {actionContext.origin}

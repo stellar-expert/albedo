@@ -48,7 +48,7 @@ function WebStellarLinkHandlerView() {
             <div className="loader"/>
         </SoloLayoutView>
     return <SoloLayoutView title="Intent Error">
-        <div className="error text-center double-space">{error}</div>
+        <div className="error segment text-center double-space">{error}</div>
     </SoloLayoutView>
 }
 

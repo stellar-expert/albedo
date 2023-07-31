@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
+import {AccountAddress} from '@stellar-expert/ui-framework'
 import {fetchAssetPrices} from "../../../state/ledger-data/asset-price"
-import { AccountAddress } from '@stellar-expert/ui-framework'
 
 export function ConfirmIntentionView({transfer}) {
     const selfTransfer = transfer.source === transfer.destination

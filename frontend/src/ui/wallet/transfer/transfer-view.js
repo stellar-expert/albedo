@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect} from 'react'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {Tabs, useDependantState, useDirectory, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {parseQuery, navigation} from '@stellar-expert/navigation'
-import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
+import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import SwapSlippageView from '../shared/slippage-view'
 import TransferAmountView from '../shared/transfer-amount-view'
@@ -36,8 +36,6 @@ function TransferView() {
     const destinationDirectoryInfo = useDirectory(transfer.destination)
     const disabled = !transfer.isValid || parseFloat(transfer.sourceAmount) <= 0
     const balances = accountLedgerData.balancesWithPriority
-    const selfTransfer = transfer.source === transfer.destination
-    const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
 
     useEffect(() => {
         const {fromAsset, destination} = parseQuery()
@@ -53,15 +51,15 @@ function TransferView() {
             transfer.startLedgerStreaming()
         }
         return transfer.stopLedgerStreaming
-    }, [network, accountLedgerData.address, transfer.mode])
+    }, [transfer])
 
-    function updateMode(tab) {
+    const updateMode = useCallback((tab) => {
         transfer.setMode(tab)
-    }
+    }, [transfer])
 
-    function onFinalize() {
+    const onFinalize = useCallback(() => {
         transfer.resetOperationAmount()
-    }
+    }, [transfer])
 
     return <WalletOperationsWrapperView title="Transfer" action="Transfer" disabled={disabled}
                                         transfer={transfer}
@@ -86,14 +84,15 @@ function TransferView() {
                     </>}
             </div>
             {transfer.mode === 'convert' &&
-                <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
+                <SwapSlippageView title="Max slippage" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
             <FeeView transfer={transfer}/>
             <TxMemoView transfer={transfer}/>
-            {transfer.createDestination && <p className="success text-small micro-space">
+            {transfer.createDestination && <div className="success segment text-small micro-space">
                 <i className="icon-info"/> The recipient account will be created automatically.{' '}
                 <a href="#" onClick={() => runInAction(() => transfer.createDestination = false)}>Cancel</a>{' '}
                 account auto-creation?
-            </p>}
+            </div>}
+            <TransferValidationView transfer={transfer} directoryInfo={destinationDirectoryInfo}/>
         </div>
         {transfer.mode === 'claimable' && <p className="segment dimmed text-tiny micro-space">
             Please note: the recipient will have to create a trustline and explicitly claim your payment.
@@ -101,7 +100,6 @@ function TransferView() {
             reclaim all transferred tokens and the reserved amount in case if the recipient won't claim the
             transfer.
         </p>}
-        <TransferValidationView transfer={transfer} directoryInfo={destinationDirectoryInfo}/>
     </WalletOperationsWrapperView>
 }
 

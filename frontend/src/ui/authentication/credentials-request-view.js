@@ -1,4 +1,4 @@
-import React, {useRef} from 'react'
+import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Button, useDependantState} from '@stellar-expert/ui-framework'
 import {ACCOUNT_TYPES} from '../../state/account'
@@ -19,6 +19,7 @@ export default function CredentialsRequestView({
                                                    error
                                                }) {
     const firstInputRef = useRef(null)
+    const [isValid, setIsValid] = useState(false)
 
     const [{password, confirmation, validationError}, updateState] = useDependantState(() => {
         focusFirstInput()
@@ -33,7 +34,7 @@ export default function CredentialsRequestView({
     }
 
     function confirm() {
-        const validationError = validate()
+        const validationError = validate({password, confirmation})
         if (validationError) {
             updateState({...defaultState, validationError})
             focusFirstInput()
@@ -46,7 +47,7 @@ export default function CredentialsRequestView({
     function onKeyDown(e) {
         //handle Esc key
         if (e.keyCode === 27) {
-            onCancel && cancel()
+            onCancel()
         }
         //handle Enter key
         if (e.keyCode === 13) {
@@ -54,19 +55,24 @@ export default function CredentialsRequestView({
         }
     }
 
-    function validate() {
-        if (password && password.length < 8) return 'Password too short'
+    function validate({password, confirmation}) {
+        if (password?.length < 8) return 'Password too short'
         if (requestPasswordConfirmation && password !== confirmation) return 'Passwords do not match'
         return null
     }
 
     function setValue(name, value) {
         //value = value.trim()
-        updateState(current => ({
-            ...current,
-            [name]: value,
-            validationError: null
-        }))
+        updateState(current => {
+            const newState = {
+                ...current,
+                [name]: value,
+                validationError: null
+            }
+            const validation = validate(newState)
+            setIsValid(!validation)
+            return newState
+        })
     }
 
     const errorsToShow = validationError || error
@@ -76,23 +82,23 @@ export default function CredentialsRequestView({
             <div>
                 <input type="password" name="password" placeholder="Password"
                        ref={firstInputRef} value={password || ''} onChange={e => setValue('password', e.target.value)}
-                       onKeyDown={e => onKeyDown(e)}/>
+                       onKeyDown={onKeyDown}/>
             </div>
             {requestPasswordConfirmation && <div>
                 <input type="password" name="confirmation" placeholder="Password confirmation"
                        value={confirmation || ''} onChange={e => setValue('confirmation', e.target.value)}
-                       onKeyDown={e => onKeyDown(e)}/>
+                       onKeyDown={onKeyDown}/>
             </div>}
         </div>
         <div className="row actions space">
             {onConfirm && <div className="column column-50">
-                <Button block disabled={!!inProgress} onClick={confirm}>{confirmText}</Button>
+                <Button block disabled={!!inProgress || !isValid} onClick={confirm}>{confirmText}</Button>
             </div>}
             {onCancel && <div className="column column-50">
                 <Button block outline onClick={onCancel}>Cancel</Button>
             </div>}
         </div>
-        {errorsToShow && <div className="error space text-center text-small">
+        {errorsToShow && <div className="error segment space text-small">
             <i className="icon-warning-hexagon"/> Error: {errorsToShow}
         </div>}
         {!noRegistrationLink && <>
