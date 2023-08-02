@@ -54,7 +54,7 @@ const iconDepends = {
     'warning': 'icon-warning',
     'error': 'icon-warning'
 }
-const timeToClose = 100 * 1000  //10 sec
+const timeToClose = 10 * 1000  //10 sec
 
 function Notification({id, type = 'info', message = '', onDelete}) {
     const [isClosing, setIsClosing] = useState(false)

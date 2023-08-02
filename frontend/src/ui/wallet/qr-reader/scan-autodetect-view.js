@@ -8,6 +8,10 @@ import {CameraQrReaderView} from './camera-qr-reader-view'
 import UploadQrReaderView from './upload-qr-reader-view'
 
 function onScan({parsed, error}) {
+    if (error) {
+        notify({type: 'error', message: error})
+        return
+    }
     if (!parsed)
         return
     if (StrKey.isValidEd25519PublicKey(parsed) || StrKey.isValidMed25519PublicKey(parsed))
