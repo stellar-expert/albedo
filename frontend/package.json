@@ -45,7 +45,7 @@
     "@stellar-expert/client-cache": "github:stellar-expert/client-cache",
     "@stellar-expert/eslint-config-js": "github:stellar-expert/eslint-config-js",
     "@stellar-expert/eslint-config-react": "github:stellar-expert/eslint-config-react",
-    "@stellar-expert/formatter": "github:stellar-expert/formatter#v1.3.1",
+    "@stellar-expert/formatter": "github:stellar-expert/formatter#v2.0.1",
     "@stellar-expert/liquidity-pool-utils": "github:stellar-expert/liquidity-pool-utils",
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
     "@stellar-expert/tx-signers-inspector": "^1.5.0",
