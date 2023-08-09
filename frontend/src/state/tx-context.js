@@ -1,12 +1,11 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
 import {Transaction} from 'stellar-sdk'
-import Bignumber from 'bignumber.js'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
-import accountManager from './account-manager'
 import standardErrors from '../util/errors'
 import {resolveAccountInfo} from '../util/account-info-resolver'
 import {hintMatchesKey} from '../util/signature-hint-utils'
 import {substituteSourceAccount, substituteSourceSequence, zeroAccount} from '../util/tx-replace-utils'
+import accountManager from './account-manager'
 
 export default class TxContext {
     /**
@@ -123,7 +122,7 @@ export default class TxContext {
             if (newSequence === undefined) {
                 const sourceAccount = await resolveAccountInfo(this.sourceAccount, this.networkParams)
                 //set incremented tx sequence
-                newSequence = new Bignumber(sourceAccount.sequenceNumber()).plus(1).toString()
+                newSequence = (BigInt(sourceAccount.sequenceNumber()) + 1n).toString()
             }
             substituteSourceSequence(this.tx, newSequence)
         } catch (err) {

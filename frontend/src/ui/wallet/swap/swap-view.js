@@ -8,6 +8,7 @@ import SwapSlippageView from '../shared/slippage-view'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
 import TransferSettings from '../transfer/transfer-settings'
 import TransferValidationView from '../transfer/transfer-validation-view'
+import TransactionConfirmationView from '../shared/transaction-confirmation-view'
 import FeeView from '../shared/fee-view'
 import SwapBandView from './swap-band-view'
 
@@ -19,14 +20,15 @@ function SwapView() {
     useEffect(() => {
         swap.startLedgerStreaming()
         return swap.stopLedgerStreaming
-    }, [network, address])
+    }, [swap, network, address])
 
     const updateSlippage = useCallback(v => swap.setSlippage(v), [swap])
 
-    return <WalletOperationsWrapperView title="Trade" action="Swap" disabled={!swap.isValid || !swap.conversionFeasible}
-                                        transfer={swap}
-                                        prepareTransaction={() => swap.prepareTransaction()}
-                                        onFinalize={() => swap.resetOperationAmount()}>
+    const prepareTransaction = useCallback(() => swap.prepareTransaction(), [swap])
+
+    const resetOperationAmount = useCallback(() => swap.resetOperationAmount(), [swap])
+
+    return <WalletOperationsWrapperView title="Trade">
         <WalletPageActionDescription>exchange your tokens</WalletPageActionDescription>
         <div className="swap segment micro-space">
             <div className="params">
@@ -34,10 +36,12 @@ function SwapView() {
                 <SwapBandView settings={swap} balances={balancesWithPriority}/>
                 <TransferAmountView settings={swap} index={1} balances={balancesWithPriority}/>
             </div>
-            <SwapSlippageView title="Slippage tolerance" defaultValue={1} onChange={updateSlippage}/>
+            <SwapSlippageView title="Max slippage" defaultValue={1} onChange={updateSlippage}/>
             <FeeView transfer={swap}/>
             <TransferValidationView transfer={swap}/>
         </div>
+        <TransactionConfirmationView action="Swap" disabled={!swap.isValid || !swap.conversionFeasible} transfer={swap}
+                                     prepareTransaction={prepareTransaction} onFinalize={resetOperationAmount}/>
     </WalletOperationsWrapperView>
 }
 

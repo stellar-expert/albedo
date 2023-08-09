@@ -1,11 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
-import CanvasQRReader from './canvas-qr-reader'
+import scanQrCodeFromCanvas from './scan-qr-code-from-canvas'
 
 export function CameraQrReaderView({requestText, onChange}) {
     const [accessStatus, setAccessStatus] = useState('')
     const [error, setError] = useState()
     const previewRef = useRef()
+    const localStream = useRef()
 
     useEffect(() => {
         if (accessStatus !== 'granted') {
@@ -30,28 +31,29 @@ export function CameraQrReaderView({requestText, onChange}) {
         //set video constraints for streaming
         navigator.mediaDevices.getUserMedia(videoConstraints)
             .then(stream => {
-                window.localStream = stream
+                localStream.current = stream
                 if (previewRef.current) {
                     previewRef.current.srcObject = stream
                 }
             })
             .catch(e => console.error(e))
         //scan QR code from canvas
-        const scanQRCode = setInterval(() => {
+        const periodicScanHandler = setInterval(() => {
             try {
                 if (!previewRef.current)
                     return
-                const codeReader = CanvasQRReader(previewRef.current)
-                onChange({parsed: codeReader.text})
+                const codeReader = scanQrCodeFromCanvas(previewRef.current)
+                if (codeReader)
+                    onChange({parsed: codeReader.text})
             } catch (e) {
-                console.log(e)
+                console.error(e)
             }
         }, 300)
 
         //stop streaming
         return () => {
-            window.localStream?.getTracks().forEach(track => track.stop())
-            clearInterval(scanQRCode)
+            localStream.current?.getTracks().forEach(track => track.stop())
+            clearInterval(periodicScanHandler)
         }
     }, [accessStatus, onChange])
 
@@ -149,14 +151,14 @@ function checkCameraStream() {
             })
             .catch((err) => {
                 switch (err.name) {
-                case 'NotAllowedError':
-                    reject('blocked')
-                    break
-                case 'NotFoundError':
-                    reject('unavailable')
-                    break
-                default:
-                    reject('unknown-error')
+                    case 'NotAllowedError':
+                        reject('blocked')
+                        break
+                    case 'NotFoundError':
+                        reject('unavailable')
+                        break
+                    default:
+                        reject('unknown-error')
                 }
             })
     })

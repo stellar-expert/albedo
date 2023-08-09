@@ -8,21 +8,21 @@
   }
 
   & > :first-child {
-    padding-top: 3px;
+    padding-top: 0.225em;
     width: 50%;
     max-width: 7em;
   }
 
   & > :nth-child(2) {
     flex-grow: 1;
-    padding-left: 0.5rem;
+    padding-left: 0.5em;
     justify-self: stretch;
     align-self: flex-end;
   }
 
   & > :last-child {
     width: 25%;
-    padding-left: 0.5rem;
+    padding-left: 0.5em;
     min-width: 7em;
 
     input[type="text"] {

@@ -12,6 +12,7 @@ import WalletPageActionDescription from '../shared/wallet-page-action-descriptio
 import TxMemoView from '../tx/tx-memo-view'
 import SwapBandView from '../swap/swap-band-view'
 import FeeView from '../shared/fee-view'
+import TransactionConfirmationView from '../shared/transaction-confirmation-view'
 import TransferSettings from './transfer-settings'
 import TransferValidationView from './transfer-validation-view'
 import TransferDestinationView from './transfer-destination-view'
@@ -53,18 +54,17 @@ function TransferView() {
         return transfer.stopLedgerStreaming
     }, [transfer])
 
-    const updateMode = useCallback((tab) => {
-        transfer.setMode(tab)
-    }, [transfer])
+    const updateMode = useCallback(tab => transfer.setMode(tab), [transfer])
 
-    const onFinalize = useCallback(() => {
-        transfer.resetOperationAmount()
-    }, [transfer])
+    const onFinalize = useCallback(() => transfer.resetOperationAmount(), [transfer])
 
-    return <WalletOperationsWrapperView title="Transfer" action="Transfer" disabled={disabled}
-                                        transfer={transfer}
-                                        prepareTransaction={() => transfer.prepareTransaction()}
-                                        onFinalize={onFinalize}>
+    const prepareTransaction = useCallback(() => transfer.prepareTransaction(), [transfer])
+
+    const changeSlippage = useCallback(v => transfer.setSlippage(v), [transfer])
+
+    const cancelDestinationCreation = useCallback(() => runInAction(() => transfer.createDestination = false), [transfer])
+
+    return <WalletOperationsWrapperView title="Transfer">
         <Tabs tabs={tabOptions} onChange={updateMode} selectedTab={transfer.mode} queryParam="mode" right/>
         <WalletPageActionDescription>
             {transferModeDescription[transfer.mode]} another Stellar account
@@ -84,12 +84,12 @@ function TransferView() {
                     </>}
             </div>
             {transfer.mode === 'convert' &&
-                <SwapSlippageView title="Max slippage" defaultValue={0.5} onChange={v => transfer.setSlippage(v)}/>}
+                <SwapSlippageView title="Max slippage" defaultValue={0.5} onChange={changeSlippage}/>}
             <FeeView transfer={transfer}/>
             <TxMemoView transfer={transfer}/>
             {transfer.createDestination && <div className="success segment text-small micro-space">
                 <i className="icon-info"/> The recipient account will be created automatically.{' '}
-                <a href="#" onClick={() => runInAction(() => transfer.createDestination = false)}>Cancel</a>{' '}
+                <a href="#" onClick={cancelDestinationCreation}>Cancel</a>{' '}
                 account auto-creation?
             </div>}
             <TransferValidationView transfer={transfer} directoryInfo={destinationDirectoryInfo}/>
@@ -100,6 +100,8 @@ function TransferView() {
             reclaim all transferred tokens and the reserved amount in case if the recipient won't claim the
             transfer.
         </p>}
+        <TransactionConfirmationView action="Transfer" disabled={disabled} transfer={transfer}
+                                     prepareTransaction={prepareTransaction} onFinalize={onFinalize}/>
     </WalletOperationsWrapperView>
 }
 

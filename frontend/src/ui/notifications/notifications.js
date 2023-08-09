@@ -48,7 +48,7 @@ export function Notifications() {
     </div>
 }
 
-const iconDepends = {
+const contextIcon = {
     'info': 'icon-info',
     'success': 'icon-ok',
     'warning': 'icon-warning',
@@ -101,9 +101,9 @@ function Notification({id, type = 'info', message = '', onDelete}) {
 
     return <div className={cn('notification-wrap', `notification-${type}`, {grow: !isClosing})}>
         <div ref={notification} className={cn('notification', {slideIn: !isClosing}, {slideOut: isClosing})}>
-            <i className={cn('icon', iconDepends[type])}/>
+            <i className={cn('notification-icon', contextIcon[type])}/>
             <div className="text-small">{message}</div>
-            <div className="delete" onClick={close}><i className="icon icon-cancel"/></div>
+            <div className="delete" onClick={close}><i className="notification-icon icon-cancel"/></div>
             <div className="lifetime" style={{animationDuration: timeToClose + 'ms'}}/>
         </div>
     </div>

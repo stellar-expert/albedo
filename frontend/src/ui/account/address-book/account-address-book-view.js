@@ -31,10 +31,14 @@ function finish() {
 }
 
 function isValid(addressSettings) {
-    if (!addressSettings) return false
-    if (!addressSettings.name) return false
-    if (!StrKey.isValidEd25519PublicKey(addressSettings.address) && !StrKey.isValidMed25519PublicKey(addressSettings.address)) return false
-    if (addressSettings.memo?.type !== 'none' && !addressSettings.memo?.value) return false
+    if (!addressSettings)
+        return false
+    if (!addressSettings.name)
+        return false
+    if (!StrKey.isValidEd25519PublicKey(addressSettings.address) && !StrKey.isValidMed25519PublicKey(addressSettings.address))
+        return false
+    if (addressSettings.memo?.type !== 'none' && !addressSettings.memo?.value)
+        return false
     return true
 }
 

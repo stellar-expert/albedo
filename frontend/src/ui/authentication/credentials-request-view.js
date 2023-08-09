@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react'
+import React, {useCallback, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Button, useDependantState} from '@stellar-expert/ui-framework'
 import {ACCOUNT_TYPES} from '../../state/account'
@@ -21,19 +21,28 @@ export default function CredentialsRequestView({
     const firstInputRef = useRef(null)
     const [isValid, setIsValid] = useState(false)
 
+    const focusFirstInput = useCallback(() => {
+        setTimeout(() => {
+            const input = firstInputRef.current
+            if (input)
+                input.focus()
+        }, 200)
+    }, [])
+
     const [{password, confirmation, validationError}, updateState] = useDependantState(() => {
         focusFirstInput()
         return {...defaultState}
     }, [confirmText, onConfirm, onCancel, requestPasswordConfirmation, noRegistrationLink, error])
 
-    function focusFirstInput() {
-        setTimeout(() => {
-            const input = firstInputRef.current
-            input && input.focus()
-        }, 200)
-    }
+    const validate = useCallback(({password, confirmation}) => {
+        if ((password || '').length < 8)
+            return 'Password too short'
+        if (requestPasswordConfirmation && password !== confirmation)
+            return 'Passwords do not match'
+        return null
+    }, [requestPasswordConfirmation])
 
-    function confirm() {
+    const confirm = useCallback(() => {
         const validationError = validate({password, confirmation})
         if (validationError) {
             updateState({...defaultState, validationError})
@@ -42,26 +51,20 @@ export default function CredentialsRequestView({
             updateState({...defaultState})
             onConfirm({password, type: ACCOUNT_TYPES.STORED_ACCOUNT})
         }
-    }
+    }, [validate, confirmation, onConfirm, password, updateState, focusFirstInput])
 
-    function onKeyDown(e) {
+    const onKeyDown = useCallback((e) => {
         //handle Esc key
-        if (e.keyCode === 27) {
+        if (e.keyCode === 27 && onCancel) {
             onCancel()
         }
         //handle Enter key
         if (e.keyCode === 13) {
             confirm()
         }
-    }
+    }, [onCancel, confirm])
 
-    function validate({password, confirmation}) {
-        if (password?.length < 8) return 'Password too short'
-        if (requestPasswordConfirmation && password !== confirmation) return 'Passwords do not match'
-        return null
-    }
-
-    function setValue(name, value) {
+    const setValue = useCallback((name, value) => {
         //value = value.trim()
         updateState(current => {
             const newState = {
@@ -73,7 +76,7 @@ export default function CredentialsRequestView({
             setIsValid(!validation)
             return newState
         })
-    }
+    }, [updateState, validate])
 
     const errorsToShow = validationError || error
 

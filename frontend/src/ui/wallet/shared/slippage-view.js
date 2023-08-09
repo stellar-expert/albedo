@@ -1,8 +1,10 @@
-import React, {useCallback} from 'react'
-import SliderValueView from '../../components/slider-value-view'
+import React, {useCallback, useState} from 'react'
+import {Slider} from '@stellar-expert/ui-framework'
+import SliderInputLayoutView from '../../components/slider-input-layout-view'
 
 export default function SlippageView({defaultValue = 0.5, max = 10, step = 0.5, title, onChange}) {
-    const validation = useCallback(v => {
+    const [slippageValue, setSlippageValue] = useState(defaultValue)
+    const validate = useCallback(v => {
         if (typeof v === 'string') {
             v = parseFloat(v.replace(/[^\d.]/g, '')) || 0
             if (v >= 99) {
@@ -12,9 +14,14 @@ export default function SlippageView({defaultValue = 0.5, max = 10, step = 0.5, 
         return v
     }, [])
 
+    const changeSlippage = useCallback(v => {
+        setSlippageValue(v)
+    }, [])
+
     return <div className="space">
-        <SliderValueView title={title} max={max} step={step} validation={validation} suffix='%'
-                         valueSlider={defaultValue} valueInput={defaultValue} onChangeSlider={onChange} onChangeInput={onChange}/>
+        <SliderInputLayoutView title={title} validate={validate} valueInput={slippageValue} onChangeInput={onChange} suffix='%'>
+            <Slider value={defaultValue} max={max} step={step} onChange={changeSlippage}/>
+        </SliderInputLayoutView>
     </div>
     /*<InfoTooltip>
                 Controls the amount of price slippage (the maximum % of price movement) you are willing to accept

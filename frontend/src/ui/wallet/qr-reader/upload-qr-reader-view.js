@@ -1,6 +1,6 @@
 import React, {useCallback} from 'react'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
-import CanvasQRReader from './canvas-qr-reader'
+import scanQrCodeFromCanvas from './scan-qr-code-from-canvas'
 import './upload-qr-overlay.scss'
 
 export default function UploadQrReaderView({onChange}) {
@@ -12,7 +12,7 @@ export default function UploadQrReaderView({onChange}) {
 
             img.decode()
                 .then(() => {
-                    const codeReader = CanvasQRReader(img)
+                    const codeReader = scanQrCodeFromCanvas(img)
                     onChange({parsed: codeReader.text})
                 })
                 .catch(() => {

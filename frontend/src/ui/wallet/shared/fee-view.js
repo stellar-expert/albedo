@@ -1,14 +1,15 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {debounce} from 'throttle-debounce'
+import {Slider} from '@stellar-expert/ui-framework'
 import {estimateFee, confidenceValues, resolveConfidenceFee} from '../../../util/fee-estimator'
-import SliderValueView from '../../components/slider-value-view'
-import './fee-view.scss'
+import SliderInputLayoutView from '../../components/slider-input-layout-view'
 
 const stroop = 0.0000001
 const minFee = 0.00001 //min 100 stroops
 
 function checkValueFee(v) {
-    if (v <= minFee) return minFee
+    if (v <= minFee)
+        return minFee
     return v || minFee
 }
 
@@ -23,9 +24,8 @@ export default function FeeView({transfer}) {
     const [fee, setFee] = useState(formatedValueFee((transfer?.fee)))
 
     const setEstimateFee = useCallback(() => {
-        estimateFee(transfer.network).then(estimatedFee => {
-            setFee(formatedValueFee(estimatedFee))
-        })
+        estimateFee(transfer.network)
+            .then(estimatedFee => setFee(formatedValueFee(estimatedFee)))
     }, [transfer])
 
     useEffect(() => {
@@ -36,7 +36,7 @@ export default function FeeView({transfer}) {
         return () => clearInterval(updateEstimateFee)
     }, [transfer, setEstimateFee, editorVisible])
 
-    const validation = useCallback(v => {
+    const validate = useCallback(v => {
         if (typeof v === 'string') {
             v = checkValueFee(parseFloat(v.replace(/(^[0-9]{0,1}\.?[0-9]{8,})/i, '')) || 0)
         }
@@ -57,17 +57,16 @@ export default function FeeView({transfer}) {
         debouncedUpdateFee(v => transfer.setFee(v), confidenceValues[index])
     }, [transfer])
 
-    const showEditor = useCallback(() => {
-        setEditorVisible(true)
-    }, [])
+    const showEditor = useCallback(() => setEditorVisible(true), [])
 
     if (!editorVisible)
         return <div className="space text-right">
-            <a className="condensed text-tiny dimmed" onClick={showEditor}>network fee: {fee} XLM</a>
+            <a className="condensed text-tiny dimmed" onClick={showEditor}>Network fee: {fee} XLM</a>
         </div>
 
     return <div className="space ">
-        <SliderValueView title='Network fee' max={2} step={1} categroies={confidenceValues} validation={validation} suffix='XLM'
-                         valueSlider={1} valueInput={fee} onChangeSlider={changeFeeConfidence} onChangeInput={changeFee}/>
+        <SliderInputLayoutView title="Network fee" validate={validate} valueInput={fee} onChangeInput={changeFee} suffix='XLM'>
+            <Slider value={1} max={2} step={1} categroies={confidenceValues} onChange={changeFeeConfidence}/>
+        </SliderInputLayoutView>
     </div>
 }
