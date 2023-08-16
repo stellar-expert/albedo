@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {CopyToClipboard, Dropdown} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
 
@@ -9,17 +9,17 @@ export default function AccountAddressListView({addressBook, editAddress, remove
         {value: 'remove', title: 'Remove'}
     ]
 
-    function handleActions(action) {
+    const handleActions = useCallback(action => {
         if (action === 'change') {
             editAddress(currentAddress)
         } else {
             removeAddress(currentAddress)
         }
-    }
+    }, [currentAddress, editAddress, removeAddress])
 
     return <>
-        {Object.entries(addressBook).map(([address, addressProps]) => {
-            return <div key={address} className="space">
+        {Object.entries(addressBook).map(([address, addressProps]) =>
+            <div key={address} className="space">
                 <div className="dual-layout">
                     <span className="account-address">
                         [{addressProps.name || 'Address'}]&nbsp;
@@ -37,6 +37,6 @@ export default function AccountAddressListView({addressBook, editAddress, remove
                 </p>
                 <hr/>
             </div>
-        })}
+        )}
     </>
 }

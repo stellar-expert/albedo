@@ -2,7 +2,7 @@ import {Operation, TransactionBuilder, Claimant} from 'stellar-sdk'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'
-import {estimateFee, resolveConfidenceFee} from '../../../util/fee-estimator'
+import {estimateFee} from '../../../util/fee-estimator'
 
 /**
  *
@@ -12,11 +12,10 @@ import {estimateFee, resolveConfidenceFee} from '../../../util/fee-estimator'
 export async function prepareTransferTx(transfer) {
     if (!transfer.hasSufficientBalance) return null
     const {accountData} = accountLedgerData
-    const currentFee = (typeof transfer.fee === Number) ? transfer.fee : resolveConfidenceFee(transfer.fee)
 
     const builder = new TransactionBuilder(accountData, {
         networkPassphrase: resolveNetworkParams({network: transfer.network}).network,
-        fee: currentFee ? currentFee : await estimateFee(transfer.network)
+        fee: (['low', 'normal', 'high'].includes(transfer.fee)) ? await estimateFee(transfer.network, transfer.fee) : transfer.fee
     }).setTimeout(60)
 
     if (transfer.memo) {

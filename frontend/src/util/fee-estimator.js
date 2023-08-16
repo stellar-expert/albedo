@@ -11,12 +11,13 @@ let estimatedFee // last estimated fee value
  * @param {'low', 'normal', 'high'} [confidence] - Estimation confidence
  * @return {Promise<String>}
  */
-function estimateFee(network, confidence = 'normal') {
-    return fetchEstimates(network, confidence)
+export function estimateFee(network, confidence = 'normal') {
+    return fetchEstimates(network)
         .then(estimates => estimates[confidence])
 }
 
-function fetchEstimates(network, confidence) {
+
+function fetchEstimates(network) {
     if (feePromise) // return a cached promise if the fee fetching process is in progress
         return feePromise
     const now = new Date().getTime()

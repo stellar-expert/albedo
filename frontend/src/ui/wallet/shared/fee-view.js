@@ -1,11 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {debounce} from 'throttle-debounce'
+import {formatWithPrecision} from '@stellar-expert/formatter'
 import {Slider} from '@stellar-expert/ui-framework'
-import {estimateFee, confidenceValues, resolveConfidenceFee} from '../../../util/fee-estimator'
+import {estimateFee} from '../../../util/fee-estimator'
 import SliderInputLayoutView from '../../components/slider-input-layout-view'
 
 const stroop = 0.0000001
 const minFee = 0.00001 //min 100 stroops
+const confidenceValues = ['low', 'normal', 'high']
 
 function checkValueFee(v) {
     if (v <= minFee)
@@ -13,19 +15,17 @@ function checkValueFee(v) {
     return v || minFee
 }
 
-function formatedValueFee(v) {
-    return (v * stroop).toFixed(7).replace(/0*$/,"")
-}
-
 const debouncedUpdateFee = debounce(400, (callback, value) => callback(value))
 
 export default function FeeView({transfer}) {
     const [editorVisible, setEditorVisible] = useState(false)
-    const [fee, setFee] = useState(formatedValueFee((transfer?.fee)))
+    const [fee, setFee] = useState(formatWithPrecision((transfer?.fee * stroop)))
 
     const setEstimateFee = useCallback(() => {
         estimateFee(transfer.network)
-            .then(estimatedFee => setFee(formatedValueFee(estimatedFee)))
+            .then(estimatedFee => {
+                setFee(formatWithPrecision(estimatedFee * stroop))
+            })
     }, [transfer])
 
     useEffect(() => {
@@ -46,14 +46,14 @@ export default function FeeView({transfer}) {
     //change the fee using the input
     const changeFee = useCallback(v => {
         setFee(v)
-        debouncedUpdateFee(v => transfer.setFee(v), (v / stroop).toFixed(0))
+        debouncedUpdateFee(v => transfer.setFee(v), formatWithPrecision(v / stroop))
     }, [transfer])
 
     //change the fee using the slider
-    const changeFeeConfidence = useCallback(v => {
+    const changeFeeConfidence = useCallback(async v => {
         const index = v || 0
-        const feeValue = resolveConfidenceFee(confidenceValues[index]) || minFee
-        setFee(formatedValueFee(feeValue))
+        const feeValue = await estimateFee(transfer.network, confidenceValues[index]) * stroop || minFee
+        setFee(formatWithPrecision(feeValue))
         debouncedUpdateFee(v => transfer.setFee(v), confidenceValues[index])
     }, [transfer])
 
