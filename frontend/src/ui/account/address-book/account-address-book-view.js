@@ -12,7 +12,7 @@ import WalletPageActionDescription from '../../wallet/shared/wallet-page-action-
 import WalletOperationsWrapperView from '../../wallet/shared/wallet-operations-wrapper-view'
 import AccountContextView from '../account-context-view'
 import AccountAddressbookForm from './account-address-book-form'
-import AccountAddressListView from './account-address-list-view'
+import AccountAddressView from './account-address-view'
 
 export const addressBlank = {
     "name": "",
@@ -112,10 +112,10 @@ function AccountAddressBookView() {
         <WalletOperationsWrapperView title="Address book" allowNonExisting>
             <hr className="flare"/>
             <WalletPageActionDescription>frequently used addresses and trusted contacts</WalletPageActionDescription>
-            <div className="space"/>
-            {Object.keys(addressBook).length ?
-                <AccountAddressListView addressBook={addressBook} editAddress={editAddress} removeAddress={removeAddress}/> :
-                <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
+            {Object.keys(addressBook) ? Object.entries(addressBook).map(([address, addressProps]) =>
+                <AccountAddressView key={address} addressSettings={[address, addressProps]}
+                                    editAddress={editAddress} removeAddress={removeAddress}/>) :
+            <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
             <div className="row actions double-space">
                 <div className="column column-50">
                     <Button block onClick={addAddress}><i className="icon-add-circle"/> Add new address</Button>
