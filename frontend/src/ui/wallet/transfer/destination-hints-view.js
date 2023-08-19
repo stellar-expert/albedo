@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {observer} from 'mobx-react'
-import {runInAction, toJS} from 'mobx'
+import {runInAction} from 'mobx'
 import {AccountAddress, Button} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
 import {persistAccountInBrowser} from '../../../storage/account-storage'
@@ -13,7 +13,7 @@ export default observer(function DestinationHintsView({transfer}) {
     const [editorVisible, setEditorVisible] = useState(false)
     const [title, setTitle] = useState('')
     const destinationSuggestions = getDestinationSuggestions(destinationInputValue)
-    const destinationIsOwnAccount = toJS(accountManager.accounts).findIndex(account => account.publicKey.startsWith(destination)) !== -1
+    const destinationIsOwnAccount = accountManager.accounts.some(account => account.publicKey.startsWith(destination))
     const addressListBlock = useRef()
 
     //add to the address book

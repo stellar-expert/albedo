@@ -6,12 +6,12 @@ export default function SliderInputLayoutView({title, validate, valueInput, onCh
     const [innerValueInput, setInnerValueInput] = useState(valueInput + suffix)
     const changeInput = useMemo(() => throttle(400, v => onChangeInput(v)), [onChangeInput])
 
-    const changeValueInput = useCallback(e => {
+    const changeInputValue = useCallback(e => {
         const validatedValue = validate(e.target.value)
         const value = validatedValue + suffix
         setInnerValueInput(value)
         changeInput(validatedValue)
-    }, [changeInput, validate, suffix])
+    }, [validate, suffix])
 
     useEffect(() => {
         setInnerValueInput(valueInput + suffix)
@@ -23,7 +23,7 @@ export default function SliderInputLayoutView({title, validate, valueInput, onCh
             {children}
         </div>
         <div>
-            <input type="text" className='condensed' value={innerValueInput} onChange={changeValueInput}/>
+            <input type="text" className='condensed' value={innerValueInput} onChange={changeInputValue}/>
         </div>
     </div>
 }

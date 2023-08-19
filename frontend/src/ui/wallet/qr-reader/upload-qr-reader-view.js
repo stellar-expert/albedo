@@ -12,8 +12,12 @@ export default function UploadQrReaderView({onChange}) {
 
             img.decode()
                 .then(() => {
-                    const codeReader = scanQrCodeFromCanvas(img)
-                    onChange({parsed: codeReader.text})
+                    const parsed = scanQrCodeFromCanvas(img)
+                    if (parsed) {
+                        onChange({parsed})
+                    } else {
+                        onChange({error: 'Failed to locate QR core on the uploaded image'})
+                    }
                 })
                 .catch(() => {
                     onChange({error: 'Failed to locate QR core on the uploaded image'})

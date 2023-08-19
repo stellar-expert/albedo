@@ -51,7 +51,7 @@ export default function CredentialsRequestView({
             updateState({...defaultState})
             onConfirm({password, type: ACCOUNT_TYPES.STORED_ACCOUNT})
         }
-    }, [validate, confirmation, onConfirm, password, updateState, focusFirstInput])
+    }, [validate, confirmation, onConfirm, updateState, focusFirstInput])
 
     const onKeyDown = useCallback((e) => {
         //handle Esc key

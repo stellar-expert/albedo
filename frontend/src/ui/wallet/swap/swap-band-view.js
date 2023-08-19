@@ -16,7 +16,7 @@ function SwapBandView({settings, balances}) {
     const predefinedAssets = balances?.map(b => b.id).filter(a => !isValidPoolId(a))
     const disabled = !predefinedAssets.includes(settings.asset[1]) || settings.asset[0] === settings.asset[1]
 
-    const assetReverse = useCallback(() => settings.reverse(), [settings])
+    const reverseAsset = useCallback(() => settings.reverse(), [settings])
 
     return <div className="swap-band dual-layout">
         {settings.mode === 'convert' ? <>
@@ -25,7 +25,7 @@ function SwapBandView({settings, balances}) {
                 {!!settings.conversionPrice && `~${formatPrice(settings.conversionPrice)} ${extractCode(settings.asset[1])}/${extractCode(settings.asset[0])}`}
             </div>
             <div className="switch">
-                {disabled ? <i className="icon-shuffle"/> : <a href="#" className="icon-shuffle" onClick={assetReverse}/>}
+                {disabled ? <i className="icon-shuffle"/> : <a href="#" className="icon-shuffle" onClick={reverseAsset}/>}
             </div>
         </> : <div/>}
         <AvailableAmountLink settings={settings} index={0}/>

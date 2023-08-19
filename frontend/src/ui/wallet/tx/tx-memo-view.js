@@ -43,15 +43,19 @@ function TxMemoView({transfer, allowMuxed = true}) {
             setType(transfer.memo?.type || 'none')
             setValue(transfer.memo?.value || '')
         }
-    }, [transfer.memo])
+    }, [transfer])
 
-    const setMemoType = useCallback((type) => {
+    const setMemoType = useCallback(type => {
         setType(type)
-        setMemo(transfer, type, value)
+        setValue(currentValue => {
+            setMemo(transfer, type, currentValue)
+            return currentValue
+        })
+
         if (allowMuxed && transfer.encodeMuxedAddress && type !== 'id') {
             transfer.toggleMuxed()
         }
-    }, [transfer, allowMuxed, value])
+    }, [transfer, allowMuxed])
 
     const setMemoValue = useCallback(e => {
         const {value} = e.target
@@ -67,7 +71,7 @@ function TxMemoView({transfer, allowMuxed = true}) {
             <input type="text" value={value} onChange={setMemoValue} placeholder={getPlaceholder(type)} ref={useAutoFocusRef}/>
         </div>}
         {!!allowMuxed && type === 'id' && <label className="micro-space text-tiny">
-            <input type="checkbox" defaultChecked={!!transfer.encodeMuxedAddress} onChange={toggleMuxed}/>{' '}
+            <input type="checkbox" checked={!!transfer.encodeMuxedAddress} onChange={toggleMuxed}/>&nbsp;
             Encode as multiplexed address <span className="dimmed">(starting with M...)</span>
         </label>}
     </div>

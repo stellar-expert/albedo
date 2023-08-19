@@ -3,7 +3,7 @@ import {BrowserQRCodeReader} from '@zxing/browser'
 const minDetectionAreaWidth = 600 //minimum resolution for QR code detection
 
 /**
- * Scan QR code from canvas. Canvas use Image or Video component like source.
+ *  Render video or image on canvas, apply contrast improvement filters, and try to detect QR code.
  * @param {Object} source - Image or Video component
  * @return {Object | null}
  */
@@ -25,13 +25,13 @@ export default function scanQrCodeFromCanvas(source) {
     const sourceDataBrightnessFilter = context.getImageData(0, 0, imgWidth, imgHeight)
     let result = tryScan(canvas, context, applyBrightnessFilter(sourceDataBrightnessFilter))
     if (result?.text)
-        return result
+        return result.text
     //try contrast filter if the brightness filter didn't help
-    context.filter = "contrast(200%)"
+    //context.filter = "contrast(200%)" //when all browsers will supports native filter - we could use it
     context.drawImage(source, 0, 0, imgWidth, imgHeight)
     const sourceDataContrastFilter = context.getImageData(0, 0, imgWidth, imgHeight)
-    result = tryScan(canvas, context, sourceDataContrastFilter.data)
-    return result
+    result = tryScan(canvas, context, applyContrastFilter(sourceDataContrastFilter))
+    return result?.text
 }
 
 function applyBrightnessFilter(sourceData) {
@@ -45,6 +45,39 @@ function applyBrightnessFilter(sourceData) {
         r += delta
         g += delta
         b += delta
+
+        if (r > 255) r = 255
+        else if (r < 0) r = 0
+        if (g > 255) g = 255
+        else if (g < 0) g = 0
+        if (b > 255) b = 255
+        else if (b < 0) b = 0
+
+        src[i] = (src[i] & 0xFF000000) | (b << 16) | (g << 8) | r
+    }
+    return new Uint8ClampedArray(src.buffer)
+}
+
+function applyContrastFilter(sourceData) {
+    const src = new Uint32Array(sourceData.data.buffer)
+    const delta = 1
+    let avgGray = 0
+    for (let i = 0; i < src.length; i++) {
+        const r = src[i] & 0xFF
+        const g = (src[i] >> 8) & 0xFF
+        const b = (src[i] >> 16) & 0xFF
+        avgGray += (r * 0.2126 + g * 0.7152 + b * 0.0722)
+    }
+    avgGray /= src.length
+
+    for (let i = 0; i < src.length; i++) {
+        let r = src[i] & 0xFF
+        let g = (src[i] >> 8) & 0xFF
+        let b = (src[i] >> 16) & 0xFF
+
+        r += (r - avgGray) * delta
+        g += (g - avgGray) * delta
+        b += (b - avgGray) * delta
 
         if (r > 255) r = 255
         else if (r < 0) r = 0

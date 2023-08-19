@@ -42,9 +42,9 @@ export function CameraQrReaderView({requestText, onChange}) {
             try {
                 if (!previewRef.current)
                     return
-                const codeReader = scanQrCodeFromCanvas(previewRef.current)
-                if (codeReader)
-                    onChange({parsed: codeReader.text})
+                const result = scanQrCodeFromCanvas(previewRef.current)
+                if (result)
+                    onChange({parsed: result})
             } catch (e) {
                 console.error(e)
             }

@@ -31,8 +31,9 @@ export default function FeeView({transfer}) {
     useEffect(() => {
         setEstimateFee()
         const updateEstimateFee = setInterval(setEstimateFee, 5000) //check fee every 5 seconds
-        if (editorVisible)
+        if (editorVisible) {
             clearInterval(updateEstimateFee)
+        }
         return () => clearInterval(updateEstimateFee)
     }, [transfer, setEstimateFee, editorVisible])
 

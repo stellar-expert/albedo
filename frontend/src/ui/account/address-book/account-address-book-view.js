@@ -11,8 +11,8 @@ import ActionLoaderView from '../../wallet/shared/action-loader-view'
 import WalletPageActionDescription from '../../wallet/shared/wallet-page-action-description'
 import WalletOperationsWrapperView from '../../wallet/shared/wallet-operations-wrapper-view'
 import AccountContextView from '../account-context-view'
-import AccountAddressbookForm from './account-address-book-form'
-import AccountAddressView from './account-address-view'
+import AccountAddressBookForm from './account-address-book-form'
+import AddressBookEntryView from './address-book-entry-view'
 
 export const addressBlank = {
     "name": "",
@@ -113,8 +113,8 @@ function AccountAddressBookView() {
             <hr className="flare"/>
             <WalletPageActionDescription>frequently used addresses and trusted contacts</WalletPageActionDescription>
             {Object.keys(addressBook) ? Object.entries(addressBook).map(([address, addressProps]) =>
-                <AccountAddressView key={address} addressSettings={[address, addressProps]}
-                                    editAddress={editAddress} removeAddress={removeAddress}/>) :
+                <AddressBookEntryView key={address} addressSettings={[address, addressProps]}
+                                      editAddress={editAddress} removeAddress={removeAddress}/>) :
             <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
             <div className="row actions double-space">
                 <div className="column column-50">
@@ -126,7 +126,7 @@ function AccountAddressBookView() {
             </div>
             {addressSettings && <DialogView dialogOpen={dialogOpen}>
                 <h2>{editAction ? 'Edit' : 'Add new'} address</h2>
-                <AccountAddressbookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
+                <AccountAddressBookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
                 <div className="row actions space">
                     <div className="column column-50">
                         <Button block disabled={!isValid(addressSettings)} onClick={saveAddress}>Save</Button>

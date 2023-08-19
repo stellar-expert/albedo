@@ -115,6 +115,10 @@ export default class TransferSettings {
      * @type {Number | String}
      */
     fee
+    /**
+     * @type {Boolean}
+     */
+    encodeMuxedAddress = false
 
     /**
      * @type {String}

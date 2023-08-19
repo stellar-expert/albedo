@@ -1,7 +1,5 @@
-@import '../styles.scss';
-
 .notifications-container {
-  $space-custom: 0.75*$space-standard;
+  $notification-inner-space: 0.75*$space-standard;
 
   position: fixed;
   top: 0;
@@ -9,11 +7,14 @@
   display: flex;
   flex-direction: column-reverse;
   padding: 3px;
-  max-width: Min(60vw, calc((100vw - #{$container-width}) / 2));
+  max-width: 60vw;
   z-index: 999;
 
   .notification-wrap {
     padding: 0;
+    width: 100%;
+    max-width: Max(15em, calc((100vw - 50em) / 2));
+    align-self: flex-end;
     background: transparent;
     filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.1));
 
@@ -30,8 +31,7 @@
       display: flex;
       align-items: start;
       width: 100%;
-      max-width: 30em;
-      padding: $space-custom 3*$space-custom $space-custom $space-custom;
+      padding: $notification-inner-space 3*$notification-inner-space $notification-inner-space $notification-inner-space;
       transition: transform 0.3s ease-out;
       opacity: 0.9;
 
@@ -90,7 +90,7 @@
         cursor: pointer;
         color: var(--color-text);
         position: absolute;
-        top: $space-custom;
+        top: $notification-inner-space;
         right: $space-micro;
         padding-top: 1px;
       }

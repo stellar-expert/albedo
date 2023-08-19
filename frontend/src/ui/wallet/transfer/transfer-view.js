@@ -62,7 +62,9 @@ function TransferView() {
 
     const changeSlippage = useCallback(v => transfer.setSlippage(v), [transfer])
 
-    const cancelDestinationCreation = useCallback(() => runInAction(() => transfer.createDestination = false), [transfer])
+    const cancelDestinationCreation = useCallback(() => runInAction(() => {
+        transfer.createDestination = false
+    }), [transfer])
 
     return <WalletOperationsWrapperView title="Transfer">
         <Tabs tabs={tabOptions} onChange={updateMode} selectedTab={transfer.mode} queryParam="mode" right/>

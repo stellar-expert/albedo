@@ -7,7 +7,7 @@ const actionOptions = [
     {value: 'remove', title: 'Remove'}
 ]
 
-export default function AccountAddressView({addressSettings, editAddress, removeAddress}) {
+export default function AddressBookEntryView({addressSettings, editAddress, removeAddress}) {
     const [address, addressProps] = addressSettings
 
     const handleActions = useCallback(action => {
