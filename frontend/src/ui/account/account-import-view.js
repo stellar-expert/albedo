@@ -103,7 +103,7 @@ export default function AccountImportView({onSuccess}) {
                 <Button block outline onClick={() => navigation.navigate('/')}>Cancel</Button>
             </div>
         </div>
-        {error && <div className="space error text-small">
+        {error && <div className="space error segment text-small">
             {error.type === 'unknown' ? 'Invalid key format. Use either 24-word passphrase or Stellar secret key.' : <>
                 Auto-detected import type: <b>{error.type}</b><br/>
                 Error: {error.details}

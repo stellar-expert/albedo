@@ -33,7 +33,7 @@ ${navigator.userAgent}`
             return <div className="container">
                 <h3>Unhandled error occurred</h3>
                 <hr className="flare"/>
-                <div className="error space text-small" style={{overflow: 'auto', maxWidth: '100%'}}>
+                <div className="error segment space text-small" style={{overflow: 'auto', maxWidth: '100%'}}>
                     <BlockSelect as="div">
                         <div className="micro-space">
                             "{message}" at {window.location.href}

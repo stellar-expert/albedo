@@ -1,19 +1,8 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {useDirectory} from '@stellar-expert/ui-framework'
-import {resolveFederationName} from '../../../util/federation-address-resolver'
 import accountManager from '../../../state/account-manager'
 import './transfer-destination-title.scss'
-
-
-async function getAccountPredefinedDisplayName(destinationInfo) {
-    if (window.predefinedAccountDisplayNames)
-        return window.predefinedAccountDisplayNames[destinationInfo.account_id]
-    const federationAddress = await resolveFederationName(destinationInfo)
-    if (federationAddress)
-        return federationAddress.split('*')[0]
-    return undefined
-}
 
 export default observer(function TransferDestinationTitleView({transfer}) {
     const directoryInfo = useDirectory(transfer.destination)

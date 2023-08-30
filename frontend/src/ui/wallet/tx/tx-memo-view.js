@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Memo} from 'stellar-sdk'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
@@ -43,21 +43,27 @@ function TxMemoView({transfer, allowMuxed = true}) {
             setType(transfer.memo?.type || 'none')
             setValue(transfer.memo?.value || '')
         }
-    }, [transfer.memo])
+    }, [transfer])
 
-    function setMemoType(type) {
+    const setMemoType = useCallback(type => {
         setType(type)
-        setMemo(transfer, type, value)
+        setValue(currentValue => {
+            setMemo(transfer, type, currentValue)
+            return currentValue
+        })
+
         if (allowMuxed && transfer.encodeMuxedAddress && type !== 'id') {
             transfer.toggleMuxed()
         }
-    }
+    }, [transfer, allowMuxed])
 
-    function setMemoValue(e) {
+    const setMemoValue = useCallback(e => {
         const {value} = e.target
         setValue(value)
         setMemo(transfer, type, value)
-    }
+    }, [transfer, type])
+
+    const toggleMuxed = useCallback(() => transfer.toggleMuxed(), [transfer])
 
     return <div className="text-small dimmed space">
         Transaction memo: <Dropdown options={memoTypes} value={type} onChange={setMemoType}/> (optional)
@@ -65,7 +71,7 @@ function TxMemoView({transfer, allowMuxed = true}) {
             <input type="text" value={value} onChange={setMemoValue} placeholder={getPlaceholder(type)} ref={useAutoFocusRef}/>
         </div>}
         {!!allowMuxed && type === 'id' && <label className="micro-space text-tiny">
-            <input type="checkbox" defaultChecked={!!transfer.encodeMuxedAddress} onChange={() => transfer.toggleMuxed()}/>{' '}
+            <input type="checkbox" checked={!!transfer.encodeMuxedAddress} onChange={toggleMuxed}/>&nbsp;
             Encode as multiplexed address <span className="dimmed">(starting with M...)</span>
         </label>}
     </div>

@@ -1,22 +1,29 @@
-import React from 'react'
-import {BrowserQRCodeReader} from '@zxing/browser'
-import './upload-qr-overlay.scss'
+import React, {useCallback} from 'react'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
+import scanQrCodeFromCanvas from './scan-qr-code-from-canvas'
+import './upload-qr-overlay.scss'
 
 export default function UploadQrReaderView({onChange}) {
-    function selectFile(e) {
+    const selectFile = useCallback(e => {
         const [file] = e.target.files
         if (file) {
-            const img = URL.createObjectURL(file)
-            const codeReader = new BrowserQRCodeReader(null)
-            codeReader.decodeFromImageUrl(img)
-                .then(res => onChange({parsed: res.text}))
-                .catch(e => {
-                    console.error(e)
+            const img = new Image()
+            img.src = URL.createObjectURL(file)
+
+            img.decode()
+                .then(() => {
+                    const parsed = scanQrCodeFromCanvas(img)
+                    if (parsed) {
+                        onChange({parsed})
+                    } else {
+                        onChange({error: 'Failed to locate QR core on the uploaded image'})
+                    }
+                })
+                .catch(() => {
                     onChange({error: 'Failed to locate QR core on the uploaded image'})
                 })
         }
-    }
+    }, [onChange])
 
     return <>
         <WalletPageActionDescription>

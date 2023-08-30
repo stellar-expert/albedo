@@ -72,7 +72,7 @@ export default function WcPairView() {
 
     return <WalletOperationsWrapperView title={<span style={{textTransform: 'none'}}>WalletConnect</span>}>
         <Tabs tabs={tabs} right/>
-        {!!error && <div className="error space text-small">
+        {!!error && <div className="error segment space text-small">
             {error}
         </div>}
     </WalletOperationsWrapperView>

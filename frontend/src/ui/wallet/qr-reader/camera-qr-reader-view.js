@@ -1,11 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react'
-import {BrowserQRCodeReader} from '@zxing/browser'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
+import scanQrCodeFromCanvas from './scan-qr-code-from-canvas'
 
 export function CameraQrReaderView({requestText, onChange}) {
     const [accessStatus, setAccessStatus] = useState('')
     const [error, setError] = useState()
     const previewRef = useRef()
+    const localStream = useRef()
 
     useEffect(() => {
         if (accessStatus !== 'granted') {
@@ -27,23 +28,34 @@ export function CameraQrReaderView({requestText, onChange}) {
             //stop polling on exit
             return () => clearInterval(permissionPollInterval)
         }
-        //init reader
-        const codeReader = new BrowserQRCodeReader(null, {delayBetweenScanAttempts: 300})
-        //attach reader to the preview control and set video constraints
-        let decoderControls
-        codeReader.decodeFromConstraints(videoConstraints, previewRef.current, (res, e) => {
-            if (e) {
-                if (e.name === 'NotFoundException') return
-                console.error(e)
-            } else {
-                onChange({parsed: res.text})
-            }
-        })
-            .then(controls => decoderControls = controls)
+        //set video constraints for streaming
+        navigator.mediaDevices.getUserMedia(videoConstraints)
+            .then(stream => {
+                localStream.current = stream
+                if (previewRef.current) {
+                    previewRef.current.srcObject = stream
+                }
+            })
             .catch(e => console.error(e))
-        //stop decoding
-        return () => decoderControls?.stop()
-    }, [accessStatus])
+        //scan QR code from canvas
+        const periodicScanHandler = setInterval(() => {
+            try {
+                if (!previewRef.current)
+                    return
+                const result = scanQrCodeFromCanvas(previewRef.current)
+                if (result)
+                    onChange({parsed: result})
+            } catch (e) {
+                console.error(e)
+            }
+        }, 300)
+
+        //stop streaming
+        return () => {
+            localStream.current?.getTracks().forEach(track => track.stop())
+            clearInterval(periodicScanHandler)
+        }
+    }, [accessStatus, onChange])
 
     //show loader if access has not been granted yet
     if (!accessStatus)
@@ -82,7 +94,7 @@ export function CameraQrReaderView({requestText, onChange}) {
         return <div>
             <WalletPageActionDescription>{requestText}</WalletPageActionDescription>
             <div className="qr-overlay space">
-                <video muted className="qr-camera-preview" ref={previewRef} style={{width: '100%', minHeight: '60%'}}/>
+                <video muted autoPlay className="qr-camera-preview" ref={previewRef} style={{width: '100%', minHeight: '60%'}}/>
                 <div className="overlay camera-frame"/>
             </div>
         </div>

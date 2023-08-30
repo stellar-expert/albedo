@@ -8,11 +8,11 @@ import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import authorizationService from '../../../state/auth/authorization'
 import ActionLoaderView from '../../wallet/shared/action-loader-view'
-import AccountAddressbookForm from './account-address-book-form'
-import AccountAddressListView from './account-address-list-view'
 import WalletPageActionDescription from '../../wallet/shared/wallet-page-action-description'
 import WalletOperationsWrapperView from '../../wallet/shared/wallet-operations-wrapper-view'
 import AccountContextView from '../account-context-view'
+import AccountAddressBookForm from './account-address-book-form'
+import AddressBookEntryView from './address-book-entry-view'
 
 export const addressBlank = {
     "name": "",
@@ -31,10 +31,14 @@ function finish() {
 }
 
 function isValid(addressSettings) {
-    if (!addressSettings) return false
-    if (!addressSettings.name) return false
-    if (!StrKey.isValidEd25519PublicKey(addressSettings.address) && !StrKey.isValidMed25519PublicKey(addressSettings.address)) return false
-    if (addressSettings.memo?.type !== 'none' && !addressSettings.memo?.value) return false
+    if (!addressSettings)
+        return false
+    if (!addressSettings.name)
+        return false
+    if (!StrKey.isValidEd25519PublicKey(addressSettings.address) && !StrKey.isValidMed25519PublicKey(addressSettings.address))
+        return false
+    if (addressSettings.memo?.type !== 'none' && !addressSettings.memo?.value)
+        return false
     return true
 }
 
@@ -59,7 +63,7 @@ function AccountAddressBookView() {
             })
     })
 
-    const addEditAddress = useCallback((address) => {
+    const editAddress = useCallback((address) => {
         const curAddress = address ? {...addressBook[address]} : addressBlank
         setAddressSettings({
             address,
@@ -67,7 +71,20 @@ function AccountAddressBookView() {
         })
         setEditAction(!!address)
         setDialogOpen(true)
-    }, [addressBook])
+    }, [addressBook, setAddressSettings])
+
+    const addAddress = useCallback(() => {
+        editAddress(null)
+    }, [editAddress])
+
+    const saveAddressBook = useCallback((copyAddressBook) => {
+        delete copyAddressBook.editMode
+        activeAccount.addressBook = copyAddressBook
+        setAddressBook(copyAddressBook)
+        activeAccount.save(credentials)
+            .catch(e => console.error(e))
+        setDialogOpen(false)
+    }, [activeAccount, credentials])
 
     const saveAddress = useCallback(() => {
         const copyAddressBook = {...addressBook}
@@ -86,15 +103,6 @@ function AccountAddressBookView() {
         }
     }, [addressBook, saveAddressBook])
 
-    function saveAddressBook(copyAddressBook) {
-        delete copyAddressBook.editMode
-        activeAccount.addressBook = copyAddressBook
-        setAddressBook(copyAddressBook)
-        activeAccount.save(credentials)
-            .catch(e => console.error(e))
-        setDialogOpen(false)
-    }
-
     if (!credentials)
         return <AccountContextView>
             <ActionLoaderView message="waiting for authorization"/>
@@ -104,13 +112,13 @@ function AccountAddressBookView() {
         <WalletOperationsWrapperView title="Address book" allowNonExisting>
             <hr className="flare"/>
             <WalletPageActionDescription>frequently used addresses and trusted contacts</WalletPageActionDescription>
-            <div className="space"/>
-            {Object.keys(addressBook).length ?
-                <AccountAddressListView addressBook={addressBook} addEditAddress={addEditAddress} removeAddress={removeAddress}/> :
-                <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
+            {Object.keys(addressBook) ? Object.entries(addressBook).map(([address, addressProps]) =>
+                <AddressBookEntryView key={address} addressSettings={[address, addressProps]}
+                                      editAddress={editAddress} removeAddress={removeAddress}/>) :
+            <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
             <div className="row actions double-space">
                 <div className="column column-50">
-                    <Button block onClick={() => addEditAddress(null)}><i className="icon-add-circle"/> Add new address</Button>
+                    <Button block onClick={addAddress}><i className="icon-add-circle"/> Add new address</Button>
                 </div>
                 <div className="column column-50">
                     <Button block outline onClick={finish}>Back</Button>
@@ -118,7 +126,7 @@ function AccountAddressBookView() {
             </div>
             {addressSettings && <DialogView dialogOpen={dialogOpen}>
                 <h2>{editAction ? 'Edit' : 'Add new'} address</h2>
-                <AccountAddressbookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
+                <AccountAddressBookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
                 <div className="row actions space">
                     <div className="column column-50">
                         <Button block disabled={!isValid(addressSettings)} onClick={saveAddress}>Save</Button>

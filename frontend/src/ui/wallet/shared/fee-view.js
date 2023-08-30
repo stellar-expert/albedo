@@ -1,41 +1,73 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {debounce} from 'throttle-debounce'
+import {formatWithPrecision} from '@stellar-expert/formatter'
+import {Slider} from '@stellar-expert/ui-framework'
 import {estimateFee} from '../../../util/fee-estimator'
-import './fee-view.scss'
+import SliderInputLayoutView from '../../components/slider-input-layout-view'
+
+const stroop = 0.0000001
+const minFee = 0.00001 //min 100 stroops
+const confidenceValues = ['low', 'normal', 'high']
 
 function checkValueFee(v) {
-    if (v <= 0.00001) return 0.00001
-    return v || 0.00001
+    if (v <= minFee)
+        return minFee
+    return v || minFee
 }
 
-export default function FeeView({transfer, ...otherProps}) {
-    const [showFee, setShowFee] = useState(false)
-    const [fee, setFee] = useState(checkValueFee(transfer?.fee * 0.0000001))
+const debouncedUpdateFee = debounce(400, (callback, value) => callback(value))
+
+export default function FeeView({transfer}) {
+    const [editorVisible, setEditorVisible] = useState(false)
+    const [fee, setFee] = useState(formatWithPrecision((transfer?.fee * stroop)))
+
+    const setEstimateFee = useCallback(() => {
+        estimateFee(transfer.network)
+            .then(estimatedFee => {
+                setFee(formatWithPrecision(estimatedFee * stroop))
+            })
+    }, [transfer])
 
     useEffect(() => {
-        if (transfer.resetFee) estimateFee(transfer.network).then(estimatedFee => {
-            transfer.setFee(estimatedFee)
-            setFee(checkValueFee(estimatedFee * 0.0000001))
-        })
-    }, [transfer.network, transfer.resetFee])
+        setEstimateFee()
+        const updateEstimateFee = setInterval(setEstimateFee, 5000) //check fee every 5 seconds
+        if (editorVisible) {
+            clearInterval(updateEstimateFee)
+        }
+        return () => clearInterval(updateEstimateFee)
+    }, [transfer, setEstimateFee, editorVisible])
 
-    function change(e) {
-        let v = e.target.value
+    const validate = useCallback(v => {
         if (typeof v === 'string') {
             v = checkValueFee(parseFloat(v.replace(/(^[0-9]{0,1}\.?[0-9]{8,})/i, '')) || 0)
         }
+        return v
+    }, [])
+
+    //change the fee using the input
+    const changeFee = useCallback(v => {
         setFee(v)
-        debounce(400, transfer.setFee((v / 0.0000001).toFixed(0)))
-    }
+        debouncedUpdateFee(v => transfer.setFee(v), formatWithPrecision(v / stroop))
+    }, [transfer])
 
-    if (!showFee) return <div className="space">
-        <a className="text-small dimmed" onClick={() => setShowFee(true)}>Adjust transaction fee</a>
-    </div>
+    //change the fee using the slider
+    const changeFeeConfidence = useCallback(async v => {
+        const index = v || 0
+        const feeValue = await estimateFee(transfer.network, confidenceValues[index]) * stroop || minFee
+        setFee(formatWithPrecision(feeValue))
+        debouncedUpdateFee(v => transfer.setFee(v), confidenceValues[index])
+    }, [transfer])
 
-    return <div className="transaction-fee space dual-layout dimmed text-small" {...otherProps}>
-        <div>Transaction fee</div>
-        <div>
-            <input type="text" value={fee} onChange={change}/>&nbsp;XLM
+    const showEditor = useCallback(() => setEditorVisible(true), [])
+
+    if (!editorVisible)
+        return <div className="space text-right">
+            <a className="condensed text-tiny dimmed" onClick={showEditor}>Network fee: {fee} XLM</a>
         </div>
+
+    return <div className="space ">
+        <SliderInputLayoutView title="Network fee" validate={validate} valueInput={fee} onChangeInput={changeFee} suffix='XLM'>
+            <Slider value={1} max={2} step={1} categroies={confidenceValues} onChange={changeFeeConfidence}/>
+        </SliderInputLayoutView>
     </div>
 }

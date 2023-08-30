@@ -15,7 +15,7 @@ export async function prepareTransferTx(transfer) {
 
     const builder = new TransactionBuilder(accountData, {
         networkPassphrase: resolveNetworkParams({network: transfer.network}).network,
-        fee: transfer.fee ? transfer.fee : await estimateFee(transfer.network)
+        fee: (['low', 'normal', 'high'].includes(transfer.fee)) ? await estimateFee(transfer.network, transfer.fee) : transfer.fee
     }).setTimeout(60)
 
     if (transfer.memo) {
