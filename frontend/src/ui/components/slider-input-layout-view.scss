@@ -8,22 +8,23 @@
   }
 
   & > :first-child {
-    padding-top: 0.225em;
+    padding-top: 1em;
     width: 50%;
-    max-width: 7em;
+    max-width: 8em;
   }
 
   & > :nth-child(2) {
     flex-grow: 1;
     padding-left: 0.5em;
+    padding-top: 1em;
     justify-self: stretch;
     align-self: flex-end;
   }
 
-  & > :last-child {
+  & > :nth-child(3) {
     width: 25%;
-    padding-left: 0.5em;
-    min-width: 7em;
+    padding-left: 1em;
+    min-width: 6em;
 
     input[type="text"] {
       text-align: right;
@@ -36,17 +37,8 @@
     }
   }
 
-  .slider > div {
-    display: flex;
-    flex-direction: column;
-
-    .categories {
-      order: -1;
-
-      option {
-        line-height: 2.67em;
-        padding: 0.42em 0 0;
-      }
-    }
+  & > :last-child {
+    width: 1em;
+    line-height: 2em;
   }
 }

@@ -65,9 +65,8 @@ export default function FeeView({transfer}) {
             <a className="condensed text-tiny dimmed" onClick={showEditor}>Network fee: {fee} XLM</a>
         </div>
 
-    return <div className="space ">
-        <SliderInputLayoutView title="Network fee" validate={validate} valueInput={fee} onChangeInput={changeFee} suffix='XLM'>
-            <Slider value={1} max={2} step={1} categroies={confidenceValues} onChange={changeFeeConfidence}/>
-        </SliderInputLayoutView>
-    </div>
+    return <SliderInputLayoutView title="Network fee" validate={validate} valueInput={fee} onChangeInput={changeFee}
+                                  suffix={<i className="icon icon-stellar"/>}>
+        <Slider value={1} max={2} step={1} categroies={confidenceValues} onChange={changeFeeConfidence}/>
+    </SliderInputLayoutView>
 }
