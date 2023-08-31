@@ -59,7 +59,7 @@ function RemoveTrustlineView() {
                 </div>}
             </div>
             {!assetBalance ?
-                <div className="segment warning space text-small">
+                <div className="segment segment-inline warning space text-small">
                     <span className="icon-warning"/> The trustline doesn't exist
                 </div> :
                 <div className="dimmed text-tiny space">

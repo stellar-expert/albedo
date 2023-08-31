@@ -102,7 +102,7 @@ export default function CredentialsRequestView({
             </div>}
         </div>
         {errorsToShow && <div className="error segment space text-small">
-            <i className="icon-warning-hexagon"/> Error: {errorsToShow}
+            <i className="icon-warning"/> Error: {errorsToShow}
         </div>}
         {!noRegistrationLink && <>
             <hr title="not registered yet?" className="flare"/>

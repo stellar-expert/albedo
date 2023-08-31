@@ -19,24 +19,3 @@ $container-width: 60rem;
 .dialog .segment {
   z-index: 1;
 }
-
-.segment {
-  &.success, &.warning, &.error {
-    background: none;
-    &:before, &:after {
-      clip-path: polygon(0.6rem 0, 100% 0, 100% calc(100% - 1.6rem), calc(100% - 0.6rem) 100%, 0 100%, 0 1.6rem);
-    }
-  }
-
-  &.success:before {
-    background: var(--color-success-bg);
-  }
-
-  &.warning:before {
-    background: var(--color-warning-bg);
-  }
-
-  &.error:before {
-    background: var(--color-alert-bg);
-  }
-}

@@ -5,12 +5,12 @@ import SoloLayoutView from '../layout/solo-layout-view'
 export default function BlockedPageView() {
     const {from = ''} = parseQuery()
     return <SoloLayoutView title="Domain Blocked">
-        <div className="warning-block">
-            <i className="icon-warning-hexagon color-warning"/> The domain <code>{from.toLowerCase()}</code> has been reported earlier
+        <div className="segment warning">
+            <i className="icon-warning color-warning"/> The domain <code>{from.toLowerCase()}</code> has been reported earlier
             for a fraudulent activity.
             Albedo automatically blocks such websites to protect our users from malicious actions.
             <div className="space text-small">
-                <i className="icon-warning-hexagon color-warning"/> Please note: There is no stacking on Stellar.
+                <i className="icon-warning color-warning"/> Please note: There is no stacking on Stellar.
                 Any website promoting "stacking competitions" will steal your funds.
             </div>
         </div>

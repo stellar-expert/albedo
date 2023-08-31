@@ -75,7 +75,7 @@ Would you like to add this asset?`)) return
                     }
                 </div>}
             </div>
-            {isValid && isTrustlineExists && <div className="segment warning space text-small">
+            {isValid && isTrustlineExists && <div className="segment segment-inline warning space text-small">
                 <span className="icon-warning"/> The trustline to this asset already exists
             </div>}
             <div className="dimmed text-tiny space">

@@ -15,8 +15,8 @@ function LiquidityPoolWithdrawView() {
     useLocation()
     const {pool} = parseQuery()
     if (!isValidPoolId(pool))
-        return <div className="segment error text-center">
-            <i className="icon icon-warning-hexagon color-warning"/> Error: Invalid liquidity pool id
+        return <div className="segment segment-inline error text-center">
+            <i className="icon icon-warning color-warning"/> Error: Invalid liquidity pool id
         </div>
 
     const network = useStellarNetwork()

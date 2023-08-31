@@ -86,10 +86,10 @@ function TransferView() {
                     </>}
             </div>
             {transfer.mode === 'convert' &&
-                <SwapSlippageView title="Max slippage" defaultValue={0.5} onChange={changeSlippage}/>}
+                <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={changeSlippage}/>}
             <FeeView transfer={transfer}/>
             <TxMemoView transfer={transfer}/>
-            {transfer.createDestination && <div className="success segment text-small micro-space">
+            {transfer.createDestination && <div className="segment segment-inline success text-small micro-space">
                 <i className="icon-info"/> The recipient account will be created automatically.{' '}
                 <a href="#" onClick={cancelDestinationCreation}>Cancel</a>{' '}
                 account auto-creation?

@@ -128,8 +128,8 @@ function TransferValidationView({transfer, directoryInfo}) {
         return null
     }
 
-    return <div className="warning segment text-small space">
-        <i className="icon-warning-hexagon"/> {validationResult}
+    return <div className="segment segment-inline warning segment text-small space">
+        <i className="icon-warning"/> {validationResult}
     </div>
 }
 

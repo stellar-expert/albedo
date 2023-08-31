@@ -27,7 +27,7 @@ export default observer(function ReceiveRequestView() {
             request a payment with fixed amount and currency
         </WalletPageActionDescription>
         {accountLedgerData.nonExisting ?
-            <div className="segment space text-center text-small condensed">
+            <div className="segment warning space text-center text-small condensed">
                 <div className="space">
                     <i className="icon-warning"/> Account doesn't exist on the ledger and cannot receive payments.
                     <br/>

@@ -39,7 +39,7 @@ export default observer(function AccountFundingStatusView() {
     const {error} = selectedAccountInfo
     if (error && error.code !== standardErrors.accountNotSelected.code) return <div>
         {error.text}
-        {error.code === standardErrors.accountDoesNotExist.code && <div className="warning-block text-small">
+        {error.code === standardErrors.accountDoesNotExist.code && <div className="segment segment-inline warning text-small">
             {isTestnet(intentParams) ? <>
                     The account does not exist on the ledger. We can create a <b>testnet</b> account for you.{' '}
                     <a href="#" onClick={createTestnetAccount}>Create it now?</a>

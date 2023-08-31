@@ -68,7 +68,7 @@ function AccountActivityView() {
                         <i className="icon-clock"/> transaction in progress…
                     </span>}
                     {!tx.successful && <span className="dimmed">
-                        <i className="icon-warning-hexagon color-warning"/> transaction failed
+                        <i className="icon-warning color-warning"/> transaction failed
                     </span>}
                     {' '}
                     <TxLink tx={tx.txHash}>

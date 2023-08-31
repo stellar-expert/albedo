@@ -36,7 +36,7 @@ function SwapView() {
                 <SwapBandView settings={swap} balances={balancesWithPriority}/>
                 <TransferAmountView settings={swap} index={1} balances={balancesWithPriority}/>
             </div>
-            <SwapSlippageView title="Max slippage" defaultValue={1} onChange={updateSlippage}/>
+            <SwapSlippageView title="Slippage tolerance" defaultValue={1} onChange={updateSlippage}/>
             <FeeView transfer={swap}/>
             <TransferValidationView transfer={swap}/>
         </div>

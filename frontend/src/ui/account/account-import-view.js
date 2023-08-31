@@ -73,7 +73,7 @@ export default function AccountImportView({onSuccess}) {
     return <SoloLayoutView title="Import Account">
         <div className="segment text-small">
             <p>
-                <i className="icon-warning-hexagon"/>{' '}
+                <i className="icon-warning"/>{' '}
                 Before starting the import process, do not forget to double-check the URL (the domain should
                 be <code>albedo.link</code>) and SSL validity(a small lock icon on the left of the address bar).
             </p>
@@ -103,7 +103,7 @@ export default function AccountImportView({onSuccess}) {
                 <Button block outline onClick={() => navigation.navigate('/')}>Cancel</Button>
             </div>
         </div>
-        {error && <div className="space error segment text-small">
+        {error && <div className="segment segment-inline error space text-small">
             {error.type === 'unknown' ? 'Invalid key format. Use either 24-word passphrase or Stellar secret key.' : <>
                 Auto-detected import type: <b>{error.type}</b><br/>
                 Error: {error.details}

@@ -34,6 +34,9 @@ export default function scanQrCodeFromCanvas(source) {
     return result?.text
 }
 
+
+//TODO: unify filters - extract shared code
+
 function applyBrightnessFilter(sourceData) {
     const src = new Uint32Array(sourceData.data.buffer)
     const delta = -255 / 2

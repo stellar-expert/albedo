@@ -30,7 +30,7 @@ function WalletOperationsWrapperView({title, allowNonExisting, children}) {
         {accountLedgerData.loaded ?
             <>
                 {accountLedgerData.nonExisting && !fundingInProgress && !allowNonExisting && <>
-                    <div className="text-tiny segment space text-center">
+                    <div className="segment warning space text-tiny text-center">
                         Account doesn't exist on the ledger.
                         <br/>
                         You need to <a href="/wallet/receive">fund it</a> with XLM in order to send/receive assets.
