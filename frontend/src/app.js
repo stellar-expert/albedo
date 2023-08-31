@@ -1,7 +1,7 @@
 import React from 'react'
 import {render} from 'react-dom'
 import {configure} from 'mobx'
-import {setStellarNetwork, subscribeToStellarNetworkChange} from '@stellar-expert/ui-framework'
+import {setStellarNetwork, subscribeToStellarNetworkChange, createToastNotificationsContainer} from '@stellar-expert/ui-framework'
 import {navigation, bindClickNavHandler} from '@stellar-expert/navigation'
 import webPushNotificationsAdapter from './notifications/web-push-notifications-adapter'
 import Router from './ui/app-router'
@@ -9,7 +9,6 @@ import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage
 import storageProvider from './storage/storage-provider'
 import accountManager from './state/account-manager'
 import {registerMessageListeners} from './util/message-listeners'
-import {createNotificationContainer} from './ui/notifications/notifications'
 import './ui/styles.scss'
 
 window.explorerFrontendOrigin = 'https://stellar.expert'
@@ -47,6 +46,6 @@ accountManager.reload()
         scheduleCleanupExpiredSessions()
     })
 
-createNotificationContainer()
+createToastNotificationsContainer()
 
 webPushNotificationsAdapter.initPushSubscription()
