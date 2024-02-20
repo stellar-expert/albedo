@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react'
 import {observer} from 'mobx-react'
 import {debounce} from 'throttle-debounce'
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 import {resolveFederationAccount} from '../../../util/federation-address-resolver'
 
 const checkFederationAddress = debounce(500, resolveFederationAccount)

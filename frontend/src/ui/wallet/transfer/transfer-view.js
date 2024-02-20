@@ -90,9 +90,9 @@ function TransferView() {
             <FeeView transfer={transfer}/>
             <TxMemoView transfer={transfer}/>
             {transfer.createDestination && <div className="segment segment-inline success text-small micro-space">
-                <i className="icon-info"/> The recipient account will be created automatically.{' '}
-                <a href="#" onClick={cancelDestinationCreation}>Cancel</a>{' '}
-                account auto-creation?
+                <i className="icon-info"/> The recipient account will be created automatically.
+                <br/>
+                <a href="#" onClick={cancelDestinationCreation}>Cancel</a> account auto-creation?
             </div>}
             <TransferValidationView transfer={transfer} directoryInfo={destinationDirectoryInfo}/>
         </div>

@@ -19,13 +19,9 @@ export default observer(function TransactionConfirmationView({action, disabled, 
     const [inProgress, setInProgress] = useState(false)
     const [showConfirmIntention, setShowConfirmIntention] = useState(false)
 
-    const showIntention = useCallback(() => {
-        setShowConfirmIntention(true)
-    }, [])
+    const showIntention = useCallback(() => setShowConfirmIntention(true), [])
 
-    const hideIntention = useCallback(() => {
-        setShowConfirmIntention(false)
-    }, [])
+    const hideIntention = useCallback(() => setShowConfirmIntention(false), [])
 
     const confirm = useCallback(async () => {
         try {
@@ -34,7 +30,8 @@ export default observer(function TransactionConfirmationView({action, disabled, 
             if (!tx)
                 return
             await confirmTransaction(network, tx)
-            notify({type: 'success', message: 'Transaction processed'})
+            //'direct'|'convert'|'claimable'
+            notify({type: 'success', message: 'Transaction processed successfully'})
             onFinalize()
         } catch (e) {
             setInProgress(false)
@@ -44,8 +41,11 @@ export default observer(function TransactionConfirmationView({action, disabled, 
             }
             if (e.code === -4)
                 return
-            console.error('Failed to prepare transaction', e)
-            notify({type: 'error', message: 'Transaction failed'})
+            console.error('Failed to execute transaction', e)
+            notify({
+                type: 'error',
+                message: `Transaction failed. Try to adjust transaction fee ${transfer.mode === 'convert' ? 'or slippage tolerance ' : ''} and resubmit the transaction.`
+            })
         }
         setInProgress(false)
     }, [network, prepareTransaction, onFinalize])
@@ -55,7 +55,7 @@ export default observer(function TransactionConfirmationView({action, disabled, 
         confirm()
     }, [confirm])
 
-    return (<>
+    return <>
         {prepareTransaction && <div className="row space">
             <div className="column column-50">
                 <Button block disabled={disabled || inProgress} onClick={showIntention}>{action}</Button>
@@ -78,5 +78,4 @@ export default observer(function TransactionConfirmationView({action, disabled, 
             </div>
         </DialogView>
     </>
-    )
 })

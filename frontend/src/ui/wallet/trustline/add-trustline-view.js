@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import {observer} from 'mobx-react'
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 import {Button, AssetLink, useStellarNetwork, AssetSelector} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'

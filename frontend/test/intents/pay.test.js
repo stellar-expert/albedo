@@ -1,5 +1,5 @@
+import {Transaction, Asset} from '@stellar/stellar-base'
 import {setupFakeArgon2} from '../util/fake-argon2'
-import {Transaction, Asset} from 'stellar-sdk'
 import {registerMessageListeners} from '../../src/util/message-listeners'
 import {fakeWindow, setupFakeWindow} from '../util/fake-window'
 import actionContext from '../../src/state/action-context'

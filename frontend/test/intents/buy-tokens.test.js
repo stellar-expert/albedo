@@ -1,4 +1,4 @@
-import {Transaction, Asset} from 'stellar-sdk'
+import {Transaction, Asset} from '@stellar/stellar-base'
 
 import {registerMessageListeners} from '../../src/util/message-listeners'
 import {fakeWindow, setupFakeWindow} from '../util/fake-window'

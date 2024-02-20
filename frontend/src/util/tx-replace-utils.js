@@ -1,4 +1,4 @@
-import {Keypair, TransactionBuilder, xdr as xdrTypes} from 'stellar-sdk'
+import {Keypair, TransactionBuilder, xdr as xdrTypes} from '@stellar/stellar-base'
 
 export const zeroAccount = 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF'
 

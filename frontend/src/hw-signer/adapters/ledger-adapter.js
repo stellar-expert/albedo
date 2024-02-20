@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import Transport from '@ledgerhq/hw-transport-webusb'
 import StellarApp from '@ledgerhq/hw-app-str'
-import {Keypair, xdr} from 'stellar-sdk'
+import {Keypair, xdr} from '@stellar/stellar-base'
 import standardErrors from '../../util/errors'
 import {DEVICE_CONNECTED, DEVICE_DISCONNECTED} from './adapter-events'
 import {extractDeviceId} from '../../util/device-id-generator'

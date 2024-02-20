@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import TrezorConnect, {DEVICE_EVENT, DEVICE} from 'trezor-connect'
-import {Keypair, xdr} from 'stellar-sdk'
+import {Keypair, xdr} from '@stellar/stellar-base'
 import {DEVICE_CONNECTED, DEVICE_DISCONNECTED} from './adapter-events'
 import standardErrors from '../../util/errors'
 import {decodeBase64} from '../../util/crypto/base64'

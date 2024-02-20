@@ -1,4 +1,4 @@
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 /**
  * Extract a short device/account identifier from a given pubkey.
  * @param {String} publicKey - Stellar pub key.

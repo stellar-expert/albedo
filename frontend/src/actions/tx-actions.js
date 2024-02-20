@@ -1,4 +1,4 @@
-import {Asset, Memo, Operation, TransactionBuilder} from 'stellar-sdk'
+import {Asset, Memo, Operation, TransactionBuilder} from '@stellar/stellar-base'
 import Bignumber from 'bignumber.js'
 import {intentInterface} from '@albedo-link/intent'
 import {resolveNetworkParams} from '../util/network-resolver'

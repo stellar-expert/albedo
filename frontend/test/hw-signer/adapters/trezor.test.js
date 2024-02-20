@@ -1,6 +1,6 @@
 jest.mock('trezor-connect')
 import TrezorConnect, {DEVICE_EVENT, DEVICE} from 'trezor-connect'
-import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
+import {Keypair, Networks, Account, TransactionBuilder, Operation} from '@stellar/stellar-base'
 import trezorAdapter from '../../../src/hw-signer/adapters/trezor-adapter'
 import appSettings from '../../../src/state/app-settings'
 

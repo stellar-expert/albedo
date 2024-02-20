@@ -1,8 +1,8 @@
 import React, {useCallback, useState} from 'react'
 import {observer} from 'mobx-react'
+import {StrKey} from '@stellar/stellar-base'
 import {Button} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
-import {StrKey} from 'stellar-sdk'
 import DialogView from '../../layout/dialog-view'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
@@ -108,11 +108,12 @@ function AccountAddressBookView() {
             <ActionLoaderView message="waiting for authorization"/>
         </AccountContextView>
 
+    const entries = Object.entries(addressBook)
     return <AccountContextView>
         <WalletOperationsWrapperView title="Address book" allowNonExisting>
             <hr className="flare"/>
             <WalletPageActionDescription>frequently used addresses and trusted contacts</WalletPageActionDescription>
-            {Object.keys(addressBook) ? Object.entries(addressBook).map(([address, addressProps]) =>
+            {entries.length ? entries.map(([address, addressProps]) =>
                 <AddressBookEntryView key={address} addressSettings={[address, addressProps]}
                                       editAddress={editAddress} removeAddress={removeAddress}/>) :
             <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}

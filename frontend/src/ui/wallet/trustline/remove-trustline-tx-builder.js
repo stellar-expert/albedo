@@ -1,4 +1,4 @@
-import {Operation, TransactionBuilder} from 'stellar-sdk'
+import {Operation, TransactionBuilder} from '@stellar/stellar-base'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'

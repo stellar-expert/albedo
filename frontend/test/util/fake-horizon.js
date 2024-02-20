@@ -1,5 +1,3 @@
-import { Server } from 'stellar-sdk'
-
 const accounts = {}
 
 const fakeHorizon = {

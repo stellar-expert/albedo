@@ -1,5 +1,5 @@
 import {autorun, runInAction, makeAutoObservable} from 'mobx'
-import {Asset, Memo} from 'stellar-sdk'
+import {Asset, Memo} from '@stellar/stellar-base'
 import {debounce} from 'throttle-debounce'
 import BigNumber from 'bignumber.js'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'

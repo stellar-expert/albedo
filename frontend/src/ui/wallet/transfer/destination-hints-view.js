@@ -46,9 +46,9 @@ export default observer(function DestinationHintsView({transfer}) {
         if (!addressListBlock.current)
             return false
         if (addressListBlock.current.contains(event.target)) {
-            return addressListBlock.current.classList.add("active")
+            return addressListBlock.current.classList.add('active')
         }
-        addressListBlock.current.classList.remove("active")
+        addressListBlock.current.classList.remove('active')
     }, [addressListBlock])
 
     useEffect(() => {
@@ -125,7 +125,7 @@ function getDestinationSuggestions(filter) {
     const search = filter ? filter.toLowerCase() : null
     const res = []
     //add accounts from the orderbook
-    for (const [address, info] of Object.entries(activeAccount.addressBook)) {
+    for (const [address, info] of Object.entries(activeAccount.addressBook || {})) {
         if (filter &&
             !address.toLowerCase().startsWith(search) &&
             !info.name.toLowerCase().includes(search) &&

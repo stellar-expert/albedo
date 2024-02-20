@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 import {AccountAddress, Dropdown, AccountIdenticon, useAutoFocusRef} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import accountManager from '../../state/account-manager'

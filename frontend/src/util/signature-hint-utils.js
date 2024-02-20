@@ -1,4 +1,4 @@
-import {Keypair} from 'stellar-sdk'
+import {Keypair} from '@stellar/stellar-base'
 
 /**
  * Convert the signature hint to the StrKey mask.

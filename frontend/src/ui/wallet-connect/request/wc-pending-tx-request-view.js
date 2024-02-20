@@ -1,5 +1,5 @@
 import React from 'react'
-import {Networks} from 'stellar-sdk'
+import {Networks} from '@stellar/stellar-base'
 import WcPendingRequestLayoutView from './wc-pending-request-layout-view'
 import TxDetailsView from '../../intent/tx/tx-details-view'
 import accountManager from '../../../state/account-manager'

@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
-import {Transaction} from 'stellar-sdk'
+import {Transaction} from '@stellar/stellar-base'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
 import standardErrors from '../util/errors'
 import {resolveAccountInfo} from '../util/account-info-resolver'

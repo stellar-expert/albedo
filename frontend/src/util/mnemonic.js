@@ -1,5 +1,5 @@
 import {entropyToMnemonic, mnemonicToEntropy, validateMnemonic as validate, wordlists} from 'bip39'
-import {Keypair} from 'stellar-sdk'
+import {Keypair} from '@stellar/stellar-base'
 
 const mnemonicWordsList = wordlists.english
 

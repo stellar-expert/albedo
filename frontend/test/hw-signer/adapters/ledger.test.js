@@ -1,6 +1,6 @@
 jest.mock('@ledgerhq/hw-transport-webusb')
 jest.mock('@ledgerhq/hw-app-str')
-import {Keypair, Networks, Account, TransactionBuilder, Operation} from 'stellar-sdk'
+import {Keypair, Networks, Account, TransactionBuilder, Operation} from '@stellar/stellar-base'
 import Transport from '@ledgerhq/hw-transport-webusb'
 import StellarApp from '@ledgerhq/hw-app-str'
 import appSettings from '../../../src/state/app-settings'

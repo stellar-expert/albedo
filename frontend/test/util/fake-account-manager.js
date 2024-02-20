@@ -1,4 +1,4 @@
-import {Account as SdkAccount} from 'stellar-sdk'
+import {Account as SdkAccount} from '@stellar/stellar-base'
 import accountManager from '../../src/state/account-manager'
 import Account from '../../src/state/account'
 import AccountKeypair from '../../src/state/account-keypair'

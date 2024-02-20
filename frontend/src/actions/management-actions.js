@@ -1,4 +1,3 @@
-import {Keypair} from 'stellar-sdk'
 import accountManager from '../state/account-manager'
 import {saveImplicitSession} from '../storage/implicit-session-storage'
 

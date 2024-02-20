@@ -1,5 +1,5 @@
 import {makeAutoObservable} from 'mobx'
-import {Networks} from 'stellar-sdk'
+import {Networks} from '@stellar/stellar-base'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import {isValidInt64Amount} from '@stellar-expert/formatter'
 import {stringifyQuery} from '@stellar-expert/navigation'

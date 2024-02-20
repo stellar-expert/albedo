@@ -1,5 +1,5 @@
 import {observable, action, makeObservable} from 'mobx'
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 import Account, {ACCOUNT_TYPES} from './account'
 import {
     enumerateStoredAccounts,

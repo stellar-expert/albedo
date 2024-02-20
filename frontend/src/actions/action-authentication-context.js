@@ -1,4 +1,4 @@
-import {Keypair} from 'stellar-sdk'
+import {Keypair} from '@stellar/stellar-base'
 import shajs from 'sha.js'
 import isEqual from 'react-fast-compare'
 import HwSigner from '../hw-signer/hw-signer'

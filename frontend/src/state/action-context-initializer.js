@@ -1,4 +1,4 @@
-import {StrKey, TransactionBuilder} from 'stellar-sdk'
+import {StrKey, TransactionBuilder} from '@stellar/stellar-base'
 import {action, transaction} from 'mobx'
 import {setStellarNetwork} from '@stellar-expert/ui-framework'
 import {intentInterface} from '@albedo-link/intent'

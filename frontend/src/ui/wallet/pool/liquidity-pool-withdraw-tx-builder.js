@@ -1,4 +1,4 @@
-import {Operation, TransactionBuilder} from 'stellar-sdk'
+import {Operation, TransactionBuilder} from '@stellar/stellar-base'
 import {getLiquidityPoolAsset} from '@stellar-expert/asset-descriptor'
 import {fromStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'

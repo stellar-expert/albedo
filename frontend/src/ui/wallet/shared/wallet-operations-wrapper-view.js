@@ -30,10 +30,10 @@ function WalletOperationsWrapperView({title, allowNonExisting, children}) {
         {accountLedgerData.loaded ?
             <>
                 {accountLedgerData.nonExisting && !fundingInProgress && !allowNonExisting && <>
-                    <div className="segment warning space text-tiny text-center">
+                    <div className="segment warning space text-small text-center">
                         Account doesn't exist on the ledger.
                         <br/>
-                        You need to <a href="/wallet/receive">fund it</a> with XLM in order to send/receive assets.
+                        You need to <a href="/wallet/receive">fund it</a> in order to send/receive assets.
                         {network === 'testnet' && <div>
                             <a href="#" onClick={createTestnetAccount}>Fund test account automatically?</a>
                         </div>}

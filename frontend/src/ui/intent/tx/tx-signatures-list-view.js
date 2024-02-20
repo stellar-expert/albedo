@@ -1,6 +1,6 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 import {AccountAddress} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
 import {formatHint} from '../../../util/signature-hint-utils'

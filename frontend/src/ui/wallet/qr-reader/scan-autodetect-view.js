@@ -1,5 +1,5 @@
 import React from 'react'
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 import {navigation} from '@stellar-expert/navigation'
 import {Tabs} from '@stellar-expert/ui-framework'
 import {validateWCLink} from '../../wallet-connect/pairing/wc-link-validator'

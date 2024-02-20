@@ -1,7 +1,7 @@
-import {FederationServer} from 'stellar-sdk'
+import {Federation} from '@stellar/stellar-sdk'
 
 export function resolveFederationAccount(federationAddress, callback) {
-    return FederationServer.resolve(federationAddress, {timeout: 3000})
+    return Federation.Server.resolve(federationAddress, {timeout: 3000})
         .then(res => callback(res || null))
         .catch(e => callback(null))//ignore resolution errors
 }

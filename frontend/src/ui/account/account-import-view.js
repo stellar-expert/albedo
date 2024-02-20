@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react'
-import {StrKey} from 'stellar-sdk'
+import {StrKey} from '@stellar/stellar-base'
 import {Button} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import {mnemonicWordsList, validateMnemonic, mnemonicToSecret} from '../../util/mnemonic'

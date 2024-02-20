@@ -1,6 +1,6 @@
-import responder from '../../src/actions/responder'
+import {Transaction, TransactionBuilder, Operation, Networks} from '@stellar/stellar-base'
 import axios from 'axios'
-import {Transaction, TransactionBuilder, Operation, Network, Networks} from 'stellar-sdk'
+import responder from '../../src/actions/responder'
 import {buildContext, loadAccount, loadKeypair} from './fake-action-context-builder'
 
 const knownHorizonNetworks = {

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react'
-import {Memo} from 'stellar-sdk'
+import {Memo} from '@stellar/stellar-base'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
 import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework'

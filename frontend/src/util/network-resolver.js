@@ -1,4 +1,5 @@
-import {Networks, Server} from 'stellar-sdk'
+import {Networks} from '@stellar/stellar-base'
+import {Horizon} from '@stellar/stellar-sdk'
 import appSettings from '../state/app-settings'
 
 class StellarNetworkParams {
@@ -10,7 +11,7 @@ class StellarNetworkParams {
     horizon = appSettings.networks.public.horizon
 
     createHorizon() {
-        return new Server(this.horizon)
+        return new Horizon.Server(this.horizon)
     }
 }
 

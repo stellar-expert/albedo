@@ -1,4 +1,4 @@
-import fetchExplorerApi from '@stellar-expert/ui-framework/api/explorer-api-call'
+import {fetchExplorerApi} from '@stellar-expert/ui-framework/api/explorer-api-call'
 
 class StoplistTracker {
     stopList = []
