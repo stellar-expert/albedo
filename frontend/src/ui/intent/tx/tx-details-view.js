@@ -22,6 +22,7 @@ function TxDetailsView({xdr, network, account, compact = false}) {
             txEnvelope: xdr
         })
     } catch (e) {
+        console.error(e)
         return <div>
             <span className="icon-warning color-danger"/> Transaction is invalid and cannot be signed.
         </div>
@@ -31,7 +32,7 @@ function TxDetailsView({xdr, network, account, compact = false}) {
     const feeSponsor = isFeeBump && tx.feeSource
     const sourceAccountDiffers = tx.source !== account?.publicKey
     return <div>
-        <TxOperationsList parsedTx={parsedTx}/>
+        <TxOperationsList parsedTx={parsedTx} showEffects={false}/>
         {sourceAccountDiffers && <div>
             <span className="label">Source account: </span>
             <TxSourceAccountView tx={tx} selectedAccount={account}/>

@@ -4,6 +4,7 @@ import {Switch, Router, Route, Redirect} from 'react-router'
 import {DynamicModule} from '@stellar-expert/ui-framework'
 import CatcherView from './layout/catcher-view'
 import Layout from './layout/layout-view'
+import WideLayout from './layout/wide-layout-view'
 import Intent from './intent/intent-view'
 import TxResultView from './intent/tx/tx-result-view'
 import WebStellarLinkHandler from './intent/web-stellar-link-handler-view'
@@ -25,6 +26,11 @@ export default function AppRouter({history}) {
                 <Route path="/playground">
                     <DynamicModule load={() => import(/* webpackChunkName: "playground" */ './demo/demo-view')}
                                    moduleKey="playground"/></Route>
+                <Route path="/intro">
+                    <WideLayout>
+                        <IntroView/>
+                    </WideLayout>
+                </Route>
                 <Route>
                     <Layout>
                         <Switch>
@@ -44,7 +50,6 @@ export default function AppRouter({history}) {
                             <Route path="/blocked" component={BlockedPageView}/>
                             <Route path="/install-extension" component={InstallExtensionView}/>
                             <Route path="/web-stellar-handler" component={WebStellarLinkHandler}/>
-                            <Route path="/intro" component={IntroView}/>
                             <Route path="/extension" component={AccountDashboard}/>
                             <Route path="/" exact component={AccountDashboard}/>
                             <Redirect from="/account" to="/"/>
