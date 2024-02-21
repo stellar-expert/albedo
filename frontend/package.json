@@ -46,7 +46,7 @@
     "@stellar-expert/eslint-config-js": "^1.1.0",
     "@stellar-expert/eslint-config-react": "^1.1.0",
     "@stellar-expert/formatter": "^2.3.0",
-    "@stellar-expert/liquidity-pool-utils": "^1.0.1",
+    "@stellar-expert/liquidity-pool-utils": "^1.0.3",
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
     "@stellar-expert/tx-meta-effects-parser": "^5.0.2",
     "@stellar-expert/tx-signers-inspector": "^1.8.1",
