@@ -11,7 +11,8 @@ import {estimateFee} from '../../../util/fee-estimator'
  * @return {Promise<Transaction>}
  */
 export async function prepareClaimBalanceTx(claimableBalance, network) {
-    if (!claimableBalance) return null
+    if (!claimableBalance)
+        return null
     const builder = new TransactionBuilder(accountLedgerData.accountData, {
         networkPassphrase: resolveNetworkParams({network}).network,
         fee: await estimateFee(network)

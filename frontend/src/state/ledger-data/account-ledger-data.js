@@ -145,13 +145,23 @@ class AccountLedgerData {
      * @return {String}
      */
     getAvailableBalance(asset, additionalReserves = 0) {
-        const trustline = this.balances[asset]
-        if (!trustline) return '0'
+        const trustline = this.getTrustline(asset)
+        if (!trustline)
+            return '0'
         return calculateAvailableBalance(this.accountData, trustline, additionalReserves)
     }
 
     hasTrustline(asset) {
-        return this.balances[asset] !== undefined
+        return this.getTrustline(asset) !== undefined
+    }
+
+    getTrustline(asset) {
+        if (!asset)
+            return undefined
+        if (asset.toFQAN) {
+            asset = asset.toFQAN()
+        }
+        return this.balances[asset]
     }
 
     /**
