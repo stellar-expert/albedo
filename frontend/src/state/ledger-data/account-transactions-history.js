@@ -1,5 +1,5 @@
-import React from 'react'
 import {action, observable, runInAction, makeObservable} from 'mobx'
+import {Networks} from '@stellar/stellar-base'
 import {parseTxDetails} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../util/horizon-connector'
 
@@ -84,6 +84,7 @@ export default class AccountTransactionHistory {
         if (!loaded)
             return
         let records = data.map(tx => processTransactionRecord(this.network, this.address, tx))
+            .filter(r => !!r)
 
         //update records
         runInAction(() => {
@@ -91,10 +92,12 @@ export default class AccountTransactionHistory {
                 this.removeInProgressTx(records)
                 this.records.replace([...this.records, ...records])
             }
-            if (!canLoadNextPage.length) {
-                this.hasMore = false
-            }
             this.loading = false
+            if (!canLoadNextPage) {
+                this.hasMore = false
+            } else if (records.length < 5) {
+                setTimeout(() => this.loadNextPage(), 100)
+            }
         })
     }
 
@@ -139,6 +142,8 @@ export default class AccountTransactionHistory {
         const parsedTxDetails = tx.txHash ?
             tx :
             processTransactionRecord(this.network, this.address, tx, inProgress)
+        if (!parsedTxDetails)
+            return
         this.removeInProgressTx([tx])
         this.records.unshift(parsedTxDetails)
         if (!inProgress) {
@@ -185,7 +190,7 @@ function streamAccountTransactions({network, address, onNewTx, includeFailed = t
         .stream({
             onmessage: tx => {
                 const processed = processTransactionRecord(network, address, tx)
-                if (!processed.unmatched) {
+                if (processed && !processed.unmatched) {
                     onNewTx(processed)
                 }
             },
@@ -203,7 +208,7 @@ function streamAccountTransactions({network, address, onNewTx, includeFailed = t
  */
 function processTransactionRecord(network, address, txRecord, inProgress = false) {
     const details = parseTxDetails({
-        network,
+        network: Networks[network.toUpperCase()] || network,
         txEnvelope: txRecord.envelope_xdr || txRecord.body,
         result: txRecord.result_xdr || txRecord.result,
         meta: txRecord.result_meta_xdr || txRecord.meta,
@@ -211,8 +216,18 @@ function processTransactionRecord(network, address, txRecord, inProgress = false
         skipUnrelated: true,
         createdAt: inProgress ? new Date().toISOString() : (txRecord.created_at || new Date(txRecord.ts * 1000).toISOString())
     })
+    if (!details.operations.some(op => op.operation.source === address || !isSpamOperation(op)))
+        return null
+
     if (txRecord.paging_token) {
         details.paging_token = txRecord.paging_token
     }
     return details
+}
+
+
+function isSpamOperation(op) {
+    if (op.operation.type === 'payment' && op.operation.asset.isNative() && op.operation.amount <= 0.01 && op.tx.tx.memo?.type === 'text')
+        return true
+    return false
 }

@@ -1,25 +1,25 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {observer} from 'mobx-react'
 import {throttle} from 'throttle-debounce'
-import {ElapsedTime, TxLink, TxOperationsList, useTxHistory} from '@stellar-expert/ui-framework'
+import {ElapsedTime, TxLink, TxOperationsList, Dropdown, useTxHistory} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
 import AccountTransactionHistory from '../../state/ledger-data/account-transactions-history'
 import ActionLoaderView from '../wallet/shared/action-loader-view'
 
-function getScrollParent(node) {
-    if (node == null) return null
-    if (node.scrollHeight > node.clientHeight) return node
-    return getScrollParent(node.parentNode)
-}
+const displayOptions = [
+    {value: 'compact', title: 'Compact history'},
+    {value: 'extended', title: 'Extended information'}
+]
 
 function AccountActivityView() {
     const {nonExisting, address, network} = accountLedgerData
-    const [compact, setCompact] = useState(true)
+    const [display, setDisplay] = useState('compact')
     const [history, setHistory] = useState(null)
     const historyModel = useTxHistory({
         filters: {account: [address]},
         order: 'desc',
-        rows: 50
+        rows: 50,
+        updateLocation: false
     })
     const txHistoryRef = useRef()
     useEffect(() => {
@@ -59,11 +59,8 @@ function AccountActivityView() {
     }
 
     return <div>
-        <div className="text-right">
-            <label className="dimmed text-small">
-                <input type="checkbox" checked={!compact} onChange={e => setCompact(!e.target.checked)}/>{' '}
-                Extended transactions information
-            </label>
+        <div className="text-right text-small">
+            <Dropdown options={displayOptions} value={display} onChange={setDisplay}/>
         </div>
         <ul style={{minHeight: '20vmin'}} className="text-small" ref={txHistoryRef}>
             {history.records.map(tx => <li key={tx.txHash}>
@@ -79,7 +76,7 @@ function AccountActivityView() {
                         <ElapsedTime ts={new Date(tx.createdAt)} suffix=" ago"/>
                     </TxLink>
                 </div>
-                <TxOperationsList parsedTx={tx} compact={compact}/>
+                <TxOperationsList parsedTx={tx} compact={display === 'compact'} showFees={display !== 'compact'}/>
                 <hr className="flare"/>
             </li>)}
             {history.loading && <li key="loader" className="dimmed text-tiny text-center">
