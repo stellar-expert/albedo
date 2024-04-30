@@ -47,7 +47,7 @@ export default function FeeView({transfer}) {
     //change the fee using the input
     const changeFee = useCallback(v => {
         setFee(v)
-        debouncedUpdateFee(v => transfer.setFee(v), formatWithPrecision(v / stroop))
+        debouncedUpdateFee(v => transfer.setFee(v), formatWithPrecision(v / stroop, 7, ''))
     }, [transfer])
 
     //change the fee using the slider
