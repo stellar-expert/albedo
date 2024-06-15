@@ -1,20 +1,89 @@
 {
-    "name": "Albedo",
-    "short_name": "Albedo",
-    "icons": [
+  "id": "/",
+  "start_url": "/",
+  "name": "Albedo Wallet - single access point to Stellar universe",
+  "short_name": "Albedo",
+  "description": "Albedo provides a safe and reliable way to use your Stellar accounts without trusting anyone with your secret key.",
+  "display": "standalone",
+  "theme_color": "#272c2e",
+  "background_color": "#272c2e",
+  "icons": [
+    {
+      "src": "/img/logo-square.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Current balance",
+      "short_name": "Balance",
+      "description": "Check your current balance, pending payments, and transactions history",
+      "url": "/",
+      "icons": [
         {
-            "src": "/android-chrome-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/android-chrome-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
         }
-    ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
-    "start_url": "https://albedo.link",
-    "display": "standalone"
+      ]
+    },
+    {
+      "name": "Send funds to another account",
+      "short_name": "Send",
+      "description": "Send funds to another Stellar account, exchange, or smart contract",
+      "url": "/wallet/transfer",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Receive funds to your account",
+      "short_name": "Receive",
+      "description": "Share your account address to receive a payment",
+      "url": "/wallet/receive",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Trade tokens on DEX",
+      "short_name": "Trade",
+      "description": "Swap and trade tokens on decentralized exchange",
+      "url": "/wallet/swap",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Scan QR code",
+      "short_name": "Scan",
+      "description": "Scan Stellar address, payment request, WalletConnect QR, or upload QR screenshot if camera is not available",
+      "url": "/wallet/scan",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }

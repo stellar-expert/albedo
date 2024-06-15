@@ -49,3 +49,9 @@ accountManager.reload()
 createToastNotificationsContainer()
 
 webPushNotificationsAdapter.initPushSubscription()
+
+if (window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true){
+        // Size window after open the app
+        window.resizeTo(Math.min(screen.availWidth, 520), Math.min(screen.availHeight, 760))
+}
