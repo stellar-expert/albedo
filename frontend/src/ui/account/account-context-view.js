@@ -6,6 +6,7 @@ import accountManager from '../../state/account-manager'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
 import AccountDropdownMenuView from '../wallet/dashboard/account-dropdown-menu-view'
 import NetworkSelectorView from '../wallet/dashboard/network-selector-view'
+import authorizationService from '../../state/auth/authorization'
 import AccountNavMenu from './account-nav-menu'
 import './account-context.scss'
 
@@ -15,6 +16,22 @@ function AccountContextView({children}) {
     if (!activeAccount) {
         navigation.navigate('/intro')
         return null
+    }
+
+    useEffect(() => {
+        document.addEventListener('visibilitychange', checkAuth)
+        const autoCheck = setInterval(checkAuth, 5 * 60 * 1000)
+        return () => {
+            document.removeEventListener('visibilitychange', checkAuth)
+            clearInterval(autoCheck)
+        }
+    }, [])
+
+    const checkAuth = async () => {
+        if (document.visibilityState !== "hidden") {
+            const credentials = await authorizationService.getCredentialsFromWebWorker()
+            console.log('Active window', credentials)
+        }
     }
 
     useEffect(() => {

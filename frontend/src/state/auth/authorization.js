@@ -1,8 +1,10 @@
 import {observable, action, runInAction, makeObservable} from 'mobx'
 import {navigation} from '@stellar-expert/navigation'
-import Credentials from './credentials'
 import {getCredentialsFromExtensionStorage, saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
 import standardErrors from '../../util/errors'
+import workerBuilder from '../../util/webworker-builder'
+import worker from './auth-worker'
+import Credentials from './credentials'
 
 const defaultSessionTimeout = 600 // 10 minutes
 
@@ -38,6 +40,8 @@ class AuthorizationService {
 
     sessions
 
+    authWorker = workerBuilder(worker)
+
     reset() {
         this.dialogOpen = false
         this.account = null
@@ -50,9 +54,9 @@ class AuthorizationService {
      * @param {Boolean} [forceCredentialsRequest] - Ensures password prompt in security-critical cases
      * @return {Promise<Credentials>}
      */
-    requestAuthorization(account, forceCredentialsRequest = false) {
-        const session = this.sessions[account.id]
-        if (session) return Promise.resolve(session.credentials)
+    async requestAuthorization(account, forceCredentialsRequest = false) {
+        const credentials = await this.getCredentialsFromWebWorker(account)
+        if (credentials) return Promise.resolve(credentials)
 
         return getCredentialsFromExtensionStorage(account.id)
             .catch(e => {
@@ -72,13 +76,10 @@ class AuthorizationService {
                         try {
                             credentials.account.requestAccountSecret(credentials)
                             saveCredentialsInExtensionStorage(credentials)
-                            //temporary store session locally
-                            if (account.sessionTimeout !== 0) {
-                                this.sessions[account.id] = {
-                                    credentials,
-                                    expires: new Date().getTime() + (account.sessionTimeout || defaultSessionTimeout) * 1000
-                                }
-                            }
+                            this.myWorker.postMessage({
+                                action: 'setCredentials',
+                                payload: credentials
+                            })
                         } catch (e) {
                             return Promise.reject(standardErrors.invalidPassword)
                         }
@@ -91,6 +92,19 @@ class AuthorizationService {
                         return Promise.reject(e)
                     })
             })
+    }
+
+    async getCredentialsFromWebWorker(account) {
+        this.authWorker.postMessage({
+            action: 'getCredentials',
+            payload: account
+        })
+        const answer = new Promise((resolve) => {
+            this.authWorker.onmessage = function(mess) {
+                resolve(mess.data.credentials)
+            }
+        })
+        return await answer
     }
 }
 
