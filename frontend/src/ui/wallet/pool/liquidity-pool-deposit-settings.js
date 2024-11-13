@@ -1,7 +1,6 @@
 import {makeAutoObservable, runInAction} from 'mobx'
-import Bignumber from 'bignumber.js'
 import {AssetDescriptor, generateLiquidityPoolId} from '@stellar-expert/asset-descriptor'
-import {adjustPrecision} from '@stellar-expert/formatter'
+import {adjustPrecision, fromStroops, toStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
 import {prepareLiquidityDepositTx} from './liquidity-pool-deposit-tx-builder'
@@ -35,9 +34,9 @@ export default class LiquidityPoolDepositSettings {
         return this.asset
             .map(asset => {
                 const additionalBalance = asset === 'XLM' ? (this.hasPoolTrustline ? 0.6 : 0.1) : 0
-                return new Bignumber(accountLedgerData.getAvailableBalance(asset, additionalBalance))
+                return toStroops(accountLedgerData.getAvailableBalance(asset, additionalBalance))
             })
-            .every((balance, i) => balance.gte(this.amount[i] || 0))
+            .every((balance, i) => balance >= toStroops(this.amount[i] || 0))
     }
 
     get hasPoolTrustline() {
@@ -97,16 +96,18 @@ export default class LiquidityPoolDepositSettings {
     }
 
     recalculate(sourceIndex) {
-        if (!this.poolInfo.parameters) return
+        if (!this.poolInfo.parameters)
+            return
         let {reserves} = this.poolInfo.parameters
-        if (parseFloat(reserves[0].amount) === 0 || parseFloat(reserves[1].amount) === 0) return
+        if (parseFloat(reserves[0].amount) === 0 || parseFloat(reserves[1].amount) === 0)
+            return
         if (this.reverse) {
             reserves = reserves.slice().reverse()
         }
-        const counter = new Bignumber(this.amount[sourceIndex] || 0)
-            .times(new Bignumber(reserves[1 - sourceIndex].amount))
-            .div(new Bignumber(reserves[sourceIndex].amount))
-        this.amount[1 - sourceIndex] = adjustPrecision(counter)
+        const counter = toStroops(this.amount[sourceIndex] || 0)
+            * toStroops(reserves[1 - sourceIndex].amount)
+            / toStroops(reserves[sourceIndex].amount)
+        this.amount[1 - sourceIndex] = adjustPrecision(fromStroops(counter))
     }
 
     prepareTransaction() {

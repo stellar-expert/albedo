@@ -8,18 +8,24 @@ import ActionLoaderView from './action-loader-view'
 
 /**
  * @param {String} action
- * @param {Bool} disabled
+ * @param {Boolean} disabled
  * @param {Object} transfer
  * @param {Function} prepareTransaction
  * @param {Function} onFinalize
+ * @param {Boolean} [skipConfirmation]
  * @constructor
  */
-export default observer(function TransactionConfirmationView({action, disabled, transfer, prepareTransaction, onFinalize}) {
+export default observer(function TransactionConfirmationView({
+                                                                 action,
+                                                                 disabled,
+                                                                 transfer,
+                                                                 prepareTransaction,
+                                                                 onFinalize,
+                                                                 skipConfirmation = false
+                                                             }) {
     const network = useStellarNetwork()
     const [inProgress, setInProgress] = useState(false)
     const [showConfirmIntention, setShowConfirmIntention] = useState(false)
-
-    const showIntention = useCallback(() => setShowConfirmIntention(true), [])
 
     const hideIntention = useCallback(() => setShowConfirmIntention(false), [])
 
@@ -55,10 +61,16 @@ export default observer(function TransactionConfirmationView({action, disabled, 
         confirm()
     }, [confirm])
 
+    const proceed = useCallback(() => {
+        if (skipConfirmation)
+            return confirm()
+        setShowConfirmIntention(true)
+    }, [])
+
     return <>
         {prepareTransaction && <div className="row space">
             <div className="column column-50">
-                <Button block disabled={disabled || inProgress} onClick={showIntention}>{action}</Button>
+                <Button block disabled={disabled || inProgress} onClick={proceed}>{action}</Button>
             </div>
             <div className="column column-50">
                 <Button href="/" block outline>Cancel</Button>

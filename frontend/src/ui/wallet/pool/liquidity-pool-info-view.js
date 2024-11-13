@@ -1,8 +1,7 @@
 import React from 'react'
-import Bignumber from 'bignumber.js'
 import {Amount} from '@stellar-expert/ui-framework'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
-import {formatPrice, formatWithAutoPrecision} from '@stellar-expert/formatter'
+import {formatPrice, formatWithAutoPrecision, fromStroops, toStroops} from '@stellar-expert/formatter'
 import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-utils'
 
 export default function LiquidityPoolInfoView({poolInfo, stake}) {
@@ -12,7 +11,7 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
     const assets = poolInfo.reserves.map(r => AssetDescriptor.parse(r.asset)),
         reserves = poolInfo.reserves.map(r => r.amount),
         price = parseFloat(reserves[0]) / parseFloat(reserves[1]),
-        estimatedValue = stake > 0 && estimateLiquidityPoolStakeValue(stake, poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
+        estimatedValue = stake > 0n && estimateLiquidityPoolStakeValue(fromStroops(stake), poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
     return <div className="segment text-small space">
         <h4>Pool info</h4>
         <div>
@@ -36,21 +35,21 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
             <span className="dimmed">Fee rate: </span>
             {poolInfo.fee_bp / 100}%
         </div>
-        {(!!estimatedValue || stake > 0) && <>
+        {(!!estimatedValue || stake > 0n) && <>
             <hr className="flare"/>
             <h4>Your current stake</h4>
             <div>
-                {stake} <span className="dimmed">shares</span>
+                {stake.toString()} <span className="dimmed">shares</span>
             </div>
             <div className="dimmed condensed">
-                &emsp;({formatWithAutoPrecision(100 * stake / (poolInfo.total_shares * 10000000))}% of the pool liquidity)
+                &emsp;({formatWithAutoPrecision(100n * stake / toStroops(poolInfo.total_shares))}% of the pool liquidity)
             </div>
             {!!estimatedValue && <>
                 <div>
-                    &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]} adjust/>
+                    &emsp;<Amount amount={estimatedValue[0]} asset={assets[0]}/>
                 </div>
                 <div>
-                    &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]} adjust/>
+                    &emsp;<Amount amount={estimatedValue[1]} asset={assets[1]}/>
                 </div>
             </>}
         </>}

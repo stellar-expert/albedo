@@ -1,15 +1,16 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import {observer} from 'mobx-react'
 import Bignumber from 'bignumber.js'
 import {useLocation} from 'react-router'
 import {Amount, useAutoFocusRef, useDependantState, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {navigation, parseQuery} from '@stellar-expert/navigation'
 import {AssetDescriptor, isValidPoolId} from '@stellar-expert/asset-descriptor'
-import {stripTrailingZeros} from '@stellar-expert/formatter'
+import {fromStroops, stripTrailingZeros, toStroops} from '@stellar-expert/formatter'
 import WalletOperationsWrapperView from '../shared/wallet-operations-wrapper-view'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
 import LiquidityPoolWithdrawSettings from './liquidity-pool-withdraw-settings'
 import LiquidityPoolInfoView from './liquidity-pool-info-view'
+import TransactionConfirmationView from '../shared/transaction-confirmation-view'
 
 function LiquidityPoolWithdrawView() {
     useLocation()
@@ -26,32 +27,26 @@ function LiquidityPoolWithdrawView() {
     const disabled = withdraw.max === '0' || withdraw.amount === '0' || withdraw.balanceExceeded
 
     function setPercentage(percentage) {
-        if (withdraw.max === '0') return 0
-        const v = new Bignumber(percentage || '0')
-            .div(100)
-            .times(new Bignumber(withdraw.max))
-            .dp()
-            .toString()
-        return withdraw.setAmount(stripTrailingZeros(v))
+        if (!withdraw.max)
+            return 0n
+        const v = withdraw.max * BigInt(percentage || '0') / 100n
+        return withdraw.setAmount(v)
     }
 
     function changeAmount(e) {
         const v = e.target.value.replace(/[^\d]/g, '')
         setInputAmount(v)
         try {
-            const parsed = new Bignumber(v)
-            if (parsed.isNegative() || parsed.isNaN())
+            const parsed = BigInt(v)
+            if (parsed < 0n)
                 throw new Error(`Invalid amount: ${v}`)
-            const amt = stripTrailingZeros(parsed.toFixed(7, Bignumber.ROUND_DOWN))
-            withdraw.setAmount(amt)
+            withdraw.setAmount(parsed)
         } catch (e) {
-            withdraw.setAmount('0')
+            withdraw.setAmount(0n)
         }
     }
 
-    return <WalletOperationsWrapperView title="Withdraw liquidity" action="Withdraw" disabled={disabled}
-                                        prepareTransaction={() => withdraw.prepareTransaction()}
-                                        onFinalize={() => navigation.navigate('/')}>
+    return <WalletOperationsWrapperView title="Withdraw liquidity">
         <WalletPageActionDescription>
             withdraw funds from the DEX liquidity pool
         </WalletPageActionDescription>
@@ -65,7 +60,7 @@ function LiquidityPoolWithdrawView() {
             <>
                 {poolInfo && <LiquidityPoolInfoView poolInfo={poolInfo} stake={max}/>}
                 <div className="segment space">
-                    <input type="text" onChange={changeAmount} value={inputAmount} ref={useAutoFocusRef}
+                    <input type="text" onChange={changeAmount} value={inputAmount.toString()} ref={useAutoFocusRef}
                            placeholder="Stake amount to withdraw"/>
                     <div className="dual-layout text-tiny condensed micro-space">
                         <div>
@@ -83,6 +78,8 @@ function LiquidityPoolWithdrawView() {
                     </div>
                 </div>
             </>}
+        <TransactionConfirmationView action="Withdraw" transfer={withdraw} prepareTransaction={() => withdraw.prepareTransaction()}
+                                     onFinalize={() => navigation.navigate('/')} disabled={disabled} skipConfirmation/>
     </WalletOperationsWrapperView>
 }
 
