@@ -7,7 +7,9 @@ import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-ut
 export default function LiquidityPoolInfoView({poolInfo, stake}) {
     /*if (assets[0].toString() === assets[1].toString())
         return <div>Invalid asset pair – select two different assets</div>*/
-    if (poolInfo === undefined) return <div className="loader"/>
+    if (poolInfo === undefined)
+        return <div className="loader"/>
+    stake = BigInt(stake)
     const assets = poolInfo.reserves.map(r => AssetDescriptor.parse(r.asset)),
         reserves = poolInfo.reserves.map(r => r.amount),
         price = parseFloat(reserves[0]) / parseFloat(reserves[1]),
