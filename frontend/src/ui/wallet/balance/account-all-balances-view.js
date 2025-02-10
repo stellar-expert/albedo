@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
 import {observer} from 'mobx-react'
-import Bignumber from 'bignumber.js'
 import {Button} from '@stellar-expert/ui-framework'
 import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'

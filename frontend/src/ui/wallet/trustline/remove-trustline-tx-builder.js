@@ -7,16 +7,17 @@ import {estimateFee} from '../../../util/fee-estimator'
 /**
  * @param {String} asset
  * @param {String|Boolean} convertAsset
- * @param {String} path
  * @param {String} network
  * @return {Promise<Transaction>}
  */
-export async function prepareRemoveTrustlineTx({asset, convertAsset, path, network}) {
+export async function prepareRemoveTrustlineTx({asset, convertAsset, network}) {
     if (!asset || asset === 'XLM')
         return null
+    const networkParams = resolveNetworkParams({network})
+    const fee = await estimateFee(networkParams)
     const builder = new TransactionBuilder(accountLedgerData.accountData, {
-        networkPassphrase: resolveNetworkParams({network}).network,
-        fee: await estimateFee(network)
+        networkPassphrase: networkParams.network,
+        fee
     }).setTimeout(60)
     const {balance} = accountLedgerData.balances[asset]
     asset = AssetDescriptor.parse(asset)

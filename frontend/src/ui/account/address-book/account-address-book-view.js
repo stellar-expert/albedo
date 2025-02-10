@@ -1,9 +1,8 @@
 import React, {useCallback, useState} from 'react'
 import {observer} from 'mobx-react'
 import {StrKey} from '@stellar/stellar-base'
-import {Button} from '@stellar-expert/ui-framework'
+import {Button, Dialog} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
-import DialogView from '../../layout/dialog-view'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import authorizationService from '../../../state/auth/authorization'
@@ -15,10 +14,10 @@ import AccountAddressBookForm from './account-address-book-form'
 import AddressBookEntryView from './address-book-entry-view'
 
 export const addressBlank = {
-    "name": "",
-    "memo": {
-        "type": "none",
-        "value": ""
+    'name': '',
+    'memo': {
+        'type': 'none',
+        'value': ''
     }
 }
 
@@ -96,11 +95,11 @@ function AccountAddressBookView() {
 
     const removeAddress = useCallback((address) => {
         const confirmation = `Do you really want to remove this address?`
-        if (confirm(confirmation)) {
+        confirm(confirmation, {title: 'Remove from address book', icon: 'warning-circle'}).then(() => {
             const copyAddressBook = {...addressBook}
             delete copyAddressBook[address]
             saveAddressBook(copyAddressBook)
-        }
+        })
     }, [addressBook, saveAddressBook])
 
     if (!credentials)
@@ -114,9 +113,9 @@ function AccountAddressBookView() {
             <hr className="flare"/>
             <WalletPageActionDescription>frequently used addresses and trusted contacts</WalletPageActionDescription>
             {entries.length ? entries.map(([address, addressProps]) =>
-                <AddressBookEntryView key={address} addressSettings={[address, addressProps]}
-                                      editAddress={editAddress} removeAddress={removeAddress}/>) :
-            <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
+                    <AddressBookEntryView key={address} addressSettings={[address, addressProps]}
+                                          editAddress={editAddress} removeAddress={removeAddress}/>) :
+                <div className="space text-small text-center dimmed">(No addresses in the Address Book yet)</div>}
             <div className="row actions double-space">
                 <div className="column column-50">
                     <Button block onClick={addAddress}><i className="icon-add-circle"/> Add new address</Button>
@@ -125,7 +124,7 @@ function AccountAddressBookView() {
                     <Button block outline onClick={finish}>Back</Button>
                 </div>
             </div>
-            {addressSettings && <DialogView dialogOpen={dialogOpen}>
+            {addressSettings && <Dialog dialogOpen={dialogOpen}>
                 <h2>{editAction ? 'Edit' : 'Add new'} address</h2>
                 <AccountAddressBookForm addressSettings={addressSettings} setAddressSettings={setAddressSettings}/>
                 <div className="row actions space">
@@ -136,7 +135,7 @@ function AccountAddressBookView() {
                         <Button block outline onClick={() => setDialogOpen(false)}>Cancel</Button>
                     </div>
                 </div>
-            </DialogView>}
+            </Dialog>}
         </WalletOperationsWrapperView>
     </AccountContextView>
 }

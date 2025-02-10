@@ -160,7 +160,8 @@ export default class Account {
     requestAccountSecret(credentials) {
         this.verifyCredentials(credentials)
         const secret = decryptAccountSecret(credentials)
-        if (!StrKey.isValidEd25519SecretSeed(secret)) return null
+        if (!StrKey.isValidEd25519SecretSeed(secret))
+            return null
         return secret
     }
 

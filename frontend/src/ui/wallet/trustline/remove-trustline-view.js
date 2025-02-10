@@ -25,15 +25,16 @@ function RemoveTrustlineView() {
         const validationResult = validateRemoveTrustline(asset)
         if (validationResult)
             return alert(validationResult)
-        if (!confirm(`Are you sure you want to remove this trustline?`))
-            return
-        prepareRemoveTrustlineTx({asset, convertAsset, network})
-            .then(tx => {
-                if (!tx) return
-                setInProgress(true)
-                return confirmTransaction(network, tx)
-                    .then(() => navigation.navigate('/account'))
-                    .finally(() => setInProgress(false))
+        confirm('Are you sure you want to remove this trustline?', {title: 'Remove trustline'})
+            .then(() => {
+                prepareRemoveTrustlineTx({asset, convertAsset, network})
+                    .then(tx => {
+                        if (!tx) return
+                        setInProgress(true)
+                        return confirmTransaction(network, tx)
+                            .then(() => navigation.navigate('/account'))
+                            .finally(() => setInProgress(false))
+                    })
             })
     }
 
@@ -58,28 +59,30 @@ function RemoveTrustlineView() {
                                    title={convertAsset ? <AssetLink asset={convertAsset} link={false}/> : 'another asset'}/>
                 </div>}
             </div>
-            {!assetBalance ?
-                <div className="segment segment-inline warning space text-small">
-                    <span className="icon-warning"/> The trustline doesn't exist
-                </div> :
-                <div className="dimmed text-tiny space">
-                    {assetBalance.balance > 0 ?
-                        <>
-                            All remaining tokens will be {convertAsset ?
-                            <>converted to <AssetLink asset={convertAsset}/></> :
-                            <>sent to the issuer account</>}, the trustline will be removed.
-                        </> :
-                        <>Trustline has zero balance and is safe to remove.</>}
-                </div>}
             {inProgress && <ActionLoaderView message="in progress"/>}
-            {!inProgress && <div className="row space">
-                <div className="column column-50">
-                    <Button block disabled={!assetBalance} onClick={removeTrustline}>Remove trustline</Button>
+            {!inProgress && <>
+                {!assetBalance ?
+                    <div className="segment segment-inline warning space text-small">
+                        <span className="icon-warning"/> The trustline doesn't exist
+                    </div> :
+                    <div className="dimmed text-tiny space">
+                        {assetBalance.balance > 0 ?
+                            <>
+                                All remaining tokens will be {convertAsset ?
+                                <>converted to <AssetLink asset={convertAsset}/></> :
+                                <>sent to the issuer account</>}, the trustline will be removed.
+                            </> :
+                            <>Trustline has zero balance and is safe to remove.</>}
+                    </div>}
+                <div className="row space">
+                    <div className="column column-50">
+                        <Button block disabled={!assetBalance} onClick={removeTrustline}>Remove trustline</Button>
+                    </div>
+                    <div className="column column-50">
+                        <Button href="/account" block outline>Cancel</Button>
+                    </div>
                 </div>
-                <div className="column column-50">
-                    <Button href="/account" block outline>Cancel</Button>
-                </div>
-            </div>}
+            </>}
         </div>
     </>
 }

@@ -15,7 +15,7 @@ export default function LiquidityPoolInfoView({poolInfo, stake}) {
         price = parseFloat(reserves[0]) / parseFloat(reserves[1]),
         estimatedValue = stake > 0n && estimateLiquidityPoolStakeValue(fromStroops(stake), poolInfo.reserves.map(r => r.amount), poolInfo.total_shares)
     return <div className="segment text-small space">
-        <h4>Pool info</h4>
+        <h4>POOL INFO</h4>
         <div>
             <div className="dimmed">Total liquidity locked:</div>
             <div>

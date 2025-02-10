@@ -134,6 +134,7 @@ class AccountLedgerData {
                     this.nonExisting = false
                     this.error = null
                 }
+                this.updated = new Date()
                 this.loaded = true
             }))
     }
@@ -145,6 +146,9 @@ class AccountLedgerData {
      * @return {String}
      */
     getAvailableBalance(asset, additionalReserves = 0) {
+        if (!additionalReserves && asset === 'XLM') {
+            additionalReserves = 0.2
+        }
         const trustline = this.getTrustline(asset)
         if (!trustline)
             return '0'

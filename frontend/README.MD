@@ -1,6 +1,6 @@
 # Albedo Frontend
 
-[Albedo](../README.MD) wallet frontend website and browser extensions.
+[Albedo](../README.MD) wallet.
 Provides a user-friendly interface for key management, basic wallet operations, and operation intents.
 
 Albedo - your single access point to all Stellar services.
@@ -41,6 +41,10 @@ Configuration parameters can be found in [default-config.json](./default-config.
 Configuration parameters may be overridden in `default-config.json` before the
 compilation.
 
+#### Environment variables
+
+- `STELLAR_BROKER_KEY`
+
 ## Development - web app
 
 #### Running a development environment
@@ -65,36 +69,6 @@ npm run build-app
 And then copy the contents of the `distr/app` directory to the web root
 directory on the server.
 
-## Development - extension
-
-Install required packages
-
-```
-npm i
-```
-
-Start development environment with automatic rebuilds when file changes spotted
-
-```
-npm run watch-extension
-```
-
-To test it locally, use ["Load unpacked" extension option](chrome://extensions/)
-in Google Chrome or ["Load Temporary Add-on..."](about:debugging#/runtime/this-firefox)
-in Firefox.
-
-Please note that you'll have to reload extension manually each time rebuild
-happens to update extension files in the browser.
-
-#### Preparing extension package for publishing
-
-1. Build extension files using `build-extension` npm script.
-   ```
-   npm run build-extension
-   ```
-2. Upload the extension package file `distr/extension.zip` to
-[Google Webstore dev console](https://chrome.google.com/u/2/webstore/devconsole/)
-or [Mozilla Add-on Developer Hub](https://addons.mozilla.org/en-US/developers/).
 
 ## Technical details
 

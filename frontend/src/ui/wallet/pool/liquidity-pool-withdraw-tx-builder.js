@@ -14,7 +14,7 @@ export async function prepareLiquidityWithdrawTx(withdraw) {
     if (!(withdraw.max > 0) || !(withdraw.amount > 0)) return null
     const builder = new TransactionBuilder(accountLedgerData.accountData, {
         networkPassphrase: resolveNetworkParams({network: withdraw.network}).network,
-        fee: await estimateFee(withdraw.network)
+        fee: await estimateFee(withdraw.network, withdraw.fee)
     }).setTimeout(60)
 
     const [minAmountA, minAmountB] = withdraw.getWithdrawalMinAmounts()

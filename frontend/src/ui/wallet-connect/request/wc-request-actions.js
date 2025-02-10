@@ -1,5 +1,0 @@
-import {navigation} from '@stellar-expert/navigation'
-import {setActionContext} from '../../../state/action-context-initializer'
-import wcPendingRequests from '../../../state/wc-pending-requests'
-import webPushNotificationsAdapter from '../../../notifications/web-push-notifications-adapter'
-import walletConnect from '../wallet-connect-adapter'

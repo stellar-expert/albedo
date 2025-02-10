@@ -1,11 +1,8 @@
 import {Asset, Memo, Operation, TransactionBuilder} from '@stellar/stellar-base'
-import Bignumber from 'bignumber.js'
 import {intentInterface} from '@albedo-link/intent'
 import {resolveNetworkParams} from '../util/network-resolver'
 import {estimateFee} from '../util/fee-estimator'
-import standardErrors from '../util/errors'
 import {resolveAccountInfo} from '../util/account-info-resolver'
-import {runInAction} from 'mobx'
 import {handleTxError} from './tx-error-handler'
 
 /**
@@ -28,13 +25,13 @@ function normalizeMemoType(memoType) {
  * @returns {Transaction} Composed Stellar transaction.
  */
 async function buildTx(actionContext, intentRequest, publicKey) {
-    const {intentParams} = intentRequest,
-        networkParams = resolveNetworkParams(intentParams)
+    const {intentParams} = intentRequest
+    const networkParams = resolveNetworkParams(intentParams)
 
     //fetch source account sequence and fee stats from Horizon
     const [source, fee] = await Promise.all([
         resolveAccountInfo(publicKey, networkParams),
-        estimateFee(networkParams)
+        estimateFee(networkParams, actionContext.confidence)
     ])
 
     //create builder with unlimited timeout and calculated fee

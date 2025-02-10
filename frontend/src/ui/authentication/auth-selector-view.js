@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import {StrKey} from '@stellar/stellar-base'
 import {AccountAddress, Dropdown, AccountIdenticon, useAutoFocusRef} from '@stellar-expert/ui-framework'
@@ -49,6 +49,13 @@ function AuthSelectorView() {
         }
     }
 
+    const directInputKeyDown = useCallback(e => {
+        if (e.key === 'Enter' && directKeyInputSecret && actionContext.selectedAccount) {
+            actionContext.confirmRequest()
+        }
+    }, [])
+    actionContext.confirmRequest()
+
     function AuthActionLink({action, children}) {
         return <a href="#" onClick={e => handleAccountAction(action)}>{children}</a>
     }
@@ -94,8 +101,8 @@ function AuthSelectorView() {
         {directKeyInput ? <>
             <div className="dimmed text-small">Provide a secret key you'd like to use:</div>
             <div className="micro-space">
-                <input type="text" ref={useAutoFocusRef} placeholder="Secret key starting with 'S', like 'SAK4...2PLT'"
-                       value={directKeyInputSecret} onChange={e => setSecret(e.target.value)} className="key"/>
+                <input type="text" className="key" ref={useAutoFocusRef} placeholder="Secret key starting with 'S', like 'SAK4...2PLT'"
+                       value={directKeyInputSecret} onChange={e => setSecret(e.target.value)} onKeyDown={directInputKeyDown}/>
             </div>
         </> : <>
             {!!requestedPubkey && !selectedAccount && <div className="space">

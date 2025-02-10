@@ -1,6 +1,5 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import Bignumber from 'bignumber.js'
 import {useLocation} from 'react-router'
 import {Amount, useAutoFocusRef, useDependantState, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {navigation, parseQuery} from '@stellar-expert/navigation'

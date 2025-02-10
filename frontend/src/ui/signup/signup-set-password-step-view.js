@@ -5,10 +5,9 @@ import Account, {ACCOUNT_TYPES} from '../../state/account'
 import accountManager from '../../state/account-manager'
 import Credentials from '../../state/auth/credentials'
 import actionContext from '../../state/action-context'
-import {saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
+import {temporarilySaveCredentials} from '../../storage/temporary-auth-storage-interface'
 import errors from '../../util/errors'
 import CredentialsRequest from '../authentication/credentials-request-view'
-import HardwareWalletSelectorView from '../authentication/hardware-wallet-selector-view'
 
 export default function SignupSetPasswordStepView({secret, onSuccess}) {
     const [inProgress, setInProgress] = useState(false)
@@ -42,9 +41,8 @@ export default function SignupSetPasswordStepView({secret, onSuccess}) {
                 }
             }
             await accountManager.setActiveAccount(account)
-            //save credentials if in extension
             if (account.isStoredAccount) {
-                await saveCredentialsInExtensionStorage(credentials)
+                await temporarilySaveCredentials(credentials)
             }
             //restore default state
             setInProgress(false)
@@ -76,8 +74,6 @@ export default function SignupSetPasswordStepView({secret, onSuccess}) {
                     <Button block outline href="/import">Import account</Button>
                 </div>
             </div>
-            <hr title="or use hardware wallet" className="flare"/>
-            <HardwareWalletSelectorView requirePublicKey onConfirm={data => saveAccount(data)}/>
         </>}
     </>
 }

@@ -15,7 +15,6 @@ import ImportAccount from './account/account-import-view'
 import AccountSettings from './account/settings/account-settings-view'
 import AccountAddressBook from './account/address-book/account-address-book-view'
 import IntroView from './pages/intro-view'
-import InstallExtensionView from './pages/install-extension-view'
 import BlockedPageView from './pages/blocked-page-view'
 import NotFound from './pages/not-found-view'
 
@@ -37,9 +36,6 @@ export default function AppRouter({history}) {
                             <Route path="/wallet">
                                 <DynamicModule load={() => import(/* webpackChunkName: "wallet" */ './wallet/wallet-router')}
                                                moduleKey="wallet"/></Route>
-                            <Route path="/wallet-connect">
-                                <DynamicModule load={() => import(/* webpackChunkName: "wallet-connect" */ './wallet-connect/wc-router')}
-                                               moduleKey="wallet-connect"/></Route>
                             <Route path="/login" component={Login}/>
                             <Route path="/import" component={ImportAccount}/>
                             <Route path="/signup" component={CreateAccount}/>
@@ -48,7 +44,6 @@ export default function AppRouter({history}) {
                             <Route path="/account-settings" component={AccountSettings}/>
                             <Route path="/addressbook" component={AccountAddressBook}/>
                             <Route path="/blocked" component={BlockedPageView}/>
-                            <Route path="/install-extension" component={InstallExtensionView}/>
                             <Route path="/web-stellar-handler" component={WebStellarLinkHandler}/>
                             <Route path="/extension" component={AccountDashboard}/>
                             <Route path="/" exact component={AccountDashboard}/>

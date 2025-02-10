@@ -11,11 +11,15 @@ import {estimateFee} from '../../../util/fee-estimator'
  * @return {Promise<Transaction>}
  */
 export async function prepareAddTrustlineTx(asset, network) {
-    if (!asset) return null
+    if (!asset)
+        return null
+    const networkParams = resolveNetworkParams({network})
+    const fee = await estimateFee(networkParams)
     const builder = new TransactionBuilder(accountLedgerData.accountData, {
-        networkPassphrase: resolveNetworkParams({network}).network,
-        fee: await estimateFee(network)
-    }).setTimeout(60)
+        networkPassphrase: networkParams.network,
+        fee
+    })
+        .setTimeout(60)
 
     builder.addOperation(Operation.changeTrust({asset: AssetDescriptor.parse(asset).toAsset()}))
 

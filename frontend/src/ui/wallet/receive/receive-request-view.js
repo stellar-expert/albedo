@@ -41,15 +41,17 @@ export default observer(function ReceiveRequestView() {
                         <TransferAmountView placeholder="Amount of tokens" settings={transfer} balances={balances} index={0} restricted
                                             autofocus/>
                     </div>
-                    <TxMemoView transfer={transfer}/>
-                </div>
-                <div className="space">
-                    <QrCodeView value={sep7link}/>
+                    <div className="space">
+                        <TxMemoView transfer={transfer}/>
+                    </div>
                 </div>
                 <div className="text-tiny text-center space">
                     <CopyToClipboard text={sep7link}>
                         <a href="#">Copy request payment link <i className="icon-copy active-icon"/></a>
                     </CopyToClipboard>
+                </div>
+                <div className="space">
+                    <QrCodeView value={sep7link}/>
                 </div>
             </>}
 

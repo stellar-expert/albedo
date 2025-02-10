@@ -24,9 +24,6 @@ export default function AccountDropdownMenuView() {
             case 'signup':
                 navigation.navigate('/signup')
                 break
-            case 'walletconnect':
-                navigation.navigate('/wallet-connect/connect')
-                break
             case 'theme':
                 setTheme(current => current === 'day' ? 'night' : 'day')
                 break
@@ -63,11 +60,6 @@ export default function AccountDropdownMenuView() {
     dropdownOptions.push({
         value: 'explorer',
         title: <>View details on StellarExpert</>
-    })
-
-    dropdownOptions.push({
-        value: 'walletconnect',
-        title: <>Link via WalletConnect</>
     })
 
     if (allAccounts.length > 1) {

@@ -10,6 +10,11 @@
   width: calc(100% - 0.4rem);
   margin-left: -0.8rem;
 
+  @media (min-width: $responsive-mobile-browser-width) {
+    margin-left: -4rem;
+    max-width: 64rem !important;
+  }
+
   &:after {
     content: '';
     display: block;

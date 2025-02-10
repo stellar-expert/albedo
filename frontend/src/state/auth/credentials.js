@@ -1,6 +1,6 @@
 import {computeArgon2Hash} from '../../util/crypto/argon2'
 import {derivePublicKeyFromSecret} from '../../util/crypto/ed25519'
-import {saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
+import {temporarilySaveCredentials} from '../../storage/temporary-auth-storage-interface'
 
 /**
  * Contains authorization credentials for a given account.
@@ -42,16 +42,19 @@ class Credentials {
      */
     checkValidity() {
         //account should be present
-        if (!this.account || !this.account.id) return false
+        if (!this.account || !this.account.id)
+            return false
         //check password
-        if (!this.encryptionKey || !this.authKey) return false
+        if (!this.encryptionKey || !this.authKey)
+            return false
         //otherwise everything seems legit
         return true
     }
 
     checkPasswordCorrect() {
-        if (!this.requestAccountSecret()) return false
-        saveCredentialsInExtensionStorage(this)
+        if (!this.requestAccountSecret())
+            return false
+        temporarilySaveCredentials(this)
         return true
     }
 

@@ -1,7 +1,5 @@
 import {observable, action, runInAction, makeObservable} from 'mobx'
 import {navigation} from '@stellar-expert/navigation'
-import Credentials from './credentials'
-import {getCredentialsFromExtensionStorage, saveCredentialsInExtensionStorage} from '../../storage/extension-auth-storage-interface'
 import standardErrors from '../../util/errors'
 
 const defaultSessionTimeout = 600 // 10 minutes
@@ -53,43 +51,35 @@ class AuthorizationService {
     requestAuthorization(account, forceCredentialsRequest = false) {
         const session = this.sessions[account.id]
         if (session) return Promise.resolve(session.credentials)
+        //TODO: store credentials temporarily in a safe place
 
-        return getCredentialsFromExtensionStorage(account.id)
-            .catch(e => {
-                e && console.error(e)
+        return new Promise((resolve, reject) => {
+            this.credentialsRequestCallback = {resolve, reject}
+            this.account = account
+            runInAction(() => {
+                this.dialogOpen = true
             })
-            .then(encryptionKey => {
-                if (encryptionKey) return Credentials.create({account, encryptionKey})
-                //no corresponding key found in extension storage - show interactive user request prompt
-                return new Promise((resolve, reject) => {
-                    this.credentialsRequestCallback = {resolve, reject}
-                    this.account = account
-                    runInAction(() => {
-                        this.dialogOpen = true
-                    })
-                })
-                    .then(credentials => {
-                        try {
-                            credentials.account.requestAccountSecret(credentials)
-                            saveCredentialsInExtensionStorage(credentials)
-                            //temporary store session locally
-                            if (account.sessionTimeout !== 0) {
-                                this.sessions[account.id] = {
-                                    credentials,
-                                    expires: new Date().getTime() + (account.sessionTimeout || defaultSessionTimeout) * 1000
-                                }
-                            }
-                        } catch (e) {
-                            return Promise.reject(standardErrors.invalidPassword)
+        })
+            .then(credentials => {
+                try {
+                    credentials.account.requestAccountSecret(credentials)
+                    //temporary store session locally
+                    if (account.sessionTimeout !== 0) {
+                        this.sessions[account.id] = {
+                            credentials,
+                            expires: new Date().getTime() + (account.sessionTimeout || defaultSessionTimeout) * 1000
                         }
-                        this.reset()
-                        return credentials
-                    })
-                    .catch(e => {
-                        console.error(e)
-                        this.reset()
-                        return Promise.reject(e)
-                    })
+                    }
+                } catch (e) {
+                    return Promise.reject(standardErrors.invalidPassword)
+                }
+                this.reset()
+                return credentials
+            })
+            .catch(e => {
+                console.error(e)
+                this.reset()
+                return Promise.reject(e)
             })
     }
 }

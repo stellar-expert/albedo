@@ -28,17 +28,22 @@ export default function AccountClaimableBalanceView({balance, account}) {
     function claimBalance() {
         const validationResult = validateClaimClaimableBalance(balance)
         if (validationResult) return alert(validationResult)
-        if (!accountLedgerData.hasTrustline(asset.toFQAN()) && !confirm(`You need to establish a trustline to before claiming this payment.
-Would you like to create the trustline?
-This action will temporarily lock 0.5 XLM on your account balance.`)) return
-        setClaiming(true)
-        prepareClaimBalanceTx(balance, network)
-            .then(tx => {
-                if (!tx) return
-                return confirmTransaction(network, tx)
-                    .then(() => navigation.navigate('/account'))
+        if (!accountLedgerData.hasTrustline(asset.toFQAN())) {
+            confirm(<div className="dimmed text-small">
+                You need to establish a trustline to before claiming this payment.
+                Would you like to create the trustline?
+                This action will temporarily lock 0.5 XLM on your account balance.
+            </div>).then(() => {
+                setClaiming(true)
+                prepareClaimBalanceTx(balance, network)
+                    .then(tx => {
+                        if (!tx) return
+                        return confirmTransaction(network, tx)
+                            .then(() => navigation.navigate('/account'))
+                    })
+                    .finally(() => setClaiming(false))
             })
-            .finally(() => setClaiming(false))
+        }
     }
 
     const hideBalance = useCallback(() => {
@@ -61,9 +66,9 @@ This action will temporarily lock 0.5 XLM on your account balance.`)) return
             <div className="text-left text-overflow">
                 <div className="asset-code">
                     {asset.code}{' '}
-                    <span className="dimmed text-tiny">
+                    {!!balance.last_modified_time && <span className="dimmed text-tiny">
                         (sent <ElapsedTime className="dimmed" ts={new Date(balance.last_modified_time)} suffix=" ago"/>)
-                    </span>
+                    </span>}
                 </div>
                 <AssetIssuer asset={asset}/>
             </div>

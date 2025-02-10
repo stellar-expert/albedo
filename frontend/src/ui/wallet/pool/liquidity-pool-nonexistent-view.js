@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react'
-import Bignumber from 'bignumber.js'
 import {useStellarNetwork} from '@stellar-expert/ui-framework'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import {formatPrice} from '@stellar-expert/formatter'
 import {resolveOrderbookInfo} from '../../../util/orderbook-info-resolver'
 
 export default function LiquidityPoolNonexistentView({assets}) {
-    const network = useStellarNetwork(),
-        [price, setPrice] = useState(null)
+    const network = useStellarNetwork()
+    const [price, setPrice] = useState(null)
     assets = assets.map(a => AssetDescriptor.parse(a).toAsset())
     useEffect(() => {
         setPrice(null)
@@ -16,10 +15,7 @@ export default function LiquidityPoolNonexistentView({assets}) {
                 const [bestBid] = orderbook.bids
                 const [bestAsk] = orderbook.asks
                 if (!bestBid || !bestAsk) return
-                const price = new Bignumber(bestBid.price_r.n).div(bestBid.price_r.d)
-                    .plus(new Bignumber(bestAsk.price_r.n).div(bestAsk.price_r.d))
-                    .div(2)
-                    .toNumber()
+                const price = (bestBid.price_r.n / bestBid.price_r.d + bestAsk.price_r.n / bestAsk.price_r.d) / 2
                 setPrice(price)
             })
     }, [network, assets.map(a => a.toString()).join()])

@@ -1,9 +1,10 @@
 import {resolveNetworkParams} from './network-resolver'
+import accountLedgerData from '../state/ledger-data/account-ledger-data'
 
 /**
  * Create and init Horizon server wrapper instance.
  * @param {String|{network: String, [horizon]: string}} network - Network passphrase or network descriptor.
- * @return {Server}
+ * @return {Horizon.Server}
  */
 export function createHorizon(network) {
     let horizon
@@ -23,4 +24,9 @@ export function requestFriendbotFunding(address) {
     return fetch('https://friendbot.stellar.org/?addr=' + address)
         .catch(err => console.error(err))
         .then(() => true)
+}
+
+export function createTestnetAccount() {
+    requestFriendbotFunding(accountLedgerData.address)
+        .then(() => setTimeout(() => accountLedgerData.loadAccountInfo(), 1500))
 }

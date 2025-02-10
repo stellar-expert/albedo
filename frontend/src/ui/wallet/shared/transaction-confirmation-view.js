@@ -1,9 +1,8 @@
 import React, {useCallback, useState} from 'react'
 import {observer} from 'mobx-react'
 import {Button, useStellarNetwork} from '@stellar-expert/ui-framework'
-import DialogView from '../../layout/dialog-view'
-import {ConfirmIntentionView} from './confirm-intention-view'
 import {confirmTransaction} from './wallet-tx-confirmation'
+import {confirmSpending} from './spending-confirmation-view'
 import ActionLoaderView from './action-loader-view'
 
 /**
@@ -25,11 +24,8 @@ export default observer(function TransactionConfirmationView({
                                                              }) {
     const network = useStellarNetwork()
     const [inProgress, setInProgress] = useState(false)
-    const [showConfirmIntention, setShowConfirmIntention] = useState(false)
 
-    const hideIntention = useCallback(() => setShowConfirmIntention(false), [])
-
-    const confirm = useCallback(async () => {
+    const confirmTx = useCallback(async () => {
         try {
             setInProgress(true)
             const tx = await prepareTransaction()
@@ -50,22 +46,27 @@ export default observer(function TransactionConfirmationView({
             console.error('Failed to execute transaction', e)
             notify({
                 type: 'error',
-                message: `Transaction failed. Try to adjust transaction fee ${transfer.mode === 'convert' ? 'or slippage tolerance ' : ''} and resubmit the transaction.`
+                message: `Transaction failed. Try to adjust transaction fee ${(transfer.destination || transfer?.mode === 'convert') ? 'or slippage tolerance ' : ''} and resubmit the transaction.`
             })
         }
         setInProgress(false)
     }, [network, prepareTransaction, onFinalize])
 
-    const confirmIntention = useCallback(() => {
-        setShowConfirmIntention(false)
-        confirm()
-    }, [confirm])
-
     const proceed = useCallback(() => {
-        if (skipConfirmation)
-            return confirm()
-        setShowConfirmIntention(true)
-    }, [])
+        if (!transfer.asset)
+            return confirmTx()
+        const params = {
+            kind: action.toLowerCase(),
+            asset: transfer.asset[0],
+            amount: transfer.amount[0]
+        }
+        if (transfer.destination) {
+            params.memo = transfer.memo
+            params.destination = transfer.destination
+        }
+        confirmSpending(params)
+            .then(confirmTx)
+    }, [confirmTx])
 
     return <>
         {prepareTransaction && <div className="row space">
@@ -77,17 +78,5 @@ export default observer(function TransactionConfirmationView({
             </div>
         </div>}
         {inProgress && <ActionLoaderView message="processing transaction"/>}
-        <DialogView dialogOpen={showConfirmIntention}>
-            <h2>Confirm transaction</h2>
-            <ConfirmIntentionView transfer={transfer}/>
-            <div className="row actions double-space">
-                <div className="column column-50">
-                    <Button block onClick={confirmIntention}>Confirm</Button>
-                </div>
-                <div className="column column-50">
-                    <Button block outline onClick={hideIntention}>Cancel</Button>
-                </div>
-            </div>
-        </DialogView>
     </>
 })

@@ -3,7 +3,6 @@ import {render} from 'react-dom'
 import {configure} from 'mobx'
 import {setStellarNetwork, subscribeToStellarNetworkChange, createToastNotificationsContainer} from '@stellar-expert/ui-framework'
 import {navigation, bindClickNavHandler} from '@stellar-expert/navigation'
-import webPushNotificationsAdapter from './notifications/web-push-notifications-adapter'
 import Router from './ui/app-router'
 import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage'
 import storageProvider from './storage/storage-provider'
@@ -47,8 +46,6 @@ accountManager.reload()
     })
 
 createToastNotificationsContainer()
-
-webPushNotificationsAdapter.initPushSubscription()
 
 if (window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true){

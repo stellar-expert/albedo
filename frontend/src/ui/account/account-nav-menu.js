@@ -10,9 +10,9 @@ function NavLink({link, icon, title, current}) {
 }
 
 const links = [
+    {link: '/wallet/swap', icon: 'icon-trade', title: 'Trade'},
     {link: '/wallet/transfer', icon: 'icon-send-circle', title: 'Send'},
     {link: '/wallet/receive', icon: 'icon-receive-circle', title: 'Receive'},
-    {link: '/wallet/swap', icon: 'icon-trade', title: 'Trade'},
     {link: '/wallet/scan', icon: 'icon-scan-qr-code', title: 'Scan'},
     {link: '/', icon: 'icon-coins', title: 'Balance'}
 ]

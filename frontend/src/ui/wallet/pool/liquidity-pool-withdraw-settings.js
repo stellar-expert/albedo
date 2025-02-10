@@ -4,6 +4,7 @@ import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-ut
 import {fromStroops, toStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
+import {withSlippage} from '../../../util/slippage'
 import {prepareLiquidityWithdrawTx} from './liquidity-pool-withdraw-tx-builder'
 
 export default class LiquidityPoolWithdrawSettings {
@@ -23,6 +24,8 @@ export default class LiquidityPoolWithdrawSettings {
     amount
 
     poolInfo
+
+    fee
 
     balanceExceeded = false
 

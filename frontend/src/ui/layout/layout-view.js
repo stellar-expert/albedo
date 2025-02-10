@@ -1,6 +1,7 @@
 import React from 'react'
+import {SystemDialog} from '@stellar-expert/ui-framework'
 import Logo from './logo-view'
-import DialogContainer from './dialog-container-view'
+import AuthDialog from './auth-dialog-view'
 import OpenNewWindowView from './open-new-window-view'
 
 export default function LayoutView({children}) {
@@ -12,6 +13,7 @@ export default function LayoutView({children}) {
         <div className="page-container container space">
             {children}
         </div>
-        <DialogContainer/>
+        <AuthDialog/>
+        <SystemDialog/>
     </>
 }

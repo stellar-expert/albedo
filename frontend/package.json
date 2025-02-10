@@ -1,7 +1,7 @@
 {
   "name": "albedo",
   "private": true,
-  "version": "0.20.2",
+  "version": "1.1.0",
   "protocol": 3,
   "description": "Delegated transactions and messages signer for Stellar Network",
   "author": "StellarExpertTeam<info@stellar.expert>",
@@ -16,11 +16,8 @@
     "url": "https://github.com/stellar-expert/albedo.git"
   },
   "scripts": {
-    "build-app": "webpack --mode=production --config src/app-webpack-config.js",
-    "build-extension": "webpack --mode=production --config src/extension-webpack-config.js",
-    "postbuild-extension": "node ./deploy/prepare-extension-package.js",
-    "watch-app": "webpack serve --mode=development --config src/app-webpack-config.js",
-    "watch-extension": "webpack --mode=development --config src/extension-webpack-config.js --watch",
+    "build-app": "webpack --mode=production --config webpack-config.js",
+    "watch-app": "webpack serve --mode=development --config webpack-config.js",
     "test": "jest"
   },
   "keywords": [
@@ -36,12 +33,9 @@
       "./test/setup-jest.js"
     ]
   },
-  "devDependencies": {
+  "dependencies": {
     "@albedo-link/intent": "file:../intent",
-    "@ledgerhq/hw-app-str": "^6.11.2",
-    "@ledgerhq/hw-transport-webusb": "^6.11.2",
-    "@stellar/stellar-base": "12.1.1",
-    "@stellar/stellar-sdk": "12.3.0",
+    "@stellar-broker/client": "^0.6.0",
     "@stellar-expert/asset-descriptor": "^1.4.0",
     "@stellar-expert/claimable-balance-utils": "^1.4.1",
     "@stellar-expert/client-cache": "github:stellar-expert/client-cache",
@@ -50,30 +44,34 @@
     "@stellar-expert/formatter": "^2.5.0",
     "@stellar-expert/liquidity-pool-utils": "^1.0.3",
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
-    "@stellar-expert/tx-meta-effects-parser": "6.2.0",
-    "@stellar-expert/tx-signers-inspector": "^1.8.2",
-    "@stellar-expert/ui-framework": "1.13.6",
-    "@stellar-expert/webpack-template": "^1.4.0",
-    "@zxing/browser": "^0.1.4",
+    "@stellar-expert/tx-meta-effects-parser": "6.3.1",
+    "@stellar-expert/tx-signers-inspector": "1.8.2",
+    "@stellar-expert/ui-framework": "1.14.8",
+    "@stellar/stellar-base": "13.0.1",
+    "@stellar/stellar-sdk": "13.1.0",
+    "@zxing/browser": "^0.1.5",
     "aes-js": "^3.1.2",
-    "archiver": "^5.3.1",
     "argon2-browser": "^1.18.0",
     "bip39": "^3.0.4",
     "classnames": "^2.5.1",
-    "clone": "^2.1.2",
-    "jest": "^29.7.0",
-    "jest-fetch-mock": "^3.0.3",
     "mobx": "^6.6.2",
     "mobx-react": "^7.5.3",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-fast-compare": "^3.2.0",
-    "react-onesignal": "^2.0.4",
-    "react-router": "^5.2.1",
+    "react-router": "^5.3.4",
     "sha.js": "^2.4.11",
     "throttle-debounce": "^5.0.0",
     "tweetnacl": "^1.0.3",
     "vivus": "^0.4.6"
+  },
+  "devDependencies": {
+    "@stellar-expert/eslint-config-js": "^1.1.0",
+    "@stellar-expert/eslint-config-react": "^1.1.0",
+    "@stellar-expert/webpack-template": "^1.4.0",
+    "clone": "^2.1.2",
+    "jest": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3"
   }
 }

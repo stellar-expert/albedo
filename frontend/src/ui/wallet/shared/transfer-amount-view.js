@@ -1,23 +1,36 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import BigNumber from 'bignumber.js'
 import PropTypes from 'prop-types'
 import {useAutoFocusRef, useDependantState, AssetSelector} from '@stellar-expert/ui-framework'
 import {isValidPoolId} from '@stellar-expert/asset-descriptor'
-import {stripTrailingZeros} from '@stellar-expert/formatter'
+import {formatWithAutoPrecision, fromStroops, toStroops} from '@stellar-expert/formatter'
 import './transfer-amount.scss'
 
-function TransferAmountView({settings, index = 0, balances, filterBalances = 'assets', restricted, placeholder, autofocus = false, error}) {
-    const amount = settings.amount[index],
-        [inputAmount, setInputAmount] = useDependantState(() => {
-            if (!amount || amount === '0') return ''
-            return amount
-        }, [amount]),
-        predefinedAssets = balances.map(b => b.id).filter(a => {
-            if (filterBalances === 'pools' && !isValidPoolId(a)) return false
-            if (filterBalances === 'assets' && isValidPoolId(a)) return false
-            return true
-        })
+function TransferAmountView({
+                                settings,
+                                index = 0,
+                                balances,
+                                filterBalances = 'assets',
+                                restricted,
+                                placeholder,
+                                autofocus = false,
+                                readOnly,
+                                profit,
+                                error
+                            }) {
+    const amount = settings.amount[index]
+    const [inputAmount, setInputAmount] = useDependantState(() => {
+        if (!amount || amount === '0')
+            return ''
+        return amount
+    }, [amount])
+    const predefinedAssets = balances.map(b => b.id).filter(a => {
+        if (filterBalances === 'pools' && !isValidPoolId(a))
+            return false
+        if (filterBalances === 'assets' && isValidPoolId(a))
+            return false
+        return true
+    })
 
     if (!predefinedAssets.length) {
         predefinedAssets.push('XLM')
@@ -27,9 +40,7 @@ function TransferAmountView({settings, index = 0, balances, filterBalances = 'as
         const v = e.target.value.replace(/[^\d.]/g, '')
         setInputAmount(v)
         try {
-            const parsed = new BigNumber(v)
-            if (parsed.isNegative() || parsed.isNaN()) throw new Error(`Invalid amount: ${v}`)
-            const amt = stripTrailingZeros(parsed.toFixed(7, BigNumber.ROUND_DOWN))
+            const amt = fromStroops(toStroops(v))
             settings.setAmount(amt, index)
         } catch (e) {
             settings.setAmount('0', index)
@@ -44,11 +55,22 @@ function TransferAmountView({settings, index = 0, balances, filterBalances = 'as
     if (error) {
         style.borderColor = 'var(--color-alert)'
     }
-
+    const selectedAsset = settings.asset[index]
     return <div className="transfer-amount relative">
         <input type="text" value={inputAmount} onChange={change} placeholder={placeholder || '0'} style={style} data-lpignore="true"
-               ref={autofocus ? useAutoFocusRef : undefined} maxLength="21"/>
-        <AssetSelector value={settings.asset[index]} onChange={onAssetChange} predefinedAssets={predefinedAssets} restricted={restricted}/>
+               ref={autofocus ? useAutoFocusRef : undefined} maxLength="21" readOnly={readOnly || false}/>
+        <AssetSelector value={selectedAsset} onChange={onAssetChange} predefinedAssets={predefinedAssets} restricted={restricted}/>
+        {profit > 0 && <div>
+            <div className="profit">
+                <span className="amount-clone">{inputAmount}</span>
+                <span className="text-tiny color-success condensed">
+                    +{formatWithAutoPrecision(profit)}&thinsp;{(selectedAsset || '').split('-')[0]}
+                    <span className="desktop-only">
+                        (+{formatWithAutoPrecision(parseFloat(profit) * 100 / parseFloat(inputAmount))}%)
+                    </span>
+                </span>
+            </div>
+        </div>}
     </div>
 }
 
@@ -70,6 +92,8 @@ TransferAmountView.propTypes = {
     placeholder: PropTypes.string,
     //automatically focus on this input when the control is loaded
     autofocus: PropTypes.bool,
+    //whether the input can be edited
+    readOnly: PropTypes.bool,
     error: PropTypes.bool
 }
 

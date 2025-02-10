@@ -13,13 +13,13 @@ export default function AccountForgetView({credentials}) {
         if (account.isStoredAccount) {
             confirmation += '\r\nPlease make sure that you backed up the recovery phrase or transferred all funds from this account.'
         }
-        if (confirm(confirmation)) {
+        confirm(confirmation, {title: 'Remove account', icon: 'warning-circle'}).then(()=>{
             account.verifyCredentials(credentials)
             accountManager.forget(account)
                 .then(() => {
                     navigation.navigate(actionContext.intent ? '/confirm' : '/account')
                 })
-        }
+        })
     }
 
     return <>

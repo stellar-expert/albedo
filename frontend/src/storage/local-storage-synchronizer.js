@@ -6,7 +6,8 @@ import storageProvider from './storage-provider'
  */
 export async function syncLocalStorage() {
     //do not allow to send sync commands from iframes
-    if (isInsideFrame()) return
+    if (isInsideFrame())
+        return
     //obtain caller window reference
     const caller = window.opener
     if (!caller || caller === window) return

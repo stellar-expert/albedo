@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
-import {Memo} from '@stellar/stellar-base'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
+import {Memo} from '@stellar/stellar-base'
 import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework'
 
 export const memoTypes = ['none', 'text', 'id', 'hash', 'return']
@@ -35,40 +35,37 @@ export function setMemo(transfer, type, value) {
 }
 
 function TxMemoView({transfer, allowMuxed = true}) {
+    const [type, setType] = useState('none')
     const [value, setValue] = useState('')
-    const [type, setType] = useState(transfer.memo?.type || 'none')
 
     useEffect(() => {
-        if (transfer.memo !== null) {
+        if (transfer.memo && !transfer.invalidMemo) {
             setType(transfer.memo?.type || 'none')
             setValue(transfer.memo?.value || '')
         }
-    }, [transfer])
+    }, [transfer.memo])
 
-    const setMemoType = useCallback(type => {
+    const setMemoType = type => {
         setType(type)
-        setValue(currentValue => {
-            setMemo(transfer, type, currentValue)
-            return currentValue
-        })
-
+        setMemo(transfer, type, value)
         if (allowMuxed && transfer.encodeMuxedAddress && type !== 'id') {
             transfer.toggleMuxed()
         }
-    }, [transfer, allowMuxed])
+    }
 
-    const setMemoValue = useCallback(e => {
+    const setMemoValue = e => {
         const {value} = e.target
         setValue(value)
         setMemo(transfer, type, value)
-    }, [transfer, type])
+    }
 
     const toggleMuxed = useCallback(() => transfer.toggleMuxed(), [transfer])
 
-    return <div className="text-small dimmed space">
+    return <div className="text-tiny dimmed">
         Transaction memo: <Dropdown options={memoTypes} value={type} onChange={setMemoType}/> (optional)
         {type !== 'none' && <div>
-            <input type="text" value={value} onChange={setMemoValue} placeholder={getPlaceholder(type)} ref={useAutoFocusRef}/>
+            <input type="text" value={value || ''} onChange={setMemoValue} placeholder={getPlaceholder(type)} ref={useAutoFocusRef}
+                   className="text-small"/>
         </div>}
         {!!allowMuxed && type === 'id' && <label className="micro-space text-tiny">
             <input type="checkbox" checked={!!transfer.encodeMuxedAddress} onChange={toggleMuxed}/>&nbsp;

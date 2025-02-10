@@ -1,11 +1,12 @@
 import {autorun, runInAction, makeAutoObservable} from 'mobx'
-import {Asset, Memo} from '@stellar/stellar-base'
 import {debounce} from 'throttle-debounce'
-import BigNumber from 'bignumber.js'
+import {Asset, Memo} from '@stellar/stellar-base'
+import {fromStroops, toStroops} from '@stellar-expert/formatter'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import {streamLedgers} from '../../../util/ledger-stream'
 import {createHorizon} from '../../../util/horizon-connector'
 import {encodeMemo} from '../../../util/memo'
+import {withSlippage} from '../../../util/slippage'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {prepareTransferTx} from './transfer-tx-builder'
 
@@ -16,7 +17,7 @@ export default class TransferSettings {
         this.asset = ['XLM', 'XLM']
         this.amount = ['0', '0']
         this.conversionSlippage = 0.5
-        this.fee = 100
+        this.fee = 'normal'
         this.selfPayment = selfPayment
         makeAutoObservable(this)
 
@@ -138,8 +139,7 @@ export default class TransferSettings {
     }
 
     get hasSufficientBalance() {
-        return new BigNumber(accountLedgerData.getAvailableBalance(this.asset[0]))
-            .gte(this.amount[0] || 0)
+        return toStroops(accountLedgerData.getAvailableBalance(this.asset[0])) >= toStroops(this.amount[0] || 0)
     }
 
     /**
@@ -168,7 +168,7 @@ export default class TransferSettings {
         this.createDestination = false
         this.createTrustline = false
         this.destinationFederationAddress = null
-        this.memo = null
+        this.memo = Memo.none()
         this.invalidMemo = false
         this.isValid = false
         if (federationInfo) {
@@ -263,7 +263,8 @@ export default class TransferSettings {
      * Estimate swap price and amount
      */
     recalculateSwap() {
-        if (this.conversionPathLoaded || this.mode !== 'convert') return
+        if (this.conversionPathLoaded || this.mode !== 'convert')
+            return
         this.conversionPath = undefined
         this.conversionPrice = undefined
         if (this.asset[0] === this.asset[1]) {
@@ -275,7 +276,8 @@ export default class TransferSettings {
         const target = this.conversionDirection === 'source' ? 1 : 0
         this.amount[target] = ''
 
-        if (!this.amount[0] && !this.amount[1] || !this.conversionDirection) return
+        if (!this.amount[0] && !this.amount[1] || !this.conversionDirection)
+            return
         this.findConversionPath()
     }
 
@@ -298,9 +300,9 @@ export default class TransferSettings {
                     const [result] = records
                     runInAction(() => {
                         if (this.conversionDirection === 'source') {
-                            this.amount[1] = adjustWithSlippage(result.destination_amount, -1, this.conversionSlippage)
+                            this.amount[1] = fromStroops(withSlippage(result.destination_amount, this.conversionSlippage))
                         } else {
-                            this.amount[0] = adjustWithSlippage(result.source_amount, 1, this.conversionSlippage)
+                            this.amount[0] = fromStroops(withSlippage(result.source_amount, -this.conversionSlippage))
                         }
                         this.conversionPrice = result.destination_amount / result.source_amount
                         this.conversionPath = (result.path || []).map(a => a.asset_type === 'native' ? Asset.native() : new Asset(a.asset_code, a.asset_issuer))
@@ -357,21 +359,6 @@ export default class TransferSettings {
         this.encodeMuxedAddress = !this.encodeMuxedAddress
     }
 }
-
-/**
- * Adjust converted amount with regard to maximum slippage amount
- * @param {String} value
- * @param {Number} direction
- * @param {Number} slippage
- * @return {String}
- */
-function adjustWithSlippage(value, direction, slippage) {
-    return new BigNumber(value)
-        .times((1 + direction * slippage / 100).toPrecision(15))
-        .dp(7, direction < 0 ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP)
-        .toString()
-}
-
 /**
  * @typedef  {'direct'|'convert'|'claimable'} TransferMode
  */

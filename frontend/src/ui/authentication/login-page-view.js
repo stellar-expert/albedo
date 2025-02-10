@@ -7,7 +7,6 @@ import actionContext from '../../state/action-context'
 import Credentials from '../../state/auth/credentials'
 import SoloLayoutView from '../layout/solo-layout-view'
 import errors from '../../util/errors'
-import HardwareWalletSelectorView from './hardware-wallet-selector-view'
 import CredentialsRequest from './credentials-request-view'
 
 export default function LoginPageView() {
@@ -64,8 +63,6 @@ export default function LoginPageView() {
                     </div>
                 </div>
             </div>
-            <hr style={{margin: '3rem 0'}} title="or use hardware wallet" className="flare"/>
-            <HardwareWalletSelectorView requirePublicKey onConfirm={login}/>
         </SoloLayoutView>
     return <SoloLayoutView title="Log In">
         <div className="space">

@@ -121,6 +121,12 @@ class ActionContext {
     selectedAccount = null
 
     /**
+     * Fee bid level
+     * @type {String}
+     */
+    confidence = 'normal'
+
+    /**
      * Horizon info for selected account.
      * @type {AccountResponse}
      */
@@ -185,7 +191,8 @@ class ActionContext {
      * @param {Account} account
      */
     selectAccount(account = null) {
-        if (account && this.requestedPubkey && this.requestedPubkey !== account.publicKey) return
+        if (account && this.requestedPubkey && this.requestedPubkey !== account.publicKey)
+            return
         const updated = this.selectedAccount !== account
         if (updated) {
             this.selectedAccount = account

@@ -1,9 +1,10 @@
 import {Operation, TransactionBuilder} from '@stellar/stellar-base'
-import Bignumber from 'bignumber.js'
 import {getLiquidityPoolAsset} from '@stellar-expert/asset-descriptor'
+import {fromStroops, stripTrailingZeros} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'
 import {estimateFee} from '../../../util/fee-estimator'
+import {withSlippage} from '../../../util/slippage'
 
 /**
  *
@@ -11,12 +12,13 @@ import {estimateFee} from '../../../util/fee-estimator'
  * @return {Promise<Transaction>}
  */
 export async function prepareLiquidityDepositTx(deposit) {
-    if (!deposit.hasSufficientBalance) return null
+    if (!deposit.hasSufficientBalance)
+        return null
     const {accountData, address} = accountLedgerData
 
     const builder = new TransactionBuilder(accountData, {
         networkPassphrase: resolveNetworkParams({network: deposit.network}).network,
-        fee: await estimateFee(deposit.network)
+        fee: await estimateFee(deposit.network, deposit.fee)
     }).setTimeout(60)
 
     if (!deposit.hasPoolTrustline) {
@@ -27,17 +29,19 @@ export async function prepareLiquidityDepositTx(deposit) {
     if (deposit.reverse) {
         amount = amount.slice().reverse()
     }
-    const depositPrice = new Bignumber(amount[0] / amount[1])
+    const depositPrice = amount[0] / amount[1]
 
     const slippageRate = deposit.slippage / 100
-    amount = amount.map(a => new Bignumber(a).times(1 - slippageRate).toFixed(7, Bignumber.ROUND_DOWN))
+    if (deposit.poolInfo?.parameters) {
+        amount = amount.map(a => fromStroops(withSlippage(a, -deposit.slippage)))
+    }
 
     builder.addOperation(Operation.liquidityPoolDeposit({
         liquidityPoolId: deposit.poolId,
         maxAmountA: amount[0],
         maxAmountB: amount[1],
-        minPrice: depositPrice.times(1 - slippageRate),
-        maxPrice: depositPrice.times(1 + slippageRate)
+        minPrice: stripTrailingZeros((depositPrice * (1 - slippageRate)).toFixed(7)),
+        maxPrice: stripTrailingZeros((depositPrice * (1 + slippageRate)).toFixed(7))
     }))
 
     return builder.build()

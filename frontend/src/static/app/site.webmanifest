@@ -76,7 +76,7 @@
     {
       "name": "Scan QR code",
       "short_name": "Scan",
-      "description": "Scan Stellar address, payment request, WalletConnect QR, or upload QR screenshot if camera is not available",
+      "description": "Scan Stellar address, payment request, or upload QR screenshot if camera is not available",
       "url": "/wallet/scan",
       "icons": [
         {

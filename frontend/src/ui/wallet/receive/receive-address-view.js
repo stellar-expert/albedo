@@ -11,16 +11,18 @@ export default observer(function ReceiveAddressView() {
         <WalletPageActionDescription>
             share your account address to receive a payment
         </WalletPageActionDescription>
+        <div className="text-center text-small micro-space">
+            <BlockSelect style={{maxWidth: '100%'}} className="text-monospace condensed">
+                <span>{publicKey.substring(0, 28)}</span>
+                <wbr/>
+                <span>{publicKey.substring(28)}</span>
+            </BlockSelect>
+            <CopyToClipboard text={publicKey}>
+                <a href="#" className="icon-copy active-icon" title="Copy account address"/>
+            </CopyToClipboard>
+        </div>
         <div className="space">
             <QrCodeView value={publicKey}/>
-        </div>
-        <div className="text-center text-tiny space">
-            <BlockSelect style={{overflow: 'hidden', maxWidth: '100%'}} className="text-monospace condensed">{publicKey}</BlockSelect>
-            <div>
-                <CopyToClipboard text={publicKey}>
-                    <a href="#">Copy account address<i className="icon-copy active-icon"/></a>
-                </CopyToClipboard>
-            </div>
         </div>
     </>
 })

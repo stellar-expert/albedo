@@ -49,7 +49,6 @@ function IntroView() {
         <div className="double-space"/>
         <div>
             {!isInsideFrame() && <>
-                <Button block outline href="/install-extension">Get browser extension</Button>
                 <Button block outline href="#" onClick={() => registerProtocolHandler()}>Install as web+stellar handler</Button>
             </>}
             <Button block outline href="/playground" target="_blank">Developer playground </Button>

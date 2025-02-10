@@ -1,13 +1,37 @@
 .transfer-amount {
   position: relative;
 
+  > input, .amount-clone {
+    font-size: $font-size-base*1.6;
+    font-family: $font-face-mono;
+    letter-spacing: -0.05em;
+    margin: 0.5em 0;
+
+    &::placeholder {
+      font-family: $font-face-primary;
+      font-size: $font-size-base;
+    }
+  }
+
   .asset-selector {
     position: absolute !important;
-    right: 0.5em;
-    top: 0.5em;
+    font-size: $font-size-base*1.3;
+    right: 0;
+    top: 1em;
 
     .dd-header {
-      font-size: 0.85em;
+      letter-spacing: -0.03em;
+    }
+  }
+
+  .profit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding-left: 0.6rem; // the same as input padding
+
+    .amount-clone {
+      visibility: hidden;
     }
   }
 }

@@ -2,9 +2,9 @@ import {useEffect, useState} from 'react'
 import {useStellarNetwork} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../../util/horizon-connector'
 
-export function useLiquidityPoolInfo(poolId) {
-    const network = useStellarNetwork(),
-        [poolInfo, setPoolInfo] = useState(undefined)
+export function useLiquidityPoolInfo(poolId, dependencies = []) {
+    const network = useStellarNetwork()
+    const [poolInfo, setPoolInfo] = useState(undefined)
     useEffect(function () {
         if (!poolId) {
             setPoolInfo(undefined)
@@ -16,6 +16,6 @@ export function useLiquidityPoolInfo(poolId) {
             .call()
             .then(res => setPoolInfo(res || null))
             .catch(() => setPoolInfo(null))
-    }, [poolId, network])
+    }, [poolId, network, ...dependencies])
     return poolInfo
 }

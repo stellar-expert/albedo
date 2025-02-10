@@ -1,5 +1,4 @@
 import {createHorizon} from './horizon-connector'
-import Bignumber from 'bignumber.js'
 
 /**
  * Get the number of new claimable balance entries since the last check
@@ -45,5 +44,5 @@ export function getNewPaymentsSince(network, account, ledger) {
             }).catch(e => console.error(e))
     }
 
-    return fetchPayments(new Bignumber(ledger + 1).times(new Bignumber(4294967295)).toString())
+    return fetchPayments((BigInt(ledger + 1) * 4294967295n).toString())
 }

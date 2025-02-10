@@ -34,7 +34,7 @@ export async function prepareClaimBalanceTx(claimableBalance, network) {
 export function validateClaimClaimableBalance(claimableBalance) {
     if (accountLedgerData.nonExisting)
         return 'Account doesn\'t exist on the ledger\nYou need to create it first by sending at least 1.6 XLM to the account address.'
-    if (!accountLedgerData.getAvailableBalance('XLM', 0.05))
+    if (!accountLedgerData.getAvailableBalance('XLM'))
         return 'Not enough funds for the transaction fee'
     if (!accountLedgerData.hasTrustline(AssetDescriptor.parse(claimableBalance.asset)) && !accountLedgerData.getAvailableBalance('XLM', 0.55))
         return 'Not enough funds for the trustline creation'

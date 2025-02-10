@@ -35,15 +35,19 @@ function AddTrustlineView() {
     function createTrustline() {
         const validationResult = validateAddTrustline(asset)
         if (validationResult) return alert(validationResult)
-        if (!confirm(`Asset trustline will temporarily lock 0.5 XLM on your account balance.
-Would you like to add this asset?`)) return
-        prepareAddTrustlineTx(asset, network)
-            .then(tx => {
-                if (!tx) return
-                setInProgress(true)
-                return confirmTransaction(network, tx)
-                    .then(() => navigation.navigate('/account'))
-                    .finally(() => setInProgress(false))
+        confirm(<div className="text-small">
+            Asset trustline will temporarily lock 0.5 XLM on your account balance.
+            Would you like to add this asset?
+        </div>, {confirmTitle: 'Create', title: <>Create trustline for <AssetLink asset={asset}/></>})
+            .then(() => {
+                prepareAddTrustlineTx(asset, network)
+                    .then(tx => {
+                        if (!tx) return
+                        setInProgress(true)
+                        return confirmTransaction(network, tx)
+                            .then(() => navigation.navigate('/account'))
+                            .finally(() => setInProgress(false))
+                    })
             })
     }
 
@@ -54,9 +58,16 @@ Would you like to add this asset?`)) return
             establish trustline to hold and transfer tokens
         </WalletPageActionDescription>
         <div>
-            <div className="space segment">
-                <AssetSelector value={asset} onChange={select} title="Choose an asset"/>or provide
-                asset parameters <a href="#" onClick={() => setDirect(true)}>manually</a>
+            <div className="segment text-center space">
+                {!direct && <div>
+                    {!!isValid ?
+                        <>Asset <AssetLink asset={asset}/></> :
+                        <span className="dimmed text-small">(asset not selected)</span>
+                    }
+                </div>}
+                <div className="space"/>
+                <AssetSelector value={asset} onChange={select} title={(!isValid ? 'Choose' : 'Change') + ' an asset'}/>or{' '}
+                <a href="#" onClick={() => setDirect(true)}>provide asset parameters</a>
                 {direct && <>
                     <hr className="flare"/>
                     <div>
@@ -68,12 +79,6 @@ Would you like to add this asset?`)) return
                                onChange={e => change(code, e.target.value)}/>
                     </div>
                 </>}
-                {!direct && <div className="space text-center">
-                    {!!isValid ?
-                        <>Asset <AssetLink asset={asset}/></> :
-                        <span className="dimmed text-small">(asset not selected)</span>
-                    }
-                </div>}
             </div>
             {isValid && isTrustlineExists && <div className="segment segment-inline warning space text-small">
                 <span className="icon-warning"/> The trustline to this asset already exists

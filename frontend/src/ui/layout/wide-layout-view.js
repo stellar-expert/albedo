@@ -1,8 +1,8 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import {ThemeSelector} from '@stellar-expert/ui-framework'
+import {ThemeSelector, SystemDialog} from '@stellar-expert/ui-framework'
 import Logo from './logo-view'
-import DialogContainer from './dialog-container-view'
+import AuthDialog from './auth-dialog-view'
 
 function WideLayoutView({children}) {
     return <>
@@ -12,7 +12,8 @@ function WideLayoutView({children}) {
         <div className="page-container container wide space" style={{minHeight: 'calc(100vh - 8rem)'}}>
             {children}
         </div>
-        <DialogContainer/>
+        <AuthDialog/>
+        <SystemDialog/>
         <div className="container wide dimmed text-center text-small">
             <div className="space"/>
             <div className="copyright">

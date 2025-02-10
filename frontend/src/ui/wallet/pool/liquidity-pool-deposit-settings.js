@@ -11,6 +11,7 @@ export default class LiquidityPoolDepositSettings {
         this.amount = ['', '']
         this.asset = ['XLM', 'XLM']
         this.poolInfo = {loaded: false}
+        this.fee = 'normal'
         makeAutoObservable(this)
     }
 
@@ -25,6 +26,12 @@ export default class LiquidityPoolDepositSettings {
     poolInfo
 
     reverse = false
+    /**
+     * @type {Number | String}
+     */
+    fee
+
+    confirm = false
 
     get poolId() {
         return generateLiquidityPoolId(this.asset)
@@ -49,6 +56,10 @@ export default class LiquidityPoolDepositSettings {
             && this.asset[0] != this.asset[1]
             && this.poolInfo?.loaded
             && this.hasSufficientBalance
+    }
+
+    setFee(fee) {
+        this.fee = fee
     }
 
     setAsset(asset, index) {

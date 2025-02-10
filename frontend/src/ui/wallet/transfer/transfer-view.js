@@ -35,7 +35,7 @@ function TransferView() {
     const network = useStellarNetwork()
     const [transfer] = useDependantState(() => new TransferSettings(network), [network, accountLedgerData.address])
     const destinationDirectoryInfo = useDirectory(transfer.destination)
-    const disabled = !transfer.isValid || parseFloat(transfer.sourceAmount) <= 0
+    const disabled = !transfer.isValid || parseFloat(transfer.amount[0]) <= 0
     const balances = accountLedgerData.balancesWithPriority
 
     useEffect(() => {
@@ -85,10 +85,18 @@ function TransferView() {
                         <TransferAmountView settings={transfer} index={1} balances={balances} placeholder="Amount received"/>
                     </>}
             </div>
-            {transfer.mode === 'convert' &&
-                <SwapSlippageView title="Slippage tolerance" defaultValue={0.5} onChange={changeSlippage}/>}
-            <FeeView transfer={transfer}/>
-            <TxMemoView transfer={transfer}/>
+            <div className="dual-layout space">
+                <div>
+                    <TxMemoView transfer={transfer}/>
+                </div>
+                <div>
+                    {transfer.mode === 'convert' &&<>
+                        <SwapSlippageView title="Slippage tolerance" value={transfer.conversionSlippage} onChange={changeSlippage}/>
+                        <div className="micro-space"/>
+                    </>}
+                    <FeeView transfer={transfer}/>
+                </div>
+            </div>
             {transfer.createDestination && <div className="segment segment-inline success text-small micro-space">
                 <i className="icon-info"/> The recipient account will be created automatically.
                 <br/>
@@ -97,7 +105,7 @@ function TransferView() {
             <TransferValidationView transfer={transfer} directoryInfo={destinationDirectoryInfo}/>
         </div>
         {transfer.mode === 'claimable' && <p className="segment dimmed text-tiny micro-space">
-            Please note: the recipient will have to create a trustline and explicitly claim your payment.
+            <i className="icon icon-info"/>Please note: the recipient will have to create a trustline and explicitly claim your payment.
             Creating a claimable balance will temporary lock 0.5 XLM on your account, but you will be able to
             reclaim all transferred tokens and the reserved amount in case if the recipient won't claim the
             transfer.

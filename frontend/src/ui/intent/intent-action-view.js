@@ -38,7 +38,6 @@ function IntentActionView() {
         [signingInProgress, setSigningInProgress] = useDependantState(() => false, [selectedPublicKey, alreadySigned]),
         accountUnavailable = !selectedPublicKey || (requiresExistingAccount && intent !== 'tx' && (!selectedAccountInfo || selectedAccountInfo.error)),
         inProgress = [ActionContextStatus.confirmed, ActionContextStatus.processed].includes(status) && !intentErrors && !alreadySigned && signingInProgress,
-        externalSignatureRequested = status >= ActionContextStatus.confirmed && status < ActionContextStatus.processed && selectedAccount?.isHWAccount && !txContext?.isFullySigned,
         pendingHorizonSubmission = status >= ActionContextStatus.processed && status < ActionContextStatus.submitted && autoSubmitToHorizon && txContext?.isFullySigned && !response
 
     if (status >= ActionContextStatus.processed) return <div>
@@ -55,7 +54,6 @@ function IntentActionView() {
     }
 
     return <div>
-        {externalSignatureRequested && <PendingStatus>Confirm the action on the hardware wallet</PendingStatus>}
         {pendingHorizonSubmission && <PendingStatus>Submitting to Horizon…</PendingStatus>}
         {!!runtimeErrors && <div className="space">
             <IntentErrorView/>

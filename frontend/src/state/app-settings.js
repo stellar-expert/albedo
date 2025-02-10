@@ -1,13 +1,5 @@
 import defaultConfig from '../../default-config'
 
-const appSettings = Object.assign(defaultConfig, {
-    walletConnect: {
-        broker: walletConnectBroker
-    },
-    oneSignal: {
-        appId: onesignalAppId,
-        safariId: onesignalSafariId
-    }
-})
+const appSettings = Object.assign(defaultConfig, {})
 
 export default appSettings
