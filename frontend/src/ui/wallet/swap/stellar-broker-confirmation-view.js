@@ -10,15 +10,14 @@ import {confirmSpending} from '../shared/spending-confirmation-view'
  * @param {Function} onFinalize
  * @constructor
  */
-export default observer(function StellarBrokerConfirmationView({disabled, swap}) {
+export default observer(function StellarBrokerConfirmationView({swap}) {
     const network = useStellarNetwork()
-    const [inProgress, setInProgress] = useState(false)
+    const disabled = !swap.isValid || !swap.conversionFeasible || swap.inProgress
 
     const confirmSmartSwap = useCallback(async () => {
         try {
-            swap.confirmSwap()
+            swap.confirmSmartRouterSwap()
         } catch (e) {
-            setInProgress(false)
             if (e.code === -4)
                 return
 
@@ -27,7 +26,6 @@ export default observer(function StellarBrokerConfirmationView({disabled, swap})
                 message: `Failed to execute the swap.`
             })
         }
-        setInProgress(false)
     }, [network])
 
     const proceed = useCallback(() => {
@@ -42,12 +40,11 @@ export default observer(function StellarBrokerConfirmationView({disabled, swap})
     return <>
         <div className="row space">
             <div className="column column-50">
-                <Button block disabled={disabled || inProgress} onClick={proceed}>Swap</Button>
+                <Button block disabled={disabled} loading={swap.inProgress} onClick={proceed}>Swap</Button>
             </div>
             <div className="column column-50">
                 <Button href="/" block outline>Cancel</Button>
             </div>
         </div>
-        {inProgress && <ActionLoaderView message="swap in progress"/>}
     </>
 })

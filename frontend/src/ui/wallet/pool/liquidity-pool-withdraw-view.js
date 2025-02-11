@@ -16,7 +16,7 @@ function LiquidityPoolWithdrawView() {
     const {pool} = parseQuery()
     if (!isValidPoolId(pool))
         return <div className="segment segment-inline error text-center">
-            <i className="icon icon-warning color-warning"/> Error: Invalid liquidity pool id
+            <i className="icon icon-warning color-warning"/> Error: Invalid liquidity pool ID
         </div>
 
     const network = useStellarNetwork()
@@ -45,9 +45,9 @@ function LiquidityPoolWithdrawView() {
         }
     }
 
-    return <WalletOperationsWrapperView title="Withdraw liquidity">
+    return <WalletOperationsWrapperView title="Classic LP withdraw">
         <WalletPageActionDescription>
-            withdraw funds from the DEX liquidity pool
+            withdraw funds from the Classic DEX liquidity pool
         </WalletPageActionDescription>
         {max === '0' ?
             <>
@@ -60,7 +60,7 @@ function LiquidityPoolWithdrawView() {
                 {poolInfo && <LiquidityPoolInfoView poolInfo={poolInfo} stake={max}/>}
                 <div className="segment space">
                     <input type="text" onChange={changeAmount} value={inputAmount.toString()} ref={useAutoFocusRef}
-                           placeholder="Stake amount to withdraw"/>
+                           placeholder="Amount of shares to withdraw"/>
                     <div className="dual-layout text-tiny condensed micro-space">
                         <div>
                             {inputAmount > 0 && !!poolInfo.reserves && <div className="block-indent">

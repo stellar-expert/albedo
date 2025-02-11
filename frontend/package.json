@@ -1,7 +1,7 @@
 {
   "name": "albedo",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "protocol": 3,
   "description": "Delegated transactions and messages signer for Stellar Network",
   "author": "StellarExpertTeam<info@stellar.expert>",
@@ -46,7 +46,7 @@
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
     "@stellar-expert/tx-meta-effects-parser": "6.3.1",
     "@stellar-expert/tx-signers-inspector": "1.8.2",
-    "@stellar-expert/ui-framework": "1.14.8",
+    "@stellar-expert/ui-framework": "1.14.11",
     "@stellar/stellar-base": "13.0.1",
     "@stellar/stellar-sdk": "13.1.0",
     "@zxing/browser": "^0.1.5",

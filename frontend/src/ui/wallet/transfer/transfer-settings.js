@@ -113,6 +113,10 @@ export default class TransferSettings {
      */
     isValid = false
     /**
+     * @type {Boolean}
+     */
+    inProgress = false
+    /**
      * @type {Number | String}
      */
     fee
@@ -147,6 +151,8 @@ export default class TransferSettings {
      * @param {TransferMode} mode
      */
     setMode(mode) {
+        if (this.inProgress)
+            return
         this.mode = mode
         if (mode === 'claimable') {
             this.createDestination = false
@@ -164,6 +170,8 @@ export default class TransferSettings {
      * @param {Object} federationInfo
      */
     setDestination(address, federationInfo = null) {
+        if (this.inProgress)
+            return
         this.destination = address || null
         this.createDestination = false
         this.createTrustline = false
@@ -185,6 +193,8 @@ export default class TransferSettings {
      * @param {String} inputValue
      */
     setDestinationInputValue(inputValue) {
+        if (this.inProgress)
+            return
         this.destinationInputValue = inputValue
     }
 
@@ -194,6 +204,8 @@ export default class TransferSettings {
      * @param {Number} index
      */
     setAmount(amount, index) {
+        if (this.inProgress)
+            return
         this.conversionDirection = index === 0 ? 'source' : 'dest'
         this.conversionPathLoaded = false
         if (this.asset[0] === this.asset[1]) {
@@ -208,6 +220,8 @@ export default class TransferSettings {
      * @param {Number} slippage
      */
     setSlippage(slippage) {
+        if (this.inProgress)
+            return
         this.conversionPathLoaded = false
         this.conversionSlippage = slippage
     }
@@ -217,6 +231,8 @@ export default class TransferSettings {
      * @param {Number | String} fee
      */
     setFee(fee) {
+        if (this.inProgress)
+            return
         this.fee = fee
     }
 
@@ -226,6 +242,8 @@ export default class TransferSettings {
      * @param {Number} index
      */
     setAsset(asset, index) {
+        if (this.inProgress)
+            return
         this.conversionPathLoaded = false
         this.createTrustline = false
         this.isValid = false
@@ -245,6 +263,8 @@ export default class TransferSettings {
      * Reverse swap direction
      */
     reverse() {
+        if (this.inProgress)
+            return
         if (this.conversionDirection === 'source') {
             this.amount = ['0', this.amount[0]]
             this.conversionDirection = 'dest'
@@ -263,6 +283,8 @@ export default class TransferSettings {
      * Estimate swap price and amount
      */
     recalculateSwap() {
+        if (this.inProgress)
+            return
         if (this.conversionPathLoaded || this.mode !== 'convert')
             return
         this.conversionPath = undefined
@@ -337,6 +359,7 @@ export default class TransferSettings {
      * Set amounts to zero
      */
     resetOperationAmount() {
+        this.inProgress = false
         this.createDestination = false
         this.createTrustline = false
         this.amount = ['0', '0']

@@ -40,9 +40,9 @@ export default observer(function LiquidityPoolDepositView() {
         }
     }, [])
 
-    return <WalletOperationsWrapperView title="Deposit liquidity">
+    return <WalletOperationsWrapperView title="Classic LP deposit">
         <WalletPageActionDescription>
-            deposit funds to the crowdsourced DEX liquidity pool
+            deposit funds to the Classic DEX liquidity pool
         </WalletPageActionDescription>
         <div className="lp-deposit space">
             <div className="segment">

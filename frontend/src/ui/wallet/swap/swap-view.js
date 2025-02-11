@@ -35,7 +35,8 @@ function SwapView() {
         <WalletPageActionDescription>exchange your tokens</WalletPageActionDescription>
         <div className="swap segment micro-space">
             <div className="params">
-                <TransferAmountView settings={swap} index={0} balances={balancesWithPriority} restricted/>
+                <TransferAmountView settings={swap} index={0} balances={balancesWithPriority} restricted
+                                    readOnly={swap.inProgress} assetSelectorDisabled={swap.inProgress}/>
                 <SwapBandView settings={swap} balances={balancesWithPriority}/>
                 <TransferAmountView settings={swap} index={1} balances={balancesWithPriority} profit={swap.profit} readOnly/>
             </div>
@@ -66,7 +67,7 @@ function SwapView() {
             <SwapValidationView swap={swap}/>
         </div>
         {swap.useStellarBroker ?
-            <SmartSwapConfirmationView swap={swap} disabled={!swap.isValid || !swap.conversionFeasible}/> :
+            <SmartSwapConfirmationView swap={swap}/> :
             <TransactionConfirmationView action="Swap" disabled={!swap.isValid} transfer={swap} prepareTransaction={prepareTransaction} onFinalize={resetOperationAmount}/>
         }
     </WalletOperationsWrapperView>

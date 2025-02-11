@@ -47,7 +47,9 @@ function SwapValidationView({swap}) {
                 This action will temporarily lock 0.5 XLM on your account balance.
             </>
         default:
-            console.warn('Unknown swap validation status: ' + swap.validationStatus)
+            if (swap.validationStatus) {
+                console.warn('Unknown swap validation status: ' + swap.validationStatus)
+            }
             return null
     }
 }

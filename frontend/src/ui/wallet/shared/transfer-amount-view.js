@@ -15,6 +15,7 @@ function TransferAmountView({
                                 placeholder,
                                 autofocus = false,
                                 readOnly,
+                                assetSelectorDisabled,
                                 profit,
                                 error
                             }) {
@@ -48,6 +49,8 @@ function TransferAmountView({
     }
 
     function onAssetChange(asset) {
+        if (assetSelectorDisabled)
+            return
         settings.setAsset(asset, index)
     }
 
@@ -94,6 +97,8 @@ TransferAmountView.propTypes = {
     autofocus: PropTypes.bool,
     //whether the input can be edited
     readOnly: PropTypes.bool,
+    //whether the asset selector can change asset
+    assetSelectorDisabled: PropTypes.bool,
     error: PropTypes.bool
 }
 

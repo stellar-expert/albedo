@@ -31,6 +31,8 @@ export default class LiquidityPoolWithdrawSettings {
 
     slippage = 1
 
+    inProgress = false
+
     get poolAssets() {
         if (!this.poolInfo)
             return null
@@ -44,6 +46,8 @@ export default class LiquidityPoolWithdrawSettings {
     }
 
     setAmount(amount) {
+        if (this.inProgress)
+            return
         const {max} = this
         if (amount < 0n || !max) {
             amount = 0n

@@ -96,7 +96,7 @@ export default class SwapSettings {
     /**
      * @type {String}
      */
-    validationStatus
+    validationStatus = 'Not initialized'
     /**
      * @type {{}}
      */
@@ -106,6 +106,10 @@ export default class SwapSettings {
      * @private
      */
     bought
+    /**
+     * @type {boolean}
+     */
+    inProgress = false
 
     /**
      * @type {String}
@@ -204,6 +208,8 @@ export default class SwapSettings {
      * Reverse swap direction
      */
     reverse() {
+        if (this.inProgress)
+            return
         this.amount = [this.amount[1] || '0', '0']
         this.asset = this.asset.slice().reverse()
         this.recalculateSwap()
@@ -219,6 +225,7 @@ export default class SwapSettings {
         this.conversionPathLoaded = false
         this.profit = undefined
         this.brokerError = undefined
+        this.inProgress = false
         const target = this.conversionDirection === 'source' ? 1 : 0
         this.amount[target] = ''
         this.validationStatus = validateSwap(this)
@@ -262,10 +269,19 @@ export default class SwapSettings {
         this.setAmount('0', 0)
     }
 
-    async confirmSwap() {
+    /**
+     * Confirm the quote provided by the smart router
+     */
+    confirmSmartRouterSwap() {
         this.brokerClient.confirmQuote()
+        this.inProgress = true
     }
 
+    /**
+     * Connect to smart router broker
+     * @param {string} network
+     * @return {Promise<void>}
+     */
     async connectToBroker(network) {
         //obtain user credentials
         const {source} = this
@@ -360,7 +376,7 @@ export default class SwapSettings {
         await client.connect()
             .catch(e => {
                 console.error(e)
-                notify({type: 'warning', message: 'Failed to connect to StellarBroker smart swaps. Try disabling Smart Routing option.'})
+                notify({type: 'warning', message: 'Failed to connect to StellarBroker smart router. Try disabling Smart Routing option.'})
             })
     }
 

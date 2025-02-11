@@ -26,8 +26,10 @@ export default class LiquidityPoolDepositSettings {
     poolInfo
 
     reverse = false
+
+    inProgress = false
     /**
-     * @type {Number | String}
+     * @type {String}
      */
     fee
 
@@ -59,10 +61,14 @@ export default class LiquidityPoolDepositSettings {
     }
 
     setFee(fee) {
+        if (this.inProgress)
+            return
         this.fee = fee
     }
 
     setAsset(asset, index) {
+        if (this.inProgress)
+            return
         this.asset[index] = asset
         this.amount[index] = ''
         this.loadPoolInfo()
@@ -70,12 +76,16 @@ export default class LiquidityPoolDepositSettings {
     }
 
     setAmount(amount, index) {
+        if (this.inProgress)
+            return
         this.amount[index] = amount
         this.loadPoolInfo()
             .then(() => this.recalculate(index))
     }
 
     setSlippage(slippage) {
+        if (this.inProgress)
+            return
         this.slippage = slippage
     }
 
@@ -126,6 +136,7 @@ export default class LiquidityPoolDepositSettings {
     }
 
     resetOperationAmount() {
+        this.inProgress = false
         this.amount = ['', '']
     }
 }
