@@ -216,9 +216,9 @@ export default class SwapSettings {
     }
 
     /**
-     * Estimate swap price and amount
+     * Reset estimated swap
      */
-    recalculateSwap() {
+    reset() {
         this.conversionPath = undefined
         this.conversionPrice = undefined
         this.conversionFeasible = false
@@ -229,6 +229,13 @@ export default class SwapSettings {
         const target = this.conversionDirection === 'source' ? 1 : 0
         this.amount[target] = ''
         this.validationStatus = validateSwap(this)
+    }
+
+    /**
+     * Estimate swap price and amount
+     */
+    recalculateSwap() {
+        this.reset()
         const {brokerClient} = this
         if (!this.isValid) {
             brokerClient?.stop()
@@ -370,6 +377,9 @@ export default class SwapSettings {
             //TODO: use "swap error prefix conditionally"
             notify({type: 'warning', message: 'Swap error. ' + e.error})
             console.warn('Broker error', e.error)
+            if (client.status === 'disconnected') {
+                this.reset()
+            }
         })
         this.brokerClient = client
         //connect...
