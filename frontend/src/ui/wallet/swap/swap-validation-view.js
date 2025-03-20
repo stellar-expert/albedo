@@ -1,11 +1,12 @@
 import React from 'react'
 import {observer} from 'mobx-react'
+import {runInAction} from 'mobx'
 import {AssetLink, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {createTestnetAccount} from '../../../util/horizon-connector'
 import {prepareAddTrustlineTx} from '../trustline/add-trustline-tx-builder'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
 
-function requestTrustlineCreation({swap, asset, network}) {
+function requestTrustlineCreation(swap, asset, network) {
     confirm(<div className="text-small">
         This action will temporarily lock 0.5 XLM on your account balance (can be reclaimed later).
         Would you like to add this asset?
@@ -16,7 +17,10 @@ function requestTrustlineCreation({swap, asset, network}) {
                     if (!tx) return
                     return confirmTransaction(network, tx)
                         .then(() => {
-                            swap.createTrustline = true
+                            runInAction(() => {
+                                swap.createTrustline = true
+                            })
+                            notify({type: 'success', message: 'Trustline created'})
                         })
                     //.finally(() => setInProgress(false))
                 })
@@ -43,7 +47,8 @@ function SwapValidationView({swap}) {
             const assetCode = swap.asset[1].split('-')[0]
             return <>
                 You need to establish a trustline to {assetCode} before trading with it.
-                Would you like to <a href="#" onClick={() => requestTrustlineCreation(swap.asset[1])}>create the trustline</a>?
+                Would you like to <a href="#" onClick={() => requestTrustlineCreation(swap, swap.asset[1], network)}>create the
+                trustline</a>?
                 This action will temporarily lock 0.5 XLM on your account balance.
             </>
         default:

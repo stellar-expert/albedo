@@ -110,6 +110,10 @@ export default class SwapSettings {
      * @type {boolean}
      */
     inProgress = false
+    /**
+     * @type {boolean}
+     */
+    createTrustline = false
 
     /**
      * @type {String}
@@ -223,6 +227,7 @@ export default class SwapSettings {
         this.conversionPrice = undefined
         this.conversionFeasible = false
         this.conversionPathLoaded = false
+        this.createTrustline = false
         this.profit = undefined
         this.brokerError = undefined
         this.inProgress = false
@@ -246,6 +251,11 @@ export default class SwapSettings {
             buyingAsset: this.asset[1],
             sellingAmount: this.amount[0] || undefined,
             slippageTolerance: this.conversionSlippage / 100
+        }
+        const aqp = process.env.STELLAR_BROKER_QP
+        if (aqp) {
+            const [key, value] = aqp.split(':')
+            quoteParams[key] = value
         }
         if (this.stopLedgerStreaming) {
             this.stopLedgerStreaming()
@@ -312,7 +322,9 @@ export default class SwapSettings {
         }
         //subscribe to the quote notifications
         client.on('quote', e => {
-            //compareWithHorizon(this, e.quote)
+            if (location.hostname === 'localhost') {
+                compareWithHorizon(this, e.quote)
+            }
             if (e.quote.directTrade) {
                 this.conversionPath = e.quote.directTrade.path.map(a => {
                     if (a === 'XLM')
@@ -326,7 +338,7 @@ export default class SwapSettings {
                 const estimated = parseFloat(e.quote.directTrade?.buying) >= parseFloat(e.quote.estimatedBuyingAmount) ?
                     this.quote.directTrade.buying :
                     this.quote.estimatedBuyingAmount
-                this.amount[1] = withSlippage(estimated, this.conversionSlippage)
+                this.amount[1] = estimated
                 this.conversionPathLoaded = true
                 this.conversionFeasible = e.quote.status === 'success' || !!e.quote.directTrade
                 this.conversionPrice = parseFloat(estimated) / parseFloat(e.quote.sellingAmount)
@@ -408,7 +420,7 @@ export default class SwapSettings {
                 if (records.length) {
                     const [result] = records
                     runInAction(() => {
-                        this.amount[1] = withSlippage(result.destination_amount, this.conversionSlippage)
+                        this.amount[1] = result.destination_amount
                         this.conversionPrice = result.destination_amount / result.source_amount
                         this.conversionPath = (result.path || []).map(a => a.asset_type === 'native' ?
                             Asset.native() :
@@ -463,10 +475,6 @@ export default class SwapSettings {
             this.stopLedgerStreaming()
         }
     }
-}
-
-function withSlippage(amount, slippage) {
-    return fromStroops(BigInt((1 - slippage / 100) * 100000000) * toStroops(amount) / 100000000n)
 }
 
 function refreshBalances() {

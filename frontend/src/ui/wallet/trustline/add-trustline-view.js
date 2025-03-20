@@ -45,7 +45,10 @@ function AddTrustlineView() {
                         if (!tx) return
                         setInProgress(true)
                         return confirmTransaction(network, tx)
-                            .then(() => navigation.navigate('/account'))
+                            .then(() => {
+                                notify({type: 'success', message: 'Trustline created'})
+                                navigation.navigate('/account')
+                            })
                             .finally(() => setInProgress(false))
                     })
             })
