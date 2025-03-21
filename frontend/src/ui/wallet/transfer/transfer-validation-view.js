@@ -28,11 +28,13 @@ function canReceive(destination, asset) {
 function validate(network, transfer, directoryInfo) {
     const selfTransfer = transfer.source === transfer.destination
     const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
-    if (transfer.destinationFederationAddress && !transfer.destination)
+    if (transfer.destinationFederationAddress && !transfer.destination) {
+        const type = transfer.destinationFederationAddress.endsWith('.xlm') ? 'SorobanDomains' : 'federation'
         return <>
-            Failed to resolve recipient public key from the federation address "{transfer.destinationFederationAddress}".
+            Failed to resolve recipient public key from the {type} address "{transfer.destinationFederationAddress}".
             Please check whether you copied it correctly.
         </>
+    }
 
     if (transfer.invalidMemo)
         return <>
