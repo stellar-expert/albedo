@@ -93,7 +93,7 @@ function PendingClaimableBalancesView() {
     return <div className="space">
         {balances ? <>
                 {balances.map(balance => <AccountClaimableBalanceView balance={balance} account={address} key={balance.id}/>)}
-                {!balances.length && <div className="text-center text-small dimmed space">(no pending balances so far)</div>}
+                {!balances.length && <div className="text-center text-small dimmed double-space">(no claimable balances so far)</div>}
             </> :
             <div className="loader"/>}
     </div>

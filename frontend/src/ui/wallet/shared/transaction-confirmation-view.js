@@ -38,17 +38,7 @@ export default observer(function TransactionConfirmationView({
             notify({type: 'success', message: action + ' processed successfully'})
             onFinalize()
         } catch (e) {
-            if (e.status === 400) {
-                notify({type: 'error', message: e.data.title})
-                return
-            }
-            if (e.code === -4)
-                return
-            console.error('Failed to execute transaction', e)
-            notify({
-                type: 'error',
-                message: `Transaction failed. Try to adjust transaction fee ${(transfer.destination || transfer?.mode === 'convert') ? 'or slippage tolerance ' : ''} and resubmit the transaction.`
-            })
+            handleError(e, transfer)
         }
         runInAction(() => {
             transfer.inProgress = false
@@ -82,3 +72,17 @@ export default observer(function TransactionConfirmationView({
         </div>}
     </>
 })
+
+function handleError(e, transfer) {
+    if (e.status === 400) {
+        notify({type: 'error', message: e.data.title})
+        return
+    }
+    if (e.code === -4)
+        return
+    console.error('Failed to execute transaction', e)
+    notify({
+        type: 'error',
+        message: `Transaction failed. Try to adjust transaction fee ${(transfer.destination || transfer?.mode === 'convert') ? 'or slippage tolerance ' : ''} and resubmit the transaction.`
+    })
+}

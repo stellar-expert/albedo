@@ -8,18 +8,18 @@ export default function AccountForgetView({credentials}) {
     if (!credentials) return null
     const {account} = credentials
 
-    function forgetAccount() {
+    async function forgetAccount() {
         let confirmation = `Do you really want to remove account ${account.displayName}?`
         if (account.isStoredAccount) {
             confirmation += '\r\nPlease make sure that you backed up the recovery phrase or transferred all funds from this account.'
         }
-        confirm(confirmation, {title: 'Remove account', icon: 'warning-circle'}).then(()=>{
-            account.verifyCredentials(credentials)
-            accountManager.forget(account)
-                .then(() => {
-                    navigation.navigate(actionContext.intent ? '/confirm' : '/account')
-                })
+        await confirm(confirmation, {
+            title: 'Remove account',
+            icon: 'warning-circle'
         })
+        account.verifyCredentials(credentials)
+        await accountManager.forget(account)
+        navigation.navigate(actionContext.intent ? '/confirm' : '/account')
     }
 
     return <>

@@ -25,25 +25,28 @@ export default function AccountClaimableBalanceView({balance, account}) {
     const claimant = balance.claimants.find(c => c.destination === account)
     const status = claimant ? getClaimableBalanceClaimStatus(claimant) : 'unavailable'
 
-    function claimBalance() {
+    async function claimBalance() {
         const validationResult = validateClaimClaimableBalance(balance)
-        if (validationResult) return alert(validationResult)
+        if (validationResult)
+            return alert(validationResult)
         if (!accountLedgerData.hasTrustline(asset.toFQAN())) {
-            confirm(<div className="dimmed text-small">
+            await confirm(<div className="dimmed text-small">
                 You need to establish a trustline to before claiming this payment.
                 Would you like to create the trustline?
                 This action will temporarily lock 0.5 XLM on your account balance.
-            </div>).then(() => {
-                setClaiming(true)
-                prepareClaimBalanceTx(balance, network)
-                    .then(tx => {
-                        if (!tx) return
-                        return confirmTransaction(network, tx)
-                            .then(() => navigation.navigate('/account'))
-                    })
-                    .finally(() => setClaiming(false))
-            })
+            </div>)
         }
+        setClaiming(true)
+        try {
+            const tx = await prepareClaimBalanceTx(balance, network)
+            if (!tx)
+                return
+            await confirmTransaction(network, tx)
+            navigation.navigate('/account')
+        } catch (e) {
+            console.error(e)
+        }
+        setClaiming(false)
     }
 
     const hideBalance = useCallback(() => {
@@ -73,23 +76,26 @@ export default function AccountClaimableBalanceView({balance, account}) {
                 <AssetIssuer asset={asset}/>
             </div>
             <div className="text-right">
-                <BalanceAmount amount={balance.amount}/>
-                {balance.estimated > 0 ?
-                    <div className="estimated-amount dimmed text-tiny">
-                        ~{balance.estimated}$
-                    </div> :
-                    <br/>}
+                {claiming ? <div style={{display: 'inline-block'}}>
+                    <div className="loader" style={{margin: 0}}/>
+                </div> : <>
+                    <BalanceAmount amount={balance.amount}/>
+                    {balance.estimated > 0 ?
+                        <div className="estimated-amount dimmed text-tiny">
+                            ~{balance.estimated}$
+                        </div> :
+                        <br/>}
+                </>}
             </div>
         </div>
         <div className="account-balance-actions">
-            {claiming && <div style={{display: 'inline-block'}}>
-                <div className="loader"/>
-            </div>}
-            {status === 'available' ?
-                <a href="#" onClick={claimBalance}><i className="icon-angle-double-right"/>claim tokens</a> :
-                <span className="dimmed">{status}</span>
-            }
-            &emsp;<a href="#" onClick={hideBalance}><i className="icon-angle-double-right"/>decline</a>
+            {!claiming ? <>
+                {status === 'available' ?
+                    <a href="#" onClick={claimBalance}><i className="icon-angle-double-right"/>claim tokens</a> :
+                    <span className="dimmed">{status}</span>
+                }
+                &emsp;<a href="#" onClick={hideBalance}><i className="icon-angle-double-right"/>decline</a>
+            </> : <br/>}
         </div>
         <hr className="flare"/>
     </div>

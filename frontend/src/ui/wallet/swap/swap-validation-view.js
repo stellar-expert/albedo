@@ -6,25 +6,17 @@ import {createTestnetAccount} from '../../../util/horizon-connector'
 import {prepareAddTrustlineTx} from '../trustline/add-trustline-tx-builder'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
 
-function requestTrustlineCreation(swap, asset, network) {
-    confirm(<div className="text-small">
+async function requestTrustlineCreation(swap, asset, network) {
+    await confirm(<div className="text-small">
         This action will temporarily lock 0.5 XLM on your account balance (can be reclaimed later).
         Would you like to add this asset?
     </div>, {title: <>Create trustline for <AssetLink asset={asset}/></>})
-        .then(() => {
-            prepareAddTrustlineTx(asset, network)
-                .then(tx => {
-                    if (!tx) return
-                    return confirmTransaction(network, tx)
-                        .then(() => {
-                            runInAction(() => {
-                                swap.createTrustline = true
-                            })
-                            notify({type: 'success', message: 'Trustline created'})
-                        })
-                    //.finally(() => setInProgress(false))
-                })
-        })
+    const tx = await prepareAddTrustlineTx(asset, network)
+    if (!tx)
+        return
+    await confirmTransaction(network, tx)
+    runInAction(() => swap.createTrustline = true)
+    notify({type: 'success', message: 'Trustline created'})
 }
 
 function SwapValidationView({swap}) {

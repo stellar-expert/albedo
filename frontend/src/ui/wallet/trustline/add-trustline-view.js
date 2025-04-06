@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {observer} from 'mobx-react'
 import {StrKey} from '@stellar/stellar-base'
 import {Button, AssetLink, useStellarNetwork, AssetSelector} from '@stellar-expert/ui-framework'
@@ -32,27 +32,14 @@ function AddTrustlineView() {
         updateAsset(`${code}-${issuer}-${code.length > 4 ? 2 : 1}`)
     }
 
-    function createTrustline() {
-        const validationResult = validateAddTrustline(asset)
-        if (validationResult) return alert(validationResult)
-        confirm(<div className="text-small">
-            Asset trustline will temporarily lock 0.5 XLM on your account balance.
-            Would you like to add this asset?
-        </div>, {confirmTitle: 'Create', title: <>Create trustline for <AssetLink asset={asset}/></>})
+    const confirmCreateTrustline = useCallback(() => {
+        setInProgress(true)
+        createTrustline(asset, network)
             .then(() => {
-                prepareAddTrustlineTx(asset, network)
-                    .then(tx => {
-                        if (!tx) return
-                        setInProgress(true)
-                        return confirmTransaction(network, tx)
-                            .then(() => {
-                                notify({type: 'success', message: 'Trustline created'})
-                                navigation.navigate('/account')
-                            })
-                            .finally(() => setInProgress(false))
-                    })
+                navigation.navigate('/account')
             })
-    }
+            .finally(() => setInProgress(false))
+    }, [asset, network])
 
     return <>
         <h3>Add trustline</h3>
@@ -62,13 +49,10 @@ function AddTrustlineView() {
         </WalletPageActionDescription>
         <div>
             <div className="segment text-center space">
-                {!direct && <div>
-                    {!!isValid ?
-                        <>Asset <AssetLink asset={asset}/></> :
-                        <span className="dimmed text-small">(asset not selected)</span>
-                    }
+                {!direct && !!isValid && <div>
+                    Asset <AssetLink asset={asset}/>
+                    <div className="space"/>
                 </div>}
-                <div className="space"/>
                 <AssetSelector value={asset} onChange={select} title={(!isValid ? 'Choose' : 'Change') + ' an asset'}/>or{' '}
                 <a href="#" onClick={() => setDirect(true)}>provide asset parameters</a>
                 {direct && <>
@@ -93,7 +77,7 @@ function AddTrustlineView() {
             {inProgress && <ActionLoaderView message="in progress"/>}
             {!inProgress && <div className="row space">
                 <div className="column column-50">
-                    <Button block disabled={!isValid || isTrustlineExists} onClick={createTrustline}>Add trustline</Button>
+                    <Button block disabled={!isValid || isTrustlineExists} onClick={confirmCreateTrustline}>Add trustline</Button>
                 </div>
                 <div className="column column-50">
                     <Button href="/account" block outline>Cancel</Button>
@@ -101,6 +85,21 @@ function AddTrustlineView() {
             </div>}
         </div>
     </>
+}
+
+export async function createTrustline(asset, network) {
+    const validationResult = validateAddTrustline(asset)
+    if (validationResult)
+        return alert(validationResult)
+    await confirm(<div className="text-small">
+        Asset trustline will temporarily lock 0.5 XLM on your account balance.
+        Would you like to add this asset?
+    </div>, {confirmTitle: 'Create', title: <>Create trustline for <AssetLink asset={asset}/></>})
+    const tx = await prepareAddTrustlineTx(asset, network)
+    if (!tx)
+        return
+    await confirmTransaction(network, tx)
+    notify({type: 'success', message: 'Trustline created'})
 }
 
 export default observer(AddTrustlineView)

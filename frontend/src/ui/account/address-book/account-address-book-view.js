@@ -93,13 +93,14 @@ function AccountAddressBookView() {
         saveAddressBook(copyAddressBook)
     }, [addressSettings, addressBook, saveAddressBook])
 
-    const removeAddress = useCallback((address) => {
-        const confirmation = `Do you really want to remove this address?`
-        confirm(confirmation, {title: 'Remove from address book', icon: 'warning-circle'}).then(() => {
-            const copyAddressBook = {...addressBook}
-            delete copyAddressBook[address]
-            saveAddressBook(copyAddressBook)
+    const removeAddress = useCallback(async address => {
+        await confirm('Do you really want to remove this address?', {
+            title: 'Remove from address book',
+            icon: 'warning-circle'
         })
+        const copyAddressBook = {...addressBook}
+        delete copyAddressBook[address]
+        saveAddressBook(copyAddressBook)
     }, [addressBook, saveAddressBook])
 
     if (!credentials)

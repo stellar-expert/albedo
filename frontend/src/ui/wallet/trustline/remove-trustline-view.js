@@ -21,21 +21,24 @@ function RemoveTrustlineView() {
     const predefinedAssets = Object.keys(accountLedgerData.balances).filter(a => a !== 'XLM' && a !== asset && !isValidPoolId(a))
     predefinedAssets.unshift('XLM')
 
-    function removeTrustline() {
+    async function removeTrustline() {
         const validationResult = validateRemoveTrustline(asset)
         if (validationResult)
             return alert(validationResult)
-        confirm('Are you sure you want to remove this trustline?', {title: 'Remove trustline'})
-            .then(() => {
-                prepareRemoveTrustlineTx({asset, convertAsset, network})
-                    .then(tx => {
-                        if (!tx) return
-                        setInProgress(true)
-                        return confirmTransaction(network, tx)
-                            .then(() => navigation.navigate('/account'))
-                            .finally(() => setInProgress(false))
-                    })
-            })
+        await confirm('Are you sure you want to remove this trustline?', {title: 'Remove trustline'})
+        setInProgress(true)
+        try {
+            const tx = await prepareRemoveTrustlineTx({asset, convertAsset, network})
+            if (!tx)
+                return
+            setInProgress(true)
+            await confirmTransaction(network, tx)
+            navigation.navigate('/account')
+        } catch (e) {
+            console.error(e)
+            notify({type: 'warning', message: 'Failed to remove trustline'})
+        }
+        setInProgress(false)
     }
 
     if (!asset)

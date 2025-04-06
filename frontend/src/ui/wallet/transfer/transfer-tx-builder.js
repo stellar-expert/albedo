@@ -15,7 +15,7 @@ export async function prepareTransferTx(transfer) {
     const {accountData} = accountLedgerData
     const networkParams = resolveNetworkParams({network: transfer.network})
     const fee = await estimateFee(networkParams, transfer.fee)
-    const builder = new TransactionBuilder(accountData, {networkPassphrase: networkParams.network,fee})
+    const builder = new TransactionBuilder(accountData, {networkPassphrase: networkParams.network, fee})
         .setTimeout(60)
 
     if (transfer.memo) {
@@ -96,12 +96,15 @@ function preparePaymentOperation(transfer, builder) {
 }
 
 function prepareClaimableBalanceOperation(transfer, builder) {
+    const claimants = [new Claimant(transfer.destination, Claimant.predicateUnconditional())]
+    if (transfer.destination !== transfer.source) {
+        claimants.push(new Claimant(transfer.source, Claimant.predicateUnconditional()))
+    }
     builder.addOperation(Operation.createClaimableBalance({
         source: transfer.source,
         asset: AssetDescriptor.parse(transfer.asset[0]).toAsset(),
         amount: transfer.amount[0],
-        claimants: [new Claimant(transfer.destination, Claimant.predicateUnconditional()),
-            new Claimant(transfer.source, Claimant.predicateUnconditional())]
+        claimants
     }))
 }
 

@@ -369,14 +369,11 @@ export default class SwapSettings {
             refreshBalances()
         })
         client.on('paused', e => {
-            confirm('Quotation paused due to the inactivity. Load fresh price quotes?', {title: 'Are you still here?'})
-                .then(resume => {
-                    if (resume) {
-                        this.recalculateSwap()
-                    } else {
-                        this.setAmount('0', 0)
-                    }
-                })
+            confirm('Quotation paused due to the inactivity. Load fresh price quotes?', {
+                title: 'Are you still here?'
+            })
+                .then(() => this.recalculateSwap())
+                .catch(e => this.setAmount('0', 0))
         })
         client.on('progress', e => {
             console.log('Progress', e.status)
