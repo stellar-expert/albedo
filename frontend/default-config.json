@@ -1,10 +1,12 @@
 {
   "networks": {
     "public": {
-      "horizon": "https://horizon.stellar.org"
+      "horizon": "https://horizon.stellar.org",
+      "rpc": "https://mainnet.sorobanrpc.com"
     },
     "testnet": {
-      "horizon": "https://horizon-testnet.stellar.org"
+      "horizon": "https://horizon-testnet.stellar.org",
+      "rpc": "https://soroban-testnet.stellar.org"
     }
   },
   "appManifest": {

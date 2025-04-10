@@ -456,7 +456,7 @@ export default class SwapSettings {
     }
 
     /**
-     * Build transfer transaction
+     * Build swap transaction
      * @return {Promise<Transaction>}
      */
     prepareTransaction() {

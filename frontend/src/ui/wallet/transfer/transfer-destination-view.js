@@ -6,13 +6,13 @@ import {resolveFederationAccount} from '../../../util/federation-address-resolve
 import {resolveSorobandomainsAccount} from '../../../util/sorobandomains-address-resolver'
 
 const checkFederationAddress = debounce(500, resolveFederationAccount)
-const checkSorobandomainsAddress= debounce(500, resolveSorobandomainsAccount)
+const checkSorobandomainsAddress = debounce(500, resolveSorobandomainsAccount)
 
 export default observer(function TransferDestinationView({transfer}) {
     const textChange = useCallback(function (e) {
         const v = e.target.value.trim()
         transfer.setDestinationInputValue(v)
-        if (StrKey.isValidEd25519PublicKey(v) || StrKey.isValidMed25519PublicKey(v)) {
+        if (StrKey.isValidEd25519PublicKey(v) || StrKey.isValidMed25519PublicKey(v) || StrKey.isValidContract(v)) {
             transfer.setDestination(v)
             return
         }

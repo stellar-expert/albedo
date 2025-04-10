@@ -1,5 +1,5 @@
 import {Networks} from '@stellar/stellar-base'
-import {Horizon} from '@stellar/stellar-sdk'
+import {Horizon, rpc} from '@stellar/stellar-sdk'
 import appSettings from '../state/app-settings'
 
 class StellarNetworkParams {
@@ -10,8 +10,16 @@ class StellarNetworkParams {
 
     horizon = appSettings.networks.public.horizon
 
+    rpc = appSettings.networks.public.rpc
+
     createHorizon() {
         return new Horizon.Server(this.horizon)
+    }
+
+    createRpc() {
+        return new rpc.Server(this.rpc, {
+            allowHttp: this.rpc.startsWith('http://')
+        })
     }
 }
 
@@ -46,6 +54,7 @@ export function resolveNetworkParams({network, horizon}) {
             //use predefined Horizon URL if none was provided
             params.horizon = networkSettings.horizon
         }
+        params.rpc = networkSettings.rpc
     } else {
         //we assume that a client provided network passphrase instead of network identifier - use it as is
         params.network = network

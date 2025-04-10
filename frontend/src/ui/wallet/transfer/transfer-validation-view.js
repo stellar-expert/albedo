@@ -1,6 +1,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
+import {StrKey} from '@stellar/stellar-base'
 import {useStellarNetwork} from '@stellar-expert/ui-framework'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
@@ -27,7 +28,8 @@ function canReceive(destination, asset) {
  */
 function validate(network, transfer, directoryInfo) {
     const selfTransfer = transfer.source === transfer.destination
-    const destinationInfo = useDestinationAccountLedgerData(!selfTransfer ? transfer.destination : '')
+    const isContract = StrKey.isValidContract(transfer.destination)
+    const destinationInfo = useDestinationAccountLedgerData(!selfTransfer && !isContract ? transfer.destination : '')
     if (transfer.destinationFederationAddress && !transfer.destination) {
         const type = transfer.destinationFederationAddress.endsWith('.xlm') ? 'SorobanDomains' : 'federation'
         return <>
@@ -37,27 +39,23 @@ function validate(network, transfer, directoryInfo) {
     }
 
     if (transfer.invalidMemo)
-        return <>
-            Invalid memo format. Please check the value.
-        </>
+        return <>Invalid memo format. Please check the value.</>
 
-    if ((!destinationInfo && !selfTransfer) || !transfer.asset[1] || !parseFloat(transfer.amount[0]) || !parseFloat(transfer.amount[1]))
+    if ((!destinationInfo && !selfTransfer && !isContract))
         return false
 
-    const assetCode = transfer.asset[1].split('-')[0]
+    const destAsset = transfer.asset[1]
+    if (!transfer.asset[1] || !parseFloat(transfer.amount[0]) || !parseFloat(transfer.amount[1]))
+        return false
+
+    const assetCode = destAsset.split('-')[0]
 
     function setCreateDestination() {
         runInAction(() => transfer.createDestination = true)
     }
 
-    function switchToClaimableBalance() {
-        transfer.setMode('claimable')
-    }
-
     if (directoryInfo?.tags?.includes('malicious'))
-        return <>
-            The payment is blocked because the recipient account has been reported for malicious activity.
-        </>
+        return <>The payment is blocked because the recipient account has been reported for malicious activity.</>
 
     if (accountLedgerData.nonExisting)
         return <>
@@ -68,20 +66,31 @@ function validate(network, transfer, directoryInfo) {
         </>
 
     if (!transfer.hasSufficientBalance)
-        return <>
-            Insufficient balance on your account. Please adjust the amount of tokens to send.
-        </>
+        return <>Insufficient balance on your account.</>
+
+    if (isContract) {
+        switch (transfer.mode) {
+            case 'direct':
+                return true //skip further validation for contract destinations
+            case 'claimable':
+                return <>Cannot create claimable balances for smart contracts.</>
+            case 'convert':
+                return <>Cannot use auto-conversion with smart contracts.</>
+            default:
+                return <>Unknown transfer mode: {transfer.mode}.</>
+        }
+    }
 
     if (transfer.mode === 'claimable')
         return true
 
     if (!selfTransfer) { //external payment
-        if (transfer.asset[1] !== 'XLM') {
-            if (!canReceive(destinationInfo, transfer.asset[1]))
+        if (destAsset !== 'XLM') {
+            if (!canReceive(destinationInfo, destAsset))
                 return <>
                     The recipient account does not have a trustline to {assetCode} and cannot
                     receive the payment. Yet you still can send tokens using a{' '}
-                    <a href="#" onClick={switchToClaimableBalance}>claimable balance</a>.
+                    <a href="#" onClick={() => transfer.setMode('claimable')}>claimable balance</a>.
                 </>
         } else if (destinationInfo.nonExisting && !transfer.createDestination)
             return <>
