@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/stellar-expert/albedo.git"
+    "url": "git+https://github.com/stellar-expert/albedo.git"
   },
   "scripts": {
     "build": "webpack --mode=production --config ./webpack.config.cjs",

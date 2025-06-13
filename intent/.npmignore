@@ -10,3 +10,5 @@ pnpm-lock.yaml
 /build
 webpack.config.cjs
 babel.config.cjs
+jest.config.cjs
+src/cjs.js
