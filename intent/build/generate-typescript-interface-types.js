@@ -1,4 +1,4 @@
-const {intentInterface} = require('../lib/albedo.intent')
+import {intentInterface} from '../src/index.js'
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -73,7 +73,7 @@ export interface AlbedoIntent {${methods.join(',')},
 }`
 }
 
-function generateTypescriptInterface() {
+export function generateTypescriptInterface() {
     return `${generateAlbedoInterface()}
 
 ${Object.keys(intentInterface).map(intent => generateParamsInterface(intent) + generateResultInterface(intent)).join('')}
@@ -116,5 +116,3 @@ export interface AlbedoIntentErrorDescriptor {
 export const intentErrors: Record<string, AlbedoIntentErrorDescriptor>
 `
 }
-
-module.exports = {generateTypescriptInterface}

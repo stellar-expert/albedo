@@ -1,9 +1,9 @@
-import {generateRandomToken} from './random-token-generator'
-import intentInterface from './intent-interface'
-import intentErrors from './intent-errors'
-import {requestIntentConfirmation} from './intent-dispatcher'
-import {forgetSession, getAllImplicitSessions, getImplicitSession} from './implicit-session-storage'
-import {bindWebStellarLinkHandler} from './web+stellar-handler'
+import {generateRandomToken} from './random-token-generator.js'
+import intentInterface from './intent-interface.js'
+import intentErrors from './intent-errors.js'
+import {requestIntentConfirmation} from './intent-dispatcher.js'
+import {forgetSession, getAllImplicitSessions, getImplicitSession} from './implicit-session-storage.js'
+import {bindWebStellarLinkHandler} from './web+stellar-handler.js'
 
 if (typeof window === 'object' && typeof window.fetch !== 'function') {
     throw new Error('Browser FetchAPI is not available. For legacy browsers support use polyfills such as whatwg-fetch.')
@@ -137,7 +137,7 @@ AlbedoIntent.prototype = {
      * @returns {Promise<SignMessageIntentResult>}
      */
     signMessage(params) {
-        params = Object.assign({}, params, {message: normalizeMessageToSign(params.message)})
+        params = Object.assign({}, params, normalizeMessageToSign(params.message))
         return this.request('sign_message', params)
     },
 
@@ -190,16 +190,27 @@ AlbedoIntent.prototype = {
 /**
  * Normalize a message before sending it to the signing endpoint.
  * @param {String} message - Message to normalize.
- * @returns {String}
+ * @returns {{message:String, [binary]: Boolean}}
  */
 function normalizeMessageToSign(message) {
-    switch (typeof message) {
-        case 'string':
-            return message
-        case 'undefined':
-            return ''
+    if (message instanceof Uint8Array)
+        message = message.reduce((a, b) => a + byte2hex(b), '')
+    return {
+        message,
+        binary: true
     }
-    return JSON.stringify(message)
+    if (typeof message === 'undefined') {
+        message = ''
+    }
+    if (typeof message !== 'string') {
+        message = JSON.stringify(message)
+    }
+    return {message}
+
+}
+
+function byte2hex(byte) {
+    return byte.toString(16).padStart(2, '0')
 }
 
 const albedo = new AlbedoIntent()

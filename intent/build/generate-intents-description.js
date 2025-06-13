@@ -1,4 +1,4 @@
-const {intentInterface} = require('../lib/albedo.intent')
+import {intentInterface} from '../src/index.js'
 
 const defaults = {
     token: 'r9gbUuThXLr/wOrg2dxWHOO4DQsvQsTpkv1OtfETB3c=',
@@ -74,10 +74,8 @@ ${generateExample(intent)}
 `
 }
 
-function generateIntentsSection() {
+export function generateIntentsSection() {
     return Object.keys(intentInterface)
         .map(intent => generateDescription(intent))
         .join('')
 }
-
-module.exports = {generateIntentsSection}

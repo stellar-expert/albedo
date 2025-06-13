@@ -1,5 +1,5 @@
-import {generateRandomToken} from './random-token-generator'
-import intentErrors from './intent-errors'
+import {generateRandomToken} from './random-token-generator.js'
+import intentErrors from './intent-errors.js'
 
 /**
  * Create transport handler for a given window|iframe and establish communication channel.

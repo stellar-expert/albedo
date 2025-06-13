@@ -1,4 +1,4 @@
-import intentInterface from '../src/intent-interface'
+import intentInterface from '../src/intent-interface.js'
 
 class SessionStorageStub {
     setItem(key, value) {

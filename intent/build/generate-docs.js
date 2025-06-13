@@ -1,7 +1,7 @@
-const fs = require('fs'),
-    path = require('path'),
-    {generateIntentsSection} = require('./generate-intents-description'),
-    {generateTypescriptInterface} = require('./generate-typescript-interface-types')
+import fs from 'fs'
+import path from 'path'
+import {generateIntentsSection} from './generate-intents-description.js'
+import {generateTypescriptInterface} from './generate-typescript-interface-types.js'
 
 const startMarker = '### Intents'
 

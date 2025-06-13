@@ -1,11 +1,13 @@
-import {assert} from 'chai'
-import intentLib from '../src/index'
-import frontendStub from './intent-test-utils'
-import {saveImplicitSession} from '../src/implicit-session-storage'
+import intentLib from '../src/index.js'
+import {saveImplicitSession} from '../src/implicit-session-storage.js'
+import frontendStub from './intent-test-utils.js'
 
 describe('utilities tests', function () {
-    before(() => {
+    beforeAll(() => {
         frontendStub.setup()
+    })
+    afterAll(() => {
+        frontendStub.destroy()
     })
 
     it('generates new random token each time', function () {
@@ -14,7 +16,7 @@ describe('utilities tests', function () {
         for (let i = 0; i < iterations; i++) {
             rnd.add(intentLib.generateRandomToken())
         }
-        assert.equal(rnd.size, iterations, 'Non-unique value detected')
+        expect(iterations, 'Non-unique value detected').toEqual(rnd.size)
     })
 
     it('manages implicit sessions', function () {
@@ -36,20 +38,20 @@ describe('utilities tests', function () {
 
         let activeSessions = intentLib.listImplicitSessions()
 
-        assert.equal(activeSessions.length, 2, 'Invalid expiration storage rules applied')
+        expect(activeSessions.length, 'Invalid expiration storage rules applied').toEqual(2)
 
-        assert.isTrue(intentLib.isImplicitSessionAllowed('tx', formatPubkey(expiration[3])))
+        expect(intentLib.isImplicitSessionAllowed('tx', formatPubkey(expiration[3]))).toBeTruthy()
 
-        assert.isFalse(intentLib.isImplicitSessionAllowed('trust', formatPubkey(expiration[3])))
+        expect(intentLib.isImplicitSessionAllowed('trust', formatPubkey(expiration[3]))).toBeFalsy()
 
-        assert.isFalse(intentLib.isImplicitSessionAllowed('tx', formatPubkey(expiration[1])))
+        expect(intentLib.isImplicitSessionAllowed('tx', formatPubkey(expiration[1]))).toBeFalsy()
 
         intentLib.forgetImplicitSession(formatPubkey(expiration[3]))
 
         activeSessions = intentLib.listImplicitSessions()
 
-        assert.equal(activeSessions.length, 1)
+        expect(activeSessions.length).toEqual(1)
 
-        assert.equal(activeSessions[0].pubkey, formatPubkey(expiration[2]))
+        expect(activeSessions[0].pubkey).toEqual(formatPubkey(expiration[2]))
     })
 })

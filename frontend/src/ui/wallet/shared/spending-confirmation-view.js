@@ -39,14 +39,14 @@ function ConfirmBalanceActionView({kind, asset, amount, value, buyingAsset, dest
         return <div className="space">
             Swap {amount}&thinsp;{getAssetCode(asset)} {estimatedText}?
         </div>
-    if (kind ==='deposit')
+    if (kind === 'deposit')
         return <div className="space">
-            Deposit assets (~{formatWithAutoPrecision(value*2)}$) to liquidity pool?
+            Deposit assets (~{formatWithAutoPrecision(value * 2)}$) to liquidity pool?
         </div>
     return <div className="space">
         Transfer {amount}&thinsp;{getAssetCode(asset)} {estimatedText}&thinsp;→&thinsp;
         <AccountAddress account={destination}/>?
-        {(!!memo && memo !== 'none') && <div className="dimmed text-tiny nowrap">{`(memo: ${memo.value})`}</div>}
+        {!!(memo?.value) && <div className="dimmed text-tiny nowrap">{`(memo: ${memo.value})`}</div>}
     </div>
 }
 

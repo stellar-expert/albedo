@@ -1,7 +1,7 @@
-import intentInterface from './intent-interface'
-import intentErrors from './intent-errors'
-import {createDialogTransport, createIframeTransport} from './transport-builder'
-import {getImplicitSession, saveImplicitSession} from './implicit-session-storage'
+import intentInterface from './intent-interface.js'
+import intentErrors from './intent-errors.js'
+import {createDialogTransport, createIframeTransport} from './transport-builder.js'
+import {getImplicitSession, saveImplicitSession} from './implicit-session-storage.js'
 
 function intentError(msg) {
     return Object.assign(new Error(), intentErrors.invalidIntentRequest, {ext: msg})

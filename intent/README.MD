@@ -19,6 +19,7 @@ import albedo from '@albedo-link/intent'
 
 ### Intents
 
+
 #### Intent `public_key` - View public key
 
 Requests account public key. It's a simple way of authentication for Stellar-based applications. The response ensures that a user owns the corresponding secret key.

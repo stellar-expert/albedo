@@ -1,4 +1,4 @@
-import TransportHandler from './transport-handler'
+import TransportHandler from './transport-handler.js'
 
 /**
  * Create explicit dialog window transport.

@@ -1,4 +1,4 @@
-import ImplicitSession from './implicit-session'
+import ImplicitSession from './implicit-session.js'
 
 const storagePrefix = 'albedo_session_',
     implicitSessions = {}

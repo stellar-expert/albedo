@@ -46,21 +46,20 @@ export default class ActionAuthenticationContext {
     /**
      *
      * @param {String} message
+     * @param {Boolean} isBinary
      * @return {Promise<{signature: Buffer, signedMessage: Buffer}>}
      */
-    async signMessage(message) {
-        const messageToSign = `${this.publicKey}:${message}`,
-            rawMessage = shajs('sha256').update(messageToSign).digest()
-        let signature
+    async signMessage(message, isBinary) {
+        let keypair
         if (this.secret) { //direct secret key input or implicit session
-            signature = Keypair.fromSecret(this.secret).sign(rawMessage)
+            keypair = Keypair.fromSecret(this.secret)
         } else if (this.account.isStoredAccount) { //stored account
-            signature = (await this.getStoredKeypair()).sign(rawMessage)
+            keypair = await this.getStoredKeypair()
         } else
             throw new Error('Unsupported account type:' + this.account.accountType)
         return {
-            signature,
-            signedMessage: messageToSign
+            ...this.signAlbedo(keypair, message),
+            ...this.signSep53(keypair, message, isBinary)
         }
     }
 
@@ -107,5 +106,39 @@ export default class ActionAuthenticationContext {
             res.secret = this.secret
         }
         return res
+    }
+
+    /**
+     * @param {Keypair} keypair
+     * @param {String} message
+     * @param {Boolean} [isBinary]
+     * @return {Promise<{signature: Buffer, signedMessage: Buffer}>}
+     * @private
+     */
+    signAlbedo(keypair, message, isBinary) {
+        const messageToSign = `${this.publicKey}:${message}`
+        const rawMessage = shajs('sha256').update(messageToSign).digest()
+        const signature = keypair.sign(rawMessage)
+        return {
+            signature,
+            albedoSignatureBase: messageToSign
+        }
+    }
+
+    /**
+     * @param {Keypair} keypair
+     * @param {String} message
+     * @param {Boolean} [isBinary]
+     * @return {Promise<{signature: Buffer, signedMessage: Buffer}>}
+     * @private
+     */
+    signSep53(keypair, message, isBinary) {
+        const prefix = Buffer.from('Stellar Signed Message:\n', 'utf8')
+        const messageToSign = Buffer.concat([prefix, Buffer.from(message, isBinary ? 'hex' : 'utf8')])
+        const rawMessage = shajs('sha256').update(messageToSign).digest()
+        const signature = keypair.sign(rawMessage)
+        return {
+            signedMessage: signature
+        }
     }
 }

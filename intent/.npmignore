@@ -1,36 +1,12 @@
-# Logs
-logs/
-*.log
-npm-debug.log*
-
-# Runtime data
-pids/
-*.pid
-*.seed
-
-# Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
-
-# Dependency directories
 node_modules/
-
-# Optional npm cache directory
 .npm
+pnpm-lock.yaml
 
-# Optional REPL history
-.node_repl_history
-
-# IDEs
 .idea
-
-# Windows cache
-*Thumbs.db
-
-#CI
-.circleci
+.vscode
 
 # tests and unneeded project files
 /test
 /build
-webpack.config.js
-babel.config.js
+webpack.config.cjs
+babel.config.cjs

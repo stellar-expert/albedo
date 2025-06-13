@@ -1,14 +1,13 @@
-import {assert} from 'chai'
-import intentLib from '../src/index'
-import frontendStub from './intent-test-utils'
-import intentErrors from '../src/intent-errors'
-import intentInterface from '../src/intent-interface'
+import intentLib from '../src/index.js'
+import intentErrors from '../src/intent-errors.js'
+import intentInterface from '../src/intent-interface.js'
+import frontendStub from './intent-test-utils.js'
 
 describe('intent tests', function () {
-    before(() => {
+    beforeAll(() => {
         frontendStub.setup()
     })
-    after(() => {
+    afterAll(() => {
         frontendStub.destroy()
     })
 
@@ -169,29 +168,24 @@ describe('intent tests', function () {
         }
     ]
     for (let {method, intent, params, expectedError, desc} of testCases) {
-        it(desc, async function () {
-            this.timeout(1000)
+        test(desc, async function () {
             let error
             try {
                 const res = await intentLib[method](params)
                 const expected = Object.keys(intentInterface[intent].returns)
                 for (const prop of expected) {
-                    if (!res.hasOwnProperty(prop))
-                        assert.fail(`Response must contain property "${prop}"`)
+                    expect(res.hasOwnProperty(prop), `Response must contain property "${prop}"`).toBe(true)
                 }
             } catch (err) {
                 error = err
             }
 
             if (expectedError) {
-                assert.isTrue(!!error, `Expected to throw "${expectedError.message}" error.`)
-                assert.equal(expectedError.code, error.code, `Expected error: "${expectedError.message}"; thrown error: "${error.message}".`)
+                expect(!!error, `Expected to throw "${expectedError.message}" error.`).toBe(true)
+                expect(error.code, `Expected error: "${expectedError.message}"; thrown error: "${error.message}".`).toBe(expectedError.code)
                 return
             }
-            if (error) {
-                assert.fail(`Unexpected error: "${error.message}".`)
-            }
+            expect(error, `Unexpected error: "${error?.message}".`).toBe(undefined)
         })
     }
-    return true
 })
