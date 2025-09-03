@@ -18,7 +18,11 @@ module.exports = initWebpackConfig({
     outputPath: './distr/app/',
     staticFilesPath: ['./src/static/app/'],
     scss: {
-        additionalData: '@import "~@stellar-expert/ui-framework/basic-styles/variables.scss";'
+        additionalData: '@import "~@stellar-expert/ui-framework/basic-styles/variables.scss";',
+        sassOptions: {
+            quietDeps: true,
+            silenceDeprecations: ['import']
+        }
         //+ '@import "~@stellar-expert/ui-framework/basic-styles/themes.scss";'
     },
     define: {
@@ -32,7 +36,9 @@ module.exports = initWebpackConfig({
     },
     devServer: {
         host: '0.0.0.0',
-        https: false,
+        server: {
+            type: 'http'
+        },
         port: 5001
     },
     inlineSvg: true,
