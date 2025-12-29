@@ -11,7 +11,7 @@ import {registerMessageListeners} from './util/message-listeners'
 import './ui/styles.scss'
 
 window.explorerFrontendOrigin = 'https://stellar.expert'
-window.explorerApiOrigin = 'https://api.stellar.expert'
+window.explorerApiOrigin =  process.env.EXPLORER_API_ORIGIN || 'https://api.stellar.expert'
 
 configure({enforceActions: 'never'})
 

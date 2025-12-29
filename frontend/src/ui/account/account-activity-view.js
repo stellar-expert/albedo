@@ -18,7 +18,7 @@ function AccountActivityView() {
     const historyModel = useTxHistory({
         filters: {account: [address]},
         order: 'desc',
-        rows: 50,
+        rows: 100,
         updateLocation: false
     })
     const txHistoryRef = useRef()

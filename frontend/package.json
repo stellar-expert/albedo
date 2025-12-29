@@ -35,18 +35,18 @@
   },
   "dependencies": {
     "@albedo-link/intent": "file:../intent",
-    "@stellar-broker/client": "^0.6.0",
-    "@stellar-expert/asset-descriptor": "^1.4.0",
+    "@stellar-broker/client": "^0.6.14",
+    "@stellar-expert/asset-descriptor": "^1.5.0",
     "@stellar-expert/claimable-balance-utils": "^1.4.1",
     "@stellar-expert/client-cache": "github:stellar-expert/client-cache",
     "@stellar-expert/formatter": "^2.5.0",
     "@stellar-expert/liquidity-pool-utils": "^1.0.3",
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
-    "@stellar-expert/tx-meta-effects-parser": "7.0.0-rc.17",
+    "@stellar-expert/tx-meta-effects-parser": "7.0.1",
     "@stellar-expert/tx-signers-inspector": "1.8.2",
-    "@stellar-expert/ui-framework": "1.15.0-rc.15",
-    "@stellar/stellar-base": "14.0.0",
-    "@stellar/stellar-sdk": "14.1.1",
+    "@stellar-expert/ui-framework": "1.15.4",
+    "@stellar/stellar-base": "14.0.4",
+    "@stellar/stellar-sdk": "14.4.3",
     "@zxing/browser": "^0.1.5",
     "aes-js": "^3.1.2",
     "argon2-browser": "^1.18.0",
@@ -67,13 +67,14 @@
   "devDependencies": {
     "@stellar-expert/eslint-config-js": "^1.1.0",
     "@stellar-expert/eslint-config-react": "^1.1.0",
-    "@stellar-expert/webpack-template": "1.5.1",
+    "@stellar-expert/webpack-template": "^1.5.1",
     "clone": "^2.1.2",
     "jest": "^29.7.0",
     "jest-fetch-mock": "^3.0.3"
   },
   "overrides": {
-    "@stellar/stellar-sdk": "14.0.0",
-    "@stellar/stellar-base": "14.1.1"
+    "@stellar/stellar-base": "14.0.4",
+    "@stellar/stellar-sdk": "14.4.3",
+    "@stellar-expert/tx-meta-effects-parser": "7.0.1"
   }
 }

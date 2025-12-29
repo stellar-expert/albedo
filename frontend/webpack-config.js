@@ -3,7 +3,7 @@ const pkgInfo = require('./package.json')
 
 const isProduction = !process.argv.some(a => a === '--mode=development')
 
-const envVariables = ['STELLAR_BROKER_ORIGIN', 'STELLAR_BROKER_KEY', 'STELLAR_BROKER_QP']
+const envVariables = ['STELLAR_BROKER_ORIGIN', 'STELLAR_BROKER_KEY', 'STELLAR_BROKER_QP', 'EXPLORER_API_ORIGIN']
 
 module.exports = initWebpackConfig({
     entries: {
@@ -36,10 +36,10 @@ module.exports = initWebpackConfig({
     },
     devServer: {
         host: '0.0.0.0',
+        port: 5001,
         server: {
             type: 'http'
-        },
-        port: 5001
+        }
     },
     inlineSvg: true,
     ignoreCallback: function (resource, context) {
