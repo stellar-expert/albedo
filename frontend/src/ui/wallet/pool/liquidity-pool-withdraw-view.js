@@ -13,14 +13,14 @@ import TransactionConfirmationView from '../shared/transaction-confirmation-view
 
 function LiquidityPoolWithdrawView() {
     useLocation()
-    const {pool} = parseQuery()
+    const {pool, id} = parseQuery()
     if (!isValidPoolId(pool))
         return <div className="segment segment-inline error text-center">
             <i className="icon icon-warning color-warning"/> Error: Invalid liquidity pool ID
         </div>
 
     const network = useStellarNetwork()
-    const [withdraw] = useDependantState(() => new LiquidityPoolWithdrawSettings(network, pool), [network])
+    const [withdraw] = useDependantState(() => new LiquidityPoolWithdrawSettings(network, pool, id), [network])
     const {poolInfo, amount, max} = withdraw
     const [inputAmount, setInputAmount] = useDependantState(() => !amount || amount === '0' ? '' : amount, [withdraw.amount])
     const disabled = withdraw.max === '0' || withdraw.amount === '0' || withdraw.balanceExceeded
@@ -69,11 +69,11 @@ function LiquidityPoolWithdrawView() {
                                 </div>)}
                             </div>}
                         </div>
-                        <div>
+                        {!!withdraw.max && <div>
                             {[10, 25, 50, 100].map(p => <span key={p}>{p !== 10 && <>&emsp;</>}
                                 <a href="#" className="dimmed" key={p} onClick={e => setPercentage(p)}>{p}%</a>
-                    </span>)}
-                        </div>
+                            </span>)}
+                        </div>}
                     </div>
                 </div>
             </>}

@@ -4,12 +4,12 @@ import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-ut
 import {fromStroops, toStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
-import {withSlippage} from '../../../util/slippage'
 import {prepareLiquidityWithdrawTx} from './liquidity-pool-withdraw-tx-builder'
 
 export default class LiquidityPoolWithdrawSettings {
-    constructor(network, poolId) {
+    constructor(network, poolHash, poolId) {
         this.network = network
+        this.poolHash = poolHash
         this.poolId = poolId
         this.share = '0'
         this.poolInfo = {loaded: false}
@@ -18,6 +18,8 @@ export default class LiquidityPoolWithdrawSettings {
     }
 
     network
+
+    poolHash
 
     poolId
 
@@ -67,8 +69,8 @@ export default class LiquidityPoolWithdrawSettings {
     loadPoolInfo(force = false) {
         if (this._poolInfoPromise && !force) return this._poolInfoPromise
         this.poolInfo = undefined
-        if (!this.poolId) return Promise.resolve()
-        this._poolInfoPromise = resolvePoolParams(this.network, this.poolId, true)
+        if (!this.poolHash) return Promise.resolve()
+        this._poolInfoPromise = resolvePoolParams(this.network, this.poolHash, true)
             .then(res => runInAction(() => {
                 this.poolInfo = res
                 this._poolInfoPromise = undefined

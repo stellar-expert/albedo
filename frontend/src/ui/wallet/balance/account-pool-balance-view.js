@@ -10,10 +10,11 @@ export default function AccountPoolBalanceView({balance, asset}) {
     const [poolInfo, setPoolInfo] = useState()
     const network = useStellarNetwork()
     const poolId = asset.toString()
+    const poolHash = balance.liquidity_pool_id
 
     useEffect(() => {
         let unloaded = false
-        resolvePoolParams(network, poolId, true)
+        resolvePoolParams(network, poolHash, true)
             .then(res => {
                 if (unloaded) return
                 setPoolInfo(res)
@@ -21,7 +22,7 @@ export default function AccountPoolBalanceView({balance, asset}) {
         return () => {
             unloaded = true
         }
-    }, [poolId])
+    }, [poolHash])
 
     if (!poolInfo)
         return <ActionLoaderView message="loading pool info"/>
@@ -58,7 +59,7 @@ export default function AccountPoolBalanceView({balance, asset}) {
         </div>
         <div className="account-balance-actions">
             {/*<a href={'/wallet/liquidity-pool/deposit?pool=' + poolId}>add liquidity</a>&emsp;*/}
-            <a href={'/wallet/liquidity-pool/withdraw?pool=' + poolId}><i className="icon-angle-double-right"/>withdraw liquidity</a>
+            <a href={`/wallet/liquidity-pool/withdraw?pool=${poolHash}&id=${poolId}`}><i className="icon-angle-double-right"/>withdraw liquidity</a>
         </div>
     </>
 }
