@@ -1,7 +1,7 @@
 {
   "name": "albedo",
   "private": true,
-  "version": "1.2.1",
+  "version": "1.2.2",
   "protocol": 3,
   "description": "Delegated transactions and messages signer for Stellar Network",
   "author": "StellarExpertTeam<info@stellar.expert>",
