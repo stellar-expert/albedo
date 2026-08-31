@@ -1,0 +1,8 @@
+shamefullyHoist: true
+autoInstallPeers: true
+allowBuilds:
+  core-js: true
+  node-sass: true
+onlyBuiltDependencies:
+  - core-js
+  - node-sass

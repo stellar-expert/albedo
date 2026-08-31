@@ -137,7 +137,15 @@ export async function setActionContext(params) {
         actionContext.origin = (app_origin || '').toLowerCase().replace(/https?:\/\//, '')
         actionContext.requestId = __reqid
         if (wallet_redirect) {
-            actionContext.walletRedirect = wallet_redirect
+            try {
+                const parsed = new URL(wallet_redirect)
+                if (parsed.protocol !== 'https:')
+                    throw new Error('Invalid protocol in "wallet_redirect" parameter.')
+                actionContext.walletRedirect = parsed.toString()
+            } catch (e) {
+                console.error(e)
+                return reject('Invalid "wallet_redirect" parameter.')
+            }
         }
         //resolve Stellar network properties for provided intent parameters
         const networkParams = resolveNetworkParams(intentParams)
