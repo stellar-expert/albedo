@@ -2,7 +2,7 @@ import {Asset, Memo, Operation, TransactionBuilder} from '@stellar/stellar-base'
 import {intentInterface} from '@albedo-link/intent'
 import {resolveNetworkParams} from '../util/network-resolver'
 import {estimateFee} from '../util/fee-estimator'
-import {resolveAccountInfo} from '../util/account-info-resolver'
+import {resolveAccountInfo, isAccountNotFoundError} from '../util/account-info-resolver'
 import {handleTxError} from './tx-error-handler'
 
 /**
@@ -72,7 +72,7 @@ async function prepareTxOperations(actionContext, source) {
                 try {
                     const acc = await resolveAccountInfo(destination, actionContext.networkParams)
                 } catch (e) {
-                    if (e.name === 'NotFoundError') {
+                    if (isAccountNotFoundError(e)) {
                         return [Operation.createAccount({startingBalance: amount, destination})]
                     }
                 }

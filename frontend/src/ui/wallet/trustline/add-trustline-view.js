@@ -3,6 +3,7 @@ import {observer} from 'mobx-react'
 import {StrKey} from '@stellar/stellar-base'
 import {Button, AssetLink, useStellarNetwork, AssetSelector} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
+import {requestConfirmation} from '../../../util/confirmation'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
 import ActionLoaderView from '../shared/action-loader-view'
@@ -33,10 +34,10 @@ function AddTrustlineView() {
     }
 
     const confirmCreateTrustline = useCallback(() => {
-        setInProgress(true)
-        createTrustline(asset, network)
-            .then(() => {
-                navigation.navigate('/account')
+        createTrustline(asset, network, () => setInProgress(true))
+            .then(created => {
+                if (created) //stay on the page if a user cancelled the action
+                    navigation.navigate('/account')
             })
             .finally(() => setInProgress(false))
     }, [asset, network])
@@ -87,19 +88,32 @@ function AddTrustlineView() {
     </>
 }
 
-export async function createTrustline(asset, network) {
+/**
+ * Ask a user to confirm the trustline creation and submit the transaction.
+ * @param {String} asset - Asset to trust.
+ * @param {String} network - Network identifier.
+ * @param {Function} [onConfirmed] - Callback invoked once a user confirmed the action, before the tx is submitted.
+ * @return {Promise<Boolean>} True if the trustline has been created, false if the action has been cancelled.
+ */
+export async function createTrustline(asset, network, onConfirmed) {
     const validationResult = validateAddTrustline(asset)
-    if (validationResult)
-        return alert(validationResult)
-    await confirm(<div className="text-small">
+    if (validationResult) {
+        alert(validationResult)
+        return false
+    }
+    const confirmed = await requestConfirmation(<div className="text-small">
         Asset trustline will temporarily lock 0.5 XLM on your account balance.
         Would you like to add this asset?
     </div>, {confirmTitle: 'Create', title: <>Create trustline for <AssetLink asset={asset}/></>})
+    if (!confirmed)
+        return false
+    onConfirmed?.()
     const tx = await prepareAddTrustlineTx(asset, network)
     if (!tx)
         return
     await confirmTransaction(network, tx)
     notify({type: 'success', message: 'Trustline created'})
+    return true
 }
 
 export default observer(AddTrustlineView)

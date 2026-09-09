@@ -1,7 +1,6 @@
-import React, {useCallback, useState} from 'react'
+import React, {useCallback} from 'react'
 import {observer} from 'mobx-react'
 import {Button, useStellarNetwork} from '@stellar-expert/ui-framework'
-import ActionLoaderView from '../shared/action-loader-view'
 import {confirmSpending} from '../shared/spending-confirmation-view'
 /**
  * @param {Bool} disabled
@@ -34,7 +33,8 @@ export default observer(function StellarBrokerConfirmationView({swap}) {
             asset: swap.asset[0],
             amount: swap.amount[0]
         })
-            .then(confirmSmartSwap)
+            .then(confirmed => confirmed && confirmSmartSwap())
+            .catch(e => console.error(e))
     }, [confirmSmartSwap])
 
     return <>

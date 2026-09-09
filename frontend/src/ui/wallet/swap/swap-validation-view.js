@@ -3,14 +3,17 @@ import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
 import {AssetLink, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {createTestnetAccount} from '../../../util/horizon-connector'
+import {requestConfirmation} from '../../../util/confirmation'
 import {prepareAddTrustlineTx} from '../trustline/add-trustline-tx-builder'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
 
 async function requestTrustlineCreation(swap, asset, network) {
-    await confirm(<div className="text-small">
+    const confirmed = await requestConfirmation(<div className="text-small">
         This action will temporarily lock 0.5 XLM on your account balance (can be reclaimed later).
         Would you like to add this asset?
     </div>, {title: <>Create trustline for <AssetLink asset={asset}/></>})
+    if (!confirmed)
+        return
     const tx = await prepareAddTrustlineTx(asset, network)
     if (!tx)
         return

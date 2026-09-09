@@ -3,6 +3,7 @@ import {observer} from 'mobx-react'
 import {StrKey} from '@stellar/stellar-base'
 import {Button, Dialog} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
+import {requestConfirmation} from '../../../util/confirmation'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import authorizationService from '../../../state/auth/authorization'
@@ -94,10 +95,12 @@ function AccountAddressBookView() {
     }, [addressSettings, addressBook, saveAddressBook])
 
     const removeAddress = useCallback(async address => {
-        await confirm('Do you really want to remove this address?', {
+        const confirmed = await requestConfirmation('Do you really want to remove this address?', {
             title: 'Remove from address book',
             icon: 'warning-circle'
         })
+        if (!confirmed)
+            return
         const copyAddressBook = {...addressBook}
         delete copyAddressBook[address]
         saveAddressBook(copyAddressBook)

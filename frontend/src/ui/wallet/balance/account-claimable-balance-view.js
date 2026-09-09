@@ -2,8 +2,9 @@ import React, {useCallback, useState} from 'react'
 import cn from 'classnames'
 import {ElapsedTime, AssetIcon, AssetIssuer, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {getClaimableBalanceClaimStatus} from '@stellar-expert/claimable-balance-utils'
-import {AssetDescriptor, parseAssetFromObject} from '@stellar-expert/asset-descriptor'
+import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
 import {navigation} from '@stellar-expert/navigation'
+import {requestConfirmation} from '../../../util/confirmation'
 import accountManager from '../../../state/account-manager'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
@@ -30,11 +31,13 @@ export default function AccountClaimableBalanceView({balance, account}) {
         if (validationResult)
             return alert(validationResult)
         if (!accountLedgerData.hasTrustline(asset.toFQAN())) {
-            await confirm(<div className="dimmed text-small">
+            const confirmed = await requestConfirmation(<div className="dimmed text-small">
                 You need to establish a trustline to before claiming this payment.
                 Would you like to create the trustline?
                 This action will temporarily lock 0.5 XLM on your account balance.
             </div>)
+            if (!confirmed)
+                return
         }
         setClaiming(true)
         try {

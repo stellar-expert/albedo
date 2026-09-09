@@ -4,7 +4,7 @@ import {calculateAvailableBalance, useStellarNetwork} from '@stellar-expert/ui-f
 import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
 import {formatWithAutoPrecision} from '@stellar-expert/formatter'
 import {resolveNetworkParams} from '../../util/network-resolver'
-import {resolveAccountInfo} from '../../util/account-info-resolver'
+import {resolveAccountInfo, isAccountNotFoundError} from '../../util/account-info-resolver'
 import AccountNotificationCounter from '../account-notification-counter'
 import {fetchAssetPrices} from './asset-price'
 
@@ -198,7 +198,7 @@ async function fetchAccountHorizonData(network, address) {
     } catch (e) {
         let nonExisting = false,
             error
-        if (e.name === 'NotFoundError') {
+        if (isAccountNotFoundError(e)) {
             error = 'Account does not exist on the ledger'
             nonExisting = true
         } else {

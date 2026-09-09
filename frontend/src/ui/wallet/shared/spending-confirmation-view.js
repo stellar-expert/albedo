@@ -2,6 +2,7 @@ import React from 'react'
 import {AccountAddress, getCurrentStellarNetwork} from '@stellar-expert/ui-framework'
 import {formatWithAutoPrecision} from '@stellar-expert/formatter'
 import {fetchAssetPrices} from '../../../state/ledger-data/asset-price'
+import {requestConfirmation} from '../../../util/confirmation'
 
 const threshold = 200
 
@@ -12,25 +13,20 @@ const threshold = 200
  * @param {string} [buyingAsset]
  * @param {string} [destination]
  * @param {string} [memo]
- * @return {Promise}
+ * @return {Promise<Boolean>} True if the spending has been confirmed, false if it has been cancelled.
  */
 export function confirmSpending({kind, asset, amount, buyingAsset, destination, memo}) {
-    return new Promise((resolve, reject) =>
-        fetchAssetPrices(getCurrentStellarNetwork(), [asset])
-            .then(prices => {
-                const estimatedPrice = Object.values(prices)[0]
-                const value = amount * estimatedPrice
-                if (value > threshold) {
-                    confirm(<ConfirmBalanceActionView {...{kind, asset, amount, value, buyingAsset, destination, memo}}/>, {
-                        title: 'Confirm transaction',
-                        icon: 'hexagon-set-options'
-                    })
-                        .then(resolve)
-                        .catch(reject)
-                } else {
-                    resolve()
-                }
-            }).catch(e => reject(e)))
+    return fetchAssetPrices(getCurrentStellarNetwork(), [asset])
+        .then(prices => {
+            const estimatedPrice = Object.values(prices)[0]
+            const value = amount * estimatedPrice
+            if (value <= threshold) //no need to confirm minor spendings
+                return true
+            return requestConfirmation(<ConfirmBalanceActionView {...{kind, asset, amount, value, buyingAsset, destination, memo}}/>, {
+                title: 'Confirm transaction',
+                icon: 'hexagon-set-options'
+            })
+        })
 }
 
 function ConfirmBalanceActionView({kind, asset, amount, value, buyingAsset, destination, memo}) {

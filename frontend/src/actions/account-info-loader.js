@@ -1,5 +1,5 @@
+import {resolveAccountInfo, isAccountNotFoundError} from '../util/account-info-resolver'
 import standardErrors from '../util/errors'
-import {resolveAccountInfo} from '../util/account-info-resolver'
 
 const pending = {}
 
@@ -18,7 +18,7 @@ export function loadSelectedAccountInfo(actionContext) {
     //load the account
     const promise = resolveAccountInfo(pubkey, networkParams)
         .catch(err => {
-            if (err.name === 'NotFoundError') {
+            if (isAccountNotFoundError(err)) {
                 return {error: standardErrors.accountDoesNotExist}
             }
             console.error(err)

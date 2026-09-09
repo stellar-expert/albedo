@@ -3,6 +3,7 @@ import {observer} from 'mobx-react'
 import {Button, AssetLink, useStellarNetwork, AssetSelector} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
 import {isValidPoolId} from '@stellar-expert/asset-descriptor'
+import {requestConfirmation} from '../../../util/confirmation'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
 import WalletPageActionDescription from '../shared/wallet-page-action-description'
@@ -25,7 +26,8 @@ function RemoveTrustlineView() {
         const validationResult = validateRemoveTrustline(asset)
         if (validationResult)
             return alert(validationResult)
-        await confirm('Are you sure you want to remove this trustline?', {title: 'Remove trustline'})
+        if (!await requestConfirmation('Are you sure you want to remove this trustline?', {title: 'Remove trustline'}))
+            return
         setInProgress(true)
         try {
             const tx = await prepareRemoveTrustlineTx({asset, convertAsset, network})

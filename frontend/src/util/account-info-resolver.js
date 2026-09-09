@@ -1,3 +1,4 @@
+import {NotFoundError} from '@stellar/stellar-sdk'
 import {createHorizon} from './horizon-connector'
 
 const accountCache = {}
@@ -33,4 +34,14 @@ export function resolveAccountInfo(address, network) {
         accountCache[key] = {meta, expires: new Date().getTime() + 2000} //set 2 sec cache expiration timeout
     }
     return meta
+}
+
+/**
+ * Check whether a Horizon error means that the requested account does not exist on the ledger.
+ * @param {Error} e - Error thrown by Horizon.
+ * @return {Boolean}
+ */
+export function isAccountNotFoundError(e) {
+    //NotFoundError inherits "name" from Error, and its class name is mangled in production builds
+    return e instanceof NotFoundError || e?.response?.status === 404
 }

@@ -1,9 +1,8 @@
-import React, {useCallback, useState} from 'react'
+import React, {useCallback} from 'react'
 import {observer} from 'mobx-react'
 import {Button, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {confirmTransaction} from './wallet-tx-confirmation'
 import {confirmSpending} from './spending-confirmation-view'
-import ActionLoaderView from './action-loader-view'
 import {runInAction} from 'mobx'
 
 /**
@@ -58,7 +57,8 @@ export default observer(function TransactionConfirmationView({
             params.destination = transfer.destination
         }
         confirmSpending(params)
-            .then(confirmTx)
+            .then(confirmed => confirmed && confirmTx())
+            .catch(e => console.error(e)) //failed to estimate the spending value
     }, [confirmTx])
 
     return <>

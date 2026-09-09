@@ -1,6 +1,7 @@
 import React from 'react'
 import {Button} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
+import {requestConfirmation} from '../../../util/confirmation'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 
@@ -13,10 +14,12 @@ export default function AccountForgetView({credentials}) {
         if (account.isStoredAccount) {
             confirmation += '\r\nPlease make sure that you backed up the recovery phrase or transferred all funds from this account.'
         }
-        await confirm(confirmation, {
+        const confirmed = await requestConfirmation(confirmation, {
             title: 'Remove account',
             icon: 'warning-circle'
         })
+        if (!confirmed)
+            return
         account.verifyCredentials(credentials)
         await accountManager.forget(account)
         navigation.navigate(actionContext.intent ? '/confirm' : '/account')
