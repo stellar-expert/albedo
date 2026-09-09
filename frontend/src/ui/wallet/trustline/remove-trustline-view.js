@@ -48,7 +48,7 @@ function RemoveTrustlineView() {
         <h3>Remove trustline</h3>
         <hr className="flare"/>
         <WalletPageActionDescription>
-            discard tokens amd remove asset trustline
+            discard tokens and remove asset trustline
         </WalletPageActionDescription>
         <div>
             <div className="space segment">
