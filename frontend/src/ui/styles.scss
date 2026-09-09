@@ -2,6 +2,11 @@
 
 $container-width: 60rem;
 
+//toast notifications must sit above all other UI (dialogs, dropdowns, tooltips)
+.toast-notifications-container {
+  z-index: 1010;
+}
+
 .container:not(.wide) {
   max-width: $container-width;
 }

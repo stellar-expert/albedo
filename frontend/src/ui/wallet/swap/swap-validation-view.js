@@ -7,10 +7,14 @@ import {prepareAddTrustlineTx} from '../trustline/add-trustline-tx-builder'
 import {confirmTransaction} from '../shared/wallet-tx-confirmation'
 
 async function requestTrustlineCreation(swap, asset, network) {
-    await confirm(<div className="text-small">
-        This action will temporarily lock 0.5 XLM on your account balance (can be reclaimed later).
-        Would you like to add this asset?
-    </div>, {title: <>Create trustline for <AssetLink asset={asset}/></>})
+    try {
+        await confirm(<div className="text-small">
+            This action will temporarily lock 0.5 XLM on your account balance (can be reclaimed later).
+            Would you like to add this asset?
+        </div>, {title: <>Create trustline for <AssetLink asset={asset}/></>})
+    } catch {
+        return //cancelled by user
+    }
     const tx = await prepareAddTrustlineTx(asset, network)
     if (!tx)
         return

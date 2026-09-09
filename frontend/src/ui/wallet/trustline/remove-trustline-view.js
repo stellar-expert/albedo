@@ -25,7 +25,11 @@ function RemoveTrustlineView() {
         const validationResult = validateRemoveTrustline(asset)
         if (validationResult)
             return alert(validationResult)
-        await confirm('Are you sure you want to remove this trustline?', {title: 'Remove trustline'})
+        try {
+            await confirm('Are you sure you want to remove this trustline?', {title: 'Remove trustline'})
+        } catch {
+            return //cancelled by user
+        }
         setInProgress(true)
         try {
             const tx = await prepareRemoveTrustlineTx({asset, convertAsset, network})

@@ -3,15 +3,14 @@ import {observer} from 'mobx-react'
 import {navigation} from '@stellar-expert/navigation'
 import errors from '../../util/errors'
 import accountManager from '../../state/account-manager'
+import authorizationService from '../../state/auth/authorization'
 import Account from '../../state/account'
 import Credentials from '../../state/auth/credentials'
 import CredentialsRequest from './credentials-request-view'
-import authorizationService from '../../state/auth/authorization'
 
 export default observer(function AuthorizationRequestView() {
     const [account, setAccount] = useState(null),
-        [inProgress, setInProgress] = useState(false),
-        [error, setError] = useState(null)
+        [inProgress, setInProgress] = useState(false)
 
     useEffect(() => {
         const selectedAccount = authorizationService.account
@@ -23,14 +22,13 @@ export default observer(function AuthorizationRequestView() {
 
     async function submit(data) {
         setInProgress(true)
-        setError(null)
         const {id, password} = data,
             selectedAccount = account || accountManager.get(id) || new Account({id}),
             credentials = await Credentials.create({account: selectedAccount, password})
 
         if (!credentials.checkPasswordCorrect()) {
             setInProgress(false)
-            setError('Invalid password')
+            notify({type: 'error', message: 'Invalid password'})
             return
         }
         try {
@@ -38,7 +36,6 @@ export default observer(function AuthorizationRequestView() {
             //restore default state
             setAccount(null)
             setInProgress(false)
-            setError(null)
         } catch (e) {
             setInProgress(false)
             console.error(e)
@@ -70,7 +67,7 @@ export default observer(function AuthorizationRequestView() {
             Please provide your password
         </div>
         <div className="space">
-            <CredentialsRequest confirmText="Confirm" noRegistrationLink {...{inProgress, error}} onConfirm={submit}
+            <CredentialsRequest confirmText="Confirm" noRegistrationLink inProgress={inProgress} onConfirm={submit}
                                 onCancel={cancel}/>
         </div>
     </div>

@@ -59,6 +59,12 @@ export default observer(function TransactionConfirmationView({
         }
         confirmSpending(params)
             .then(confirmTx)
+            .catch(e => {
+                //confirm() rejects with undefined on cancel — ignore, report real errors
+                if (e) {
+                    console.error(e)
+                }
+            })
     }, [confirmTx])
 
     return <>

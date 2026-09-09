@@ -23,8 +23,11 @@ export default function LoginPageView() {
                 const {password} = data
                 account = allAccounts.find(a => a.id === selectedAccount)
                 const credentials = await Credentials.create({account, password})
-
-                await account.load(credentials)
+                if (!credentials.checkPasswordCorrect()) {
+                    setInProgress(false)
+                    alert(errors.invalidPassword.message)
+                    return
+                }
             } else {
                 account = await accountManager.loginHWAccount(data)
             }
@@ -70,7 +73,7 @@ export default function LoginPageView() {
                       options={accountSelectorOptions}/>
         </div>
         <div className="space">
-            <CredentialsRequest confirmText="Log in" inProgress={inProgress || accountSelectorOptions.length}
+            <CredentialsRequest confirmText="Log in" inProgress={inProgress}
                                 onConfirm={login} onCancel={() => navigation.navigate('/')}/>
         </div>
     </SoloLayoutView>

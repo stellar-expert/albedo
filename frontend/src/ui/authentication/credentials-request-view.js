@@ -1,12 +1,11 @@
-import React, {useCallback, useRef, useState} from 'react'
+import React, {useCallback, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Button, useDependantState} from '@stellar-expert/ui-framework'
 import {ACCOUNT_TYPES} from '../../state/account'
 
 const defaultState = {
     password: '',
-    confirmation: '',
-    validationError: null
+    confirmation: ''
 }
 
 export default function CredentialsRequestView({
@@ -15,11 +14,9 @@ export default function CredentialsRequestView({
                                                    onCancel,
                                                    requestPasswordConfirmation,
                                                    inProgress,
-                                                   noRegistrationLink,
-                                                   error
+                                                   noRegistrationLink
                                                }) {
     const firstInputRef = useRef(null)
-    const [isValid, setIsValid] = useState(false)
 
     const focusFirstInput = useCallback(() => {
         setTimeout(() => {
@@ -29,56 +26,34 @@ export default function CredentialsRequestView({
         }, 200)
     }, [])
 
-    const [{password, confirmation, validationError}, updateState] = useDependantState(() => {
+    const [{password, confirmation}, updateState] = useDependantState(() => {
         focusFirstInput()
         return {...defaultState}
-    }, [confirmText, onConfirm, onCancel, requestPasswordConfirmation, noRegistrationLink, error])
+    }, [confirmText, onConfirm, onCancel, requestPasswordConfirmation, noRegistrationLink])
 
-    const validate = useCallback(({password, confirmation}) => {
-        if ((password || '').length < 8)
-            return 'Password too short'
-        if (requestPasswordConfirmation && password !== confirmation)
-            return 'Passwords do not match'
-        return null
-    }, [requestPasswordConfirmation])
+    //derive from current values so it stays in sync after form resets
+    const isValid = (password || '').length >= 8 &&
+        (!requestPasswordConfirmation || password === confirmation)
 
     const confirm = useCallback(() => {
-        const validationError = validate({password, confirmation})
-        if (validationError) {
-            updateState({...defaultState, validationError})
-            focusFirstInput()
-        } else {
-            updateState({...defaultState})
-            onConfirm({password, type: ACCOUNT_TYPES.STORED_ACCOUNT})
-        }
-    }, [validate, confirmation, onConfirm, updateState, focusFirstInput])
+        updateState({...defaultState})
+        onConfirm({password, type: ACCOUNT_TYPES.STORED_ACCOUNT})
+    }, [password, onConfirm, updateState])
 
     const onKeyDown = useCallback((e) => {
         //handle Esc key
         if (e.keyCode === 27 && onCancel) {
             onCancel()
         }
-        //handle Enter key
-        if (e.keyCode === 13) {
+        //handle Enter key — gated on isValid to match the disabled Confirm button
+        if (e.keyCode === 13 && isValid) {
             confirm()
         }
-    }, [onCancel, confirm])
+    }, [onCancel, confirm, isValid])
 
     const setValue = useCallback((name, value) => {
-        //value = value.trim()
-        updateState(current => {
-            const newState = {
-                ...current,
-                [name]: value,
-                validationError: null
-            }
-            const validation = validate(newState)
-            setIsValid(!validation)
-            return newState
-        })
-    }, [updateState, validate])
-
-    const errorsToShow = validationError || error
+        updateState(current => ({...current, [name]: value}))
+    }, [updateState])
 
     return <>
         <div className="segment">
@@ -101,9 +76,6 @@ export default function CredentialsRequestView({
                 <Button block outline onClick={onCancel}>Cancel</Button>
             </div>}
         </div>
-        {errorsToShow && <div className="error segment space text-small">
-            <i className="icon-warning"/> Error: {errorsToShow}
-        </div>}
         {!noRegistrationLink && <>
             <hr title="not registered yet?" className="flare"/>
             <div className="row">
@@ -127,7 +99,5 @@ CredentialsRequestView.propTypes = {
     //action is in progress
     inProgress: PropTypes.bool,
     //whether to show "create account" link or not
-    noRegistrationLink: PropTypes.bool,
-    //error message provided from a top level component
-    error: PropTypes.string
+    noRegistrationLink: PropTypes.bool
 }

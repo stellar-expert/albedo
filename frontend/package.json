@@ -39,14 +39,14 @@
     "@stellar-expert/asset-descriptor": "^1.5.0",
     "@stellar-expert/claimable-balance-utils": "^1.4.1",
     "@stellar-expert/client-cache": "github:stellar-expert/client-cache",
-    "@stellar-expert/formatter": "^2.5.0",
+    "@stellar-expert/formatter": "^3.0.0",
     "@stellar-expert/liquidity-pool-utils": "^1.0.3",
-    "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
-    "@stellar-expert/tx-meta-effects-parser": "7.0.1",
-    "@stellar-expert/tx-signers-inspector": "1.8.2",
-    "@stellar-expert/ui-framework": "1.15.5",
-    "@stellar/stellar-base": "14.0.4",
-    "@stellar/stellar-sdk": "14.4.3",
+    "@stellar-expert/navigation": "^1.1.0",
+    "@stellar-expert/tx-meta-effects-parser": "8.5.0",
+    "@stellar-expert/tx-signers-inspector": "^1.8.2",
+    "@stellar-expert/ui-framework": "1.19.2",
+    "@stellar/stellar-base": "15.0.0",
+    "@stellar/stellar-sdk": "15.0.1",
     "@zxing/browser": "^0.1.5",
     "aes-js": "^3.1.2",
     "argon2-browser": "^1.18.0",
@@ -73,8 +73,8 @@
     "jest-fetch-mock": "^3.0.3"
   },
   "overrides": {
-    "@stellar/stellar-base": "14.0.4",
-    "@stellar/stellar-sdk": "14.4.3",
+    "@stellar/stellar-base": "15.0.0",
+    "@stellar/stellar-sdk": "15.0.1",
     "@stellar-expert/tx-meta-effects-parser": "7.0.1"
   },
   "pnpm": {

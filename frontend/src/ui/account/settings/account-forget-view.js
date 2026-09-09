@@ -13,10 +13,14 @@ export default function AccountForgetView({credentials}) {
         if (account.isStoredAccount) {
             confirmation += '\r\nPlease make sure that you backed up the recovery phrase or transferred all funds from this account.'
         }
-        await confirm(confirmation, {
-            title: 'Remove account',
-            icon: 'warning-circle'
-        })
+        try {
+            await confirm(confirmation, {
+                title: 'Remove account',
+                icon: 'warning-circle'
+            })
+        } catch {
+            return //cancelled by user
+        }
         account.verifyCredentials(credentials)
         await accountManager.forget(account)
         navigation.navigate(actionContext.intent ? '/confirm' : '/account')

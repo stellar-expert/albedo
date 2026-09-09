@@ -38,6 +38,12 @@ function AddTrustlineView() {
             .then(() => {
                 navigation.navigate('/account')
             })
+            .catch(e => {
+                //confirm() rejects with undefined on cancel — ignore, report real errors
+                if (e) {
+                    console.error(e)
+                }
+            })
             .finally(() => setInProgress(false))
     }, [asset, network])
 

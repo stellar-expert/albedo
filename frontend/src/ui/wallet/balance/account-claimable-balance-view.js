@@ -30,11 +30,15 @@ export default function AccountClaimableBalanceView({balance, account}) {
         if (validationResult)
             return alert(validationResult)
         if (!accountLedgerData.hasTrustline(asset.toFQAN())) {
-            await confirm(<div className="dimmed text-small">
-                You need to establish a trustline to before claiming this payment.
-                Would you like to create the trustline?
-                This action will temporarily lock 0.5 XLM on your account balance.
-            </div>)
+            try {
+                await confirm(<div className="dimmed text-small">
+                    You need to establish a trustline to before claiming this payment.
+                    Would you like to create the trustline?
+                    This action will temporarily lock 0.5 XLM on your account balance.
+                </div>)
+            } catch {
+                return //cancelled by user
+            }
         }
         setClaiming(true)
         try {

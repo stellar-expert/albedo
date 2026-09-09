@@ -35,6 +35,12 @@ export default observer(function StellarBrokerConfirmationView({swap}) {
             amount: swap.amount[0]
         })
             .then(confirmSmartSwap)
+            .catch(e => {
+                //confirm() rejects with undefined on cancel — ignore, report real errors
+                if (e) {
+                    console.error(e)
+                }
+            })
     }, [confirmSmartSwap])
 
     return <>
