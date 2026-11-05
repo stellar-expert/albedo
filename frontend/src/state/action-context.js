@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
-import {navigation} from '@stellar-expert/navigation'
+import {navigation} from '@stellar-expert/ui-framework'
 import {processIntents} from '../actions/responder'
 import {dispatchIntentResponse, dispatchIntentError} from '../actions/callback-dispatcher'
 import {loadSelectedAccountInfo} from '../actions/account-info-loader'
@@ -222,7 +222,8 @@ class ActionContext {
         this.setStatus(ActionContextStatus.confirmed, true)
 
         try {
-            await processIntents(this)
+            if (!await processIntents(this))
+                return //the request has been rejected and the context reset
             this.setStatus(ActionContextStatus.processed)
 
             await submitTxIntents(this)

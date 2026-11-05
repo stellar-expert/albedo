@@ -1,8 +1,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import PropTypes from 'prop-types'
-import {useAutoFocusRef, useDependantState, AssetSelector} from '@stellar-expert/ui-framework'
-import {isValidPoolId} from '@stellar-expert/asset-descriptor'
+import {useAutoFocusRef, useDependantState, AssetSelector, isValidPoolId} from '@stellar-expert/ui-framework'
 import {formatWithAutoPrecision, fromStroops, toStroops} from '@stellar-expert/formatter'
 import './transfer-amount.scss'
 

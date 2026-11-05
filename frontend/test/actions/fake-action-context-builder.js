@@ -1,59 +1,40 @@
-import clone from 'clone'
-import {Account, Keypair} from '@stellar/stellar-base'
+import {Account, Keypair, TransactionBuilder} from '@stellar/stellar-sdk'
+import IntentRequest from '../../src/state/intent-request'
+import ActionAuthenticationContext from '../../src/actions/action-authentication-context'
+import {resolveNetworkParams} from '../../src/util/network-resolver'
 
-const defaultContext = {
-    selectedAccount: {
-        email: 'test@test.org',
-        avatar: 'none'
-    },
-    selectedKeypair: {
-        address: 'GDUPSWMNKRF7ERDYAF2VVP2T5BQPJWTLPRWBP3KFO264GDBOILC2XZ6K',
-        secret: 'SAWR7UAO7SFBF2CLGMRLF3KRLG36HEFZHEE4G3NFJ7WRSWBIYHXWJDMQ'
-    },
-    confirmed: true
-}
+const defaultSecret = 'SAWR7UAO7SFBF2CLGMRLF3KRLG36HEFZHEE4G3NFJ7WRSWBIYHXWJDMQ'
 
-class FakeActionContextBuilder {
-    constructor() {
-        this.props = clone(defaultContext)
+/**
+ * Build action context, intent request, and execution context for a given intent request data.
+ * @param {{intent: String}} data - Intent name and intent params.
+ * @return {Promise<{actionContext: Object, intentRequest: IntentRequest, executionContext: ActionAuthenticationContext}>}
+ */
+async function buildContext({intent, ...intentParams}) {
+    const networkParams = resolveNetworkParams(intentParams)
+    const intentRequest = new IntentRequest(intent, intentParams, networkParams)
+    const actionContext = {
+        intent,
+        intentParams,
+        networkParams,
+        confidence: 'normal',
+        intentRequests: [intentRequest]
     }
-
-    notConfirmed() {
-        this.props.confirmed = false
-        return this
+    //tx intent context is initialized in advance (see action-context-initializer)
+    if (intent === 'tx') {
+        await intentRequest.setTxContext(TransactionBuilder.fromXdr(intentParams.xdr, networkParams.network), null)
     }
-
-    withoutSelectedAccount() {
-        this.props.selectedAccount = undefined
-        return this
-    }
-
-    withoutSelectedKeypair() {
-        this.props.selectedAccount = undefined
-        return this
-    }
-
-    fromData({intent, ...data}) {
-        Object.assign(this.props, {intent, data})
-        return this
-    }
-
-    build() {
-        return clone(this.props)
-    }
-}
-
-function buildContext(data) {
-    return new FakeActionContextBuilder().fromData(data).build()
+    const keypair = loadKeypair()
+    const executionContext = ActionAuthenticationContext.forAccount({publicKey: keypair.publicKey(), secret: keypair.secret()})
+    return {actionContext, intentRequest, executionContext}
 }
 
 function loadAccount(sequence = '1', address = null) {
-    return new Account(address || defaultContext.selectedKeypair.publicKey, sequence || Math.floor(Math.random() * 100000000).toString())
+    return new Account(address || loadKeypair().publicKey(), sequence)
 }
 
 function loadKeypair(secret = null) {
-    return Keypair.fromSecret(secret || defaultContext.selectedKeypair.secret)
+    return Keypair.fromSecret(secret || defaultSecret)
 }
 
-
-export {FakeActionContextBuilder, buildContext, loadAccount, loadKeypair}
+export {buildContext, loadAccount, loadKeypair}

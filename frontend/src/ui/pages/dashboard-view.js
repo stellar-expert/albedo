@@ -1,6 +1,6 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import {navigation} from '@stellar-expert/navigation'
+import {navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../state/account-manager'
 import AccountDashboardView from '../wallet/balance/account-dashboard-view'
 

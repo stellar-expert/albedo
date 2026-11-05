@@ -1,7 +1,11 @@
-import { registerMessageListeners } from '../../src/util/message-listeners'
-import { fakeWindow, setupFakeWindow } from '../util/fake-window'
-import actionContext from '../../src/state/action-context'
-import { setupAccountManager } from '../util/fake-account-manager'
+/**
+ * @jest-environment ./test/jsdom-environment.js
+ */
+import {registerMessageListeners} from '../../src/util/message-listeners'
+import {fakeWindow, setupFakeWindow} from '../util/fake-window'
+import {setupFakeHorizon} from '../util/fake-horizon'
+import {sendIntent} from '../util/intent-flow'
+import {setupAccountManager} from '../util/fake-account-manager'
 
 const fakeIntent = {
     intent: 'basic_info'
@@ -10,6 +14,7 @@ const fakeIntent = {
 describe('Intent - basic info', () => {
     beforeAll(async () => {
         setupFakeWindow()
+        setupFakeHorizon()
         registerMessageListeners(fakeWindow)
         await setupAccountManager()
     })
@@ -19,25 +24,9 @@ describe('Intent - basic info', () => {
         jest.restoreAllMocks()
     })
 
-    it('should be able to call basic info intent', async () => {
-        fakeWindow.callEventListenersWithParams({
-            data: {
-                ...fakeIntent
-            },
-            origin: '*',
-            source: '*'
-        }, this)
+    it('should reject basic info intent removed from the protocol', async () => {
+        await sendIntent(fakeIntent)
 
-        expect(actionContext.intentErrors).toBeNull()
-        expect(fakeWindow.__history.push).toHaveBeenCalledWith('/confirm')
-
-        await actionContext.confirmRequest()
-
-        expect(actionContext.intentErrors).toBeNull()
-        expect(fakeWindow.checkIfExpectedResultReturned({
-            intent: 'basic_info',
-            pubkey: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2'
-            //signature:
-        })).toBeTruthy()
+        expect(fakeWindow.getResults()[0].error).toMatchObject({code: -3, ext: 'Unknown intent "basic_info".'})
     })
 })

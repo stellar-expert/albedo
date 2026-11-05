@@ -1,6 +1,5 @@
 import React from 'react'
-import {useLocation} from 'react-router'
-import {parseQuery} from '@stellar-expert/navigation'
+import {useLocation, parseQuery} from '@stellar-expert/ui-framework'
 import WideLayout from '../layout/wide-layout-view'
 import IntentBlock from './demo-intent-block/demo-intent-block-view'
 import DemoIntroView from './demo-intro-view'

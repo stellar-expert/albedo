@@ -1,6 +1,5 @@
 import React from 'react'
-import {Amount} from '@stellar-expert/ui-framework'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {Amount, AssetDescriptor} from '@stellar-expert/ui-framework'
 import {formatPrice, formatWithAutoPrecision, fromStroops, toStroops} from '@stellar-expert/formatter'
 import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-utils'
 

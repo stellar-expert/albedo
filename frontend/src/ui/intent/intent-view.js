@@ -1,5 +1,5 @@
 import React from 'react'
-import {withRouter} from 'react-router'
+import {withRouter} from '@stellar-expert/ui-framework'
 import {observer} from 'mobx-react'
 import actionContext, {ActionContextStatus} from '../../state/action-context'
 import SoloLayoutView from '../layout/solo-layout-view'

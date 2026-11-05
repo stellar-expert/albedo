@@ -1,5 +1,5 @@
 import React from 'react'
-import {parseQuery} from '@stellar-expert/navigation'
+import {parseQuery} from '@stellar-expert/ui-framework'
 import SoloLayoutView from '../layout/solo-layout-view'
 
 export default function BlockedPageView() {

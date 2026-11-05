@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
-import {AccountAddress, Button, CopyToClipboard} from '@stellar-expert/ui-framework'
-import {navigation} from '@stellar-expert/navigation'
+import {AccountAddress, Button, CopyToClipboard, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 import authorizationService from '../../../state/auth/authorization'

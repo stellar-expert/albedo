@@ -1,9 +1,8 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {runInAction} from 'mobx'
-import {StrKey} from '@stellar/stellar-base'
-import {useStellarNetwork} from '@stellar-expert/ui-framework'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {StrKey} from '@stellar/stellar-sdk'
+import {useStellarNetwork, AssetDescriptor} from '@stellar-expert/ui-framework'
 import accountLedgerData, {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'
 import {requestFriendbotFunding} from '../../../util/horizon-connector'
 

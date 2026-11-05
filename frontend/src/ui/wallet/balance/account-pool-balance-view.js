@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {AssetIcon, AssetIssuer, useStellarNetwork} from '@stellar-expert/ui-framework'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {AssetIcon, AssetIssuer, useStellarNetwork, AssetDescriptor} from '@stellar-expert/ui-framework'
 import {estimateLiquidityPoolStakeValue} from '@stellar-expert/liquidity-pool-utils'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'
 import ActionLoaderView from '../shared/action-loader-view'

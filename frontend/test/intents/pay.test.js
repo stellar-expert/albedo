@@ -1,12 +1,13 @@
-import {Transaction, Asset} from '@stellar/stellar-base'
-import {setupFakeArgon2} from '../util/fake-argon2'
+/**
+ * @jest-environment ./test/jsdom-environment.js
+ */
+import {TransactionBuilder, Networks, Asset} from '@stellar/stellar-sdk'
+import {navigation} from '@stellar-expert/ui-framework'
 import {registerMessageListeners} from '../../src/util/message-listeners'
 import {fakeWindow, setupFakeWindow} from '../util/fake-window'
-import actionContext from '../../src/state/action-context'
+import {setupFakeHorizon} from '../util/fake-horizon'
+import {sendIntent, confirmRequest} from '../util/intent-flow'
 import {setupAccountManager, publicKey} from '../util/fake-account-manager'
-
-setupFakeArgon2()
-jest.mock('../../src/util/horizon-connector')
 
 const fakeIntent = {
     intent: 'pay',
@@ -15,10 +16,13 @@ const fakeIntent = {
 }
 
 describe('Intent - pay', () => {
+    let credentials
+
     beforeAll(async () => {
         setupFakeWindow()
+        setupFakeHorizon()
         registerMessageListeners(fakeWindow)
-        await setupAccountManager()
+        credentials = await setupAccountManager()
     })
 
     afterAll(() => {
@@ -27,33 +31,26 @@ describe('Intent - pay', () => {
     })
 
     it('should be able to call a pay intent', async () => {
-        fakeWindow.callEventListenersWithParams({
-            data: {
-                ...fakeIntent
-            },
-            origin: '*',
-            source: '*'
-        }, this)
+        await sendIntent(fakeIntent)
 
-        expect(actionContext.intentErrors).toBeNull()
-        //expect(fakeWindow.__history.push).toHaveBeenCalledWith('/confirm')
+        expect(navigation.path).toEqual('/confirm')
 
-        await actionContext.confirmRequest()
+        await confirmRequest(credentials)
 
-        //expect(actionContext.intentErrors).toBeNull()
         expect(fakeWindow.checkIfExpectedResultReturned({
             intent: 'pay',
-            pubkey: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2',
-            destination: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2'
+            pubkey: publicKey,
+            destination: fakeIntent.destination,
+            network: 'public'
         })).toBeTruthy()
 
         const xdr = fakeWindow.getResults()[0].signed_envelope_xdr
-        const transaction = new Transaction(xdr)
+        const transaction = TransactionBuilder.fromXdr(xdr, Networks.PUBLIC)
         expect(transaction.source).toBe(publicKey)
         expect(transaction.operations.length).toBe(1)
         expect(transaction.operations[0].type).toBe('payment')
         expect(transaction.operations[0].destination).toBe(fakeIntent.destination)
-        expect(transaction.operations[0].asset).toStrictEqual(Asset.native())
+        expect(transaction.operations[0].asset.equals(Asset.native())).toBe(true)
         expect(transaction.operations[0].amount).toBe('1.0000000')
     })
 })

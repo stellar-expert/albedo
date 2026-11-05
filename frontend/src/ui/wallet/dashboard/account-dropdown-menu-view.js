@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
-import {Dropdown, AccountIdenticon, formatExplorerLink, useTheme} from '@stellar-expert/ui-framework'
-import {navigation} from '@stellar-expert/navigation'
+import {Dropdown, AccountIdenticon, formatExplorerLink, useTheme, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
 
 export default function AccountDropdownMenuView() {

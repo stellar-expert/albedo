@@ -1,4 +1,4 @@
-import {StrKey, TransactionBuilder} from '@stellar/stellar-base'
+import {StrKey, TransactionBuilder} from '@stellar/stellar-sdk'
 import {action, transaction} from 'mobx'
 import {setStellarNetwork} from '@stellar-expert/ui-framework'
 import {intentInterface} from '@albedo-link/intent'
@@ -43,7 +43,7 @@ function validateRequestParams(intent, intentParams) {
  * @return {Promise<IntentRequest>}
  */
 async function parseIntentRequest(intent, intentParams, networkParams, actionContextParams) {
-    const intentRequest = new IntentRequest(intent, intentParams)
+    const intentRequest = new IntentRequest(intent, intentParams, networkParams)
 
     function reject(error) {
         intentRequest.intentErrors = error
@@ -56,7 +56,7 @@ async function parseIntentRequest(intent, intentParams, networkParams, actionCon
     //initialize transaction context in advance for the tx intent
     if (intent === 'tx') {
         try {
-            const tx = TransactionBuilder.fromXDR(intentParams.xdr, networkParams.network)
+            const tx = TransactionBuilder.fromXdr(intentParams.xdr, networkParams.network)
             await intentRequest.setTxContext(tx, actionContextParams.selectedAccount)
         } catch (e) {
             return reject(`Invalid transaction XDR`)

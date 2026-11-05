@@ -1,6 +1,5 @@
 import React from 'react'
-import {Button} from '@stellar-expert/ui-framework'
-import {navigation} from '@stellar-expert/navigation'
+import {Button, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../../state/account-manager'
 import actionContext from '../../../state/action-context'
 

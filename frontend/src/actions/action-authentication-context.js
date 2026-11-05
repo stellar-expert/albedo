@@ -1,6 +1,4 @@
-import {Keypair} from '@stellar/stellar-base'
-import shajs from 'sha.js'
-import isEqual from 'react-fast-compare'
+import {Keypair, hash, xdr} from '@stellar/stellar-sdk'
 import {ACCOUNT_TYPES} from '../state/account'
 
 export default class ActionAuthenticationContext {
@@ -47,7 +45,7 @@ export default class ActionAuthenticationContext {
      *
      * @param {String} message
      * @param {Boolean} isBinary
-     * @return {Promise<{signature: Buffer, signedMessage: Buffer}>}
+     * @return {Promise<{signature: Uint8Array, signedMessage: Uint8Array}>}
      */
     async signMessage(message, isBinary) {
         let keypair
@@ -75,8 +73,8 @@ export default class ActionAuthenticationContext {
         //find new signature and return it
         for (let sig of transaction.signatures.slice()) {
             //remove duplicates
-            while (transaction.signatures.filter(s => isEqual(s.signature(), sig.signature())).length > 1) {
-                const idx = transaction.signatures.findIndex(s => isEqual(s.signature(), sig.signature()))
+            while (transaction.signatures.filter(s => s.signature.equals(sig.signature)).length > 1) {
+                const idx = transaction.signatures.findIndex(s => s.signature.equals(sig.signature))
                 transaction.signatures.splice(idx, 1)
             }
             //check whether it's a new signature
@@ -112,12 +110,12 @@ export default class ActionAuthenticationContext {
      * @param {Keypair} keypair
      * @param {String} message
      * @param {Boolean} [isBinary]
-     * @return {Promise<{signature: Buffer, signedMessage: Buffer}>}
+     * @return {Promise<{signature: Uint8Array, signedMessage: Uint8Array}>}
      * @private
      */
     signAlbedo(keypair, message, isBinary) {
         const messageToSign = `${this.publicKey}:${message}`
-        const rawMessage = shajs('sha256').update(messageToSign).digest()
+        const rawMessage = hash(messageToSign)
         const signature = keypair.sign(rawMessage)
         return {
             signature,
@@ -129,13 +127,17 @@ export default class ActionAuthenticationContext {
      * @param {Keypair} keypair
      * @param {String} message
      * @param {Boolean} [isBinary]
-     * @return {Promise<{signature: Buffer, signedMessage: Buffer}>}
+     * @return {Promise<{signature: Uint8Array, signedMessage: Uint8Array}>}
      * @private
      */
     signSep53(keypair, message, isBinary) {
-        const prefix = Buffer.from('Stellar Signed Message:\n', 'utf8')
-        const messageToSign = Buffer.concat([prefix, Buffer.from(message, isBinary ? 'hex' : 'utf8')])
-        const rawMessage = shajs('sha256').update(messageToSign).digest()
+        const encoder = new TextEncoder()
+        const prefix = encoder.encode('Stellar Signed Message:\n')
+        const payload = isBinary ? xdr.decodeBytes(message, 'hex') : encoder.encode(message)
+        const messageToSign = new Uint8Array(prefix.length + payload.length)
+        messageToSign.set(prefix)
+        messageToSign.set(payload, prefix.length)
+        const rawMessage = hash(messageToSign)
         const signature = keypair.sign(rawMessage)
         return {
             signedMessage: signature

@@ -1,15 +1,22 @@
 let eventListenersFns = []
 let postMessageResults = []
 
-const fakeWindow = {
-    addEventListener: (eventName, fn) => {
-        eventListenersFns.push(fn)
+//caller application window that receives intent results
+const fakeOpener = {
+    postMessage: ({albedoIntentResult}) => {
+        if (albedoIntentResult) {
+            postMessageResults.push(albedoIntentResult)
+        }
     },
-    opener: {
-        postMessage: ({albedoIntentResult}) => {
-            if (albedoIntentResult) {
-                postMessageResults.push(albedoIntentResult)
-            }
+    frames: []
+}
+
+const fakeWindow = {
+    origin: window.origin,
+    location: window.location,
+    addEventListener: (eventName, fn) => {
+        if (eventName === 'message') {
+            eventListenersFns.push(fn)
         }
     },
     checkIfExpectedResultReturned: (expectedResult) => {
@@ -23,24 +30,23 @@ const fakeWindow = {
     getResults: () => {
         return postMessageResults
     },
-    callEventListenersWithParams: (params, callee) => {
-        eventListenersFns.forEach(fn => fn.call(callee || this, params))
+    /**
+     * Deliver a message to registered listeners and wait until it's processed
+     * @param {{data: Object, origin: String}} message
+     * @return {Promise}
+     */
+    callEventListenersWithParams: (message) => {
+        return Promise.all(eventListenersFns.map(fn => fn({source: fakeOpener, ...message})))
     },
-    __history: {
-        push: jest.fn()
-    },
-    fetch: jest.fn(),
-    origin: 'https://stellar.expert',
     reset: () => {
-        eventListenersFns = []
         postMessageResults = []
     }
 }
 
 function setupFakeWindow() {
-    for (var prop in fakeWindow) {
-        Object.defineProperty(global, prop, {value: fakeWindow[prop]})
-    }
+    Object.defineProperty(window, 'opener', {value: fakeOpener, configurable: true})
+    //the app closes the window after the intent rejection (restored by jest.restoreAllMocks)
+    jest.spyOn(window, 'close').mockImplementation(() => {})
 }
 
 export {fakeWindow, setupFakeWindow}

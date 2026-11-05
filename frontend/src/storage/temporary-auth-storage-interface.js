@@ -1,4 +1,4 @@
-import {encodeBase64} from '../util/crypto/base64'
+import {encodeBase64, decodeBase64} from '../util/crypto/base64'
 import {generateRandomEncryptionKey} from '../util/crypto/random'
 
 const ttl = 60 * 60 * 1000
@@ -13,7 +13,7 @@ export function temporarilySaveCredentials(credentials) {
     const payload = {
         messageType: 'save-stored-credentials',
         accountId: credentials.account.id,
-        data: Buffer.from(credentials.encryptionKey).toString('base64'),
+        data: encodeBase64(credentials.encryptionKey),
         ts: new Date().getTime(),
         ttl //TODO: set TTL based on user settings
     }
@@ -32,7 +32,7 @@ export function getCredentialsFromTemporaryStorage(accountId) {
             if (credentials !== undefined) {
                 installed = false
                 window.removeEventListener('message', waitForCredentials, false)
-                resolve(credentials ? Buffer.from(credentials, 'base64') : null)
+                resolve(credentials ? decodeBase64(credentials) : null)
             }
         }
 

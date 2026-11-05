@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Keypair} from '@stellar/stellar-base'
+import {Keypair} from '@stellar/stellar-sdk'
 import {Button} from '@stellar-expert/ui-framework'
 import Account, {ACCOUNT_TYPES} from '../../state/account'
 import accountManager from '../../state/account-manager'

@@ -1,5 +1,5 @@
 import {observable, action, runInAction, makeObservable} from 'mobx'
-import {navigation} from '@stellar-expert/navigation'
+import {navigation} from '@stellar-expert/ui-framework'
 import standardErrors from '../../util/errors'
 
 const defaultSessionTimeout = 600 // 10 minutes
@@ -14,7 +14,7 @@ class AuthorizationService {
         this.sessions = {}
 
         setTimeout(() => { //TODO: address the loading sequence problem and rewrite this dirty hack
-            navigation.history.listen((location, action) => {
+            navigation.listen(() => {
                 this.dialogOpen = false // hide auth dialog when navigation occurred
             })
         }, 200)

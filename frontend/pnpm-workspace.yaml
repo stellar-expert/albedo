@@ -1,8 +1,9 @@
 shamefullyHoist: true
 autoInstallPeers: true
 allowBuilds:
+  '@parcel/watcher': false
   core-js: true
   node-sass: true
-onlyBuiltDependencies:
-  - core-js
-  - node-sass
+minimumReleaseAgeExclude:
+  - '@stellar-expert/ui-framework@3.1.0'
+  - '@stellar-broker/client@0.8.0'

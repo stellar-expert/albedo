@@ -1,5 +1,4 @@
-import {Networks} from '@stellar/stellar-base'
-import {Horizon, rpc} from '@stellar/stellar-sdk'
+import {Networks, Horizon, rpc} from '@stellar/stellar-sdk'
 import appSettings from '../state/app-settings'
 
 class StellarNetworkParams {

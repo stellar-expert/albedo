@@ -1,5 +1,5 @@
-import {Operation, TransactionBuilder} from '@stellar/stellar-base'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {Operation, TransactionBuilder} from '@stellar/stellar-sdk'
+import {AssetDescriptor} from '@stellar-expert/ui-framework'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'
 import {estimateFee} from '../../../util/fee-estimator'

@@ -1,5 +1,5 @@
 import {makeAutoObservable, runInAction} from 'mobx'
-import {AssetDescriptor, generateLiquidityPoolId} from '@stellar-expert/asset-descriptor'
+import {AssetDescriptor, generateLiquidityPoolId} from '@stellar-expert/ui-framework'
 import {adjustPrecision, fromStroops, toStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolvePoolParams} from '../../../util/liquidity-pool-params-resolver'

@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react'
 import {observer} from 'mobx-react'
-import {AccountAddress, useStellarNetwork} from '@stellar-expert/ui-framework'
-import {navigation} from '@stellar-expert/navigation'
+import {AccountAddress, useStellarNetwork, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../state/account-manager'
 import accountLedgerData from '../../state/ledger-data/account-ledger-data'
 import AccountDropdownMenuView from '../wallet/dashboard/account-dropdown-menu-view'

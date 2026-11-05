@@ -1,6 +1,5 @@
 import React from 'react'
-import {withRouter} from 'react-router'
-import {BlockSelect} from '@stellar-expert/ui-framework'
+import {withRouter, BlockSelect} from '@stellar-expert/ui-framework'
 
 class CatcherView extends React.Component {
     constructor(props) {

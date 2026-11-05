@@ -1,7 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import {Switch, Router, Route, Redirect} from 'react-router'
-import {DynamicModule} from '@stellar-expert/ui-framework'
+import {RouterSwitch, Router, Route, Redirect, DynamicModule} from '@stellar-expert/ui-framework'
 import CatcherView from './layout/catcher-view'
 import Layout from './layout/layout-view'
 import WideLayout from './layout/wide-layout-view'
@@ -18,10 +16,10 @@ import IntroView from './pages/intro-view'
 import BlockedPageView from './pages/blocked-page-view'
 import NotFound from './pages/not-found-view'
 
-export default function AppRouter({history}) {
-    return <Router history={history}>
+export default function AppRouter() {
+    return <Router>
         <CatcherView>
-            <Switch>
+            <RouterSwitch>
                 <Route path="/playground">
                     <DynamicModule load={() => import(/* webpackChunkName: "playground" */ './demo/demo-view')}
                                    moduleKey="playground"/></Route>
@@ -32,7 +30,7 @@ export default function AppRouter({history}) {
                 </Route>
                 <Route>
                     <Layout>
-                        <Switch>
+                        <RouterSwitch>
                             <Route path="/wallet">
                                 <DynamicModule load={() => import(/* webpackChunkName: "wallet" */ './wallet/wallet-router')}
                                                moduleKey="wallet"/></Route>
@@ -49,14 +47,10 @@ export default function AppRouter({history}) {
                             <Route path="/" exact component={AccountDashboard}/>
                             <Redirect from="/account" to="/"/>
                             <Route component={NotFound}/>
-                        </Switch>
+                        </RouterSwitch>
                     </Layout>
                 </Route>
-            </Switch>
+            </RouterSwitch>
         </CatcherView>
     </Router>
-}
-
-AppRouter.propTypes = {
-    history: PropTypes.object.isRequired
 }

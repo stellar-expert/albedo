@@ -26,7 +26,7 @@ class Credentials {
 
     /**
      * Sensitive data encryption key derived from the password and unique browser id. Hashed using Argon2di.
-     * @type {Buffer}
+     * @type {Uint8Array}
      */
     encryptionKey
 

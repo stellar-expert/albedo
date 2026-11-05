@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {useStellarNetwork} from '@stellar-expert/ui-framework'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {useStellarNetwork, AssetDescriptor} from '@stellar-expert/ui-framework'
 import {formatPrice} from '@stellar-expert/formatter'
 import {resolveOrderbookInfo} from '../../../util/orderbook-info-resolver'
 

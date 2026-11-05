@@ -1,26 +1,52 @@
-import {Keypair, TransactionBuilder, xdr as xdrTypes} from '@stellar/stellar-base'
+import {Keypair, Transaction, TransactionBuilder, xdr as xdrTypes} from '@stellar/stellar-sdk'
 
 export const zeroAccount = 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF'
 
 /**
- * Modify a transaction, substituting sourceAccount parameter with a provided value.
- * @param {Transaction} tx - Stellar transaction to modify.
- * @param {String} sourceAccount - Account public key that will be used as a source account.
+ * Create a copy of the transaction with modified transaction body fields (transactions are immutable).
+ * @param {Transaction} tx - Original transaction.
+ * @param {Object} changes - Body fields to override.
+ * @return {Transaction}
  */
-export function substituteSourceAccount(tx, sourceAccount) {
-    tx._source = sourceAccount
-    tx.tx._attributes.sourceAccountEd25519 = Keypair.fromPublicKey(sourceAccount).xdrAccountId().ed25519() //update nested xdr
+function rebuildTransaction(tx, changes) {
+    const envelope = tx.toEnvelope()
+    const {tx: body, signatures} = envelope.value
+    let newEnvelope
+    if (envelope.type === 'envelopeTypeTxV0') {
+        newEnvelope = xdrTypes.TransactionEnvelope.envelopeTypeTxV0(new xdrTypes.TransactionV0Envelope({
+            tx: new xdrTypes.TransactionV0({...body, ...changes}),
+            signatures
+        }))
+    } else {
+        newEnvelope = xdrTypes.TransactionEnvelope.envelopeTypeTx(new xdrTypes.TransactionV1Envelope({
+            tx: new xdrTypes.Transaction({...body, ...changes}),
+            signatures
+        }))
+    }
+    return new Transaction(newEnvelope, tx.networkPassphrase)
 }
 
 /**
- * Modify a transaction, substituting sequence number with a provided value.
+ * Create a copy of the transaction, substituting sourceAccount parameter with a provided value.
+ * @param {Transaction} tx - Stellar transaction to modify.
+ * @param {String} sourceAccount - Account public key that will be used as a source account.
+ * @return {Transaction}
+ */
+export function substituteSourceAccount(tx, sourceAccount) {
+    const keypair = Keypair.fromPublicKey(sourceAccount)
+    if (tx.toEnvelope().type === 'envelopeTypeTxV0')
+        return rebuildTransaction(tx, {sourceAccountEd25519: keypair.rawPublicKey()})
+    return rebuildTransaction(tx, {sourceAccount: keypair.xdrMuxedAccount()})
+}
+
+/**
+ * Create a copy of the transaction, substituting sequence number with a provided value.
  * @param {Transaction} tx - Stellar transaction to modify.
  * @param {String} newSequence
+ * @return {Transaction}
  */
 export function substituteSourceSequence(tx, newSequence) {
-    newSequence = newSequence.toString() //ensure that int64 is represented as string
-    tx._sequence = newSequence
-    tx.tx._attributes.seqNum = xdrTypes.SequenceNumber.fromString(newSequence)
+    return rebuildTransaction(tx, {seqNum: BigInt(newSequence)})
 }
 
 /**
@@ -35,14 +61,14 @@ export function replaceTokens(intentParams, networkParams) {
     const replacementParts = replace.split(',')
         .map(pair => pair.split(':'))
 
-    const parsedTx = TransactionBuilder.fromXDR(xdr, networkParams.network)
+    let parsedTx = TransactionBuilder.fromXdr(xdr, networkParams.network)
 
     //we only support sourceAccount replacement for now
     for (let pair of replacementParts) {
         if (pair[0] !== 'sourceAccount') continue
-        substituteSourceAccount(parsedTx, zeroAccount) //replace with zero account for further processing
-        //substituteSourceSequence(parsedTx, '0')
+        parsedTx = substituteSourceAccount(parsedTx, zeroAccount) //replace with zero account for further processing
+        //parsedTx = substituteSourceSequence(parsedTx, '0')
     }
 
-    intentParams.xdr = parsedTx.toXDR()
+    intentParams.xdr = parsedTx.toXdr()
 }

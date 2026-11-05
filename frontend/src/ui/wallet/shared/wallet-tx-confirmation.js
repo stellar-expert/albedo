@@ -1,4 +1,4 @@
-import {Keypair} from '@stellar/stellar-base'
+import {Keypair} from '@stellar/stellar-sdk'
 import authorization from '../../../state/auth/authorization'
 import accountManager from '../../../state/account-manager'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'

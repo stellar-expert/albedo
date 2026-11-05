@@ -1,5 +1,5 @@
 import {action, observable, runInAction, makeObservable} from 'mobx'
-import {Networks} from '@stellar/stellar-base'
+import {Networks} from '@stellar/stellar-sdk'
 import {parseTxDetails} from '@stellar-expert/ui-framework'
 import {createHorizon} from '../../util/horizon-connector'
 
@@ -135,7 +135,7 @@ export default class AccountTransactionHistory {
      * @param {Transaction} tx
      */
     addInProgressTx(tx) {
-        return this.addNewTx({envelope_xdr: tx.toXDR('base64')}, true)
+        return this.addNewTx({envelope_xdr: tx.toXdr()}, true)
     }
 
     addNewTx(tx, inProgress = false) {

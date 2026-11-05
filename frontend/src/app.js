@@ -1,8 +1,7 @@
 import React from 'react'
 import {render} from 'react-dom'
 import {configure} from 'mobx'
-import {setStellarNetwork, subscribeToStellarNetworkChange, createToastNotificationsContainer} from '@stellar-expert/ui-framework'
-import {navigation, bindClickNavHandler} from '@stellar-expert/navigation'
+import {setStellarNetwork, subscribeToStellarNetworkChange, createToastNotificationsContainer, bindClickNavHandler} from '@stellar-expert/ui-framework'
 import Router from './ui/app-router'
 import {scheduleCleanupExpiredSessions} from './storage/implicit-session-storage'
 import storageProvider from './storage/storage-provider'
@@ -32,7 +31,7 @@ subscribeToStellarNetworkChange(network => storageProvider.setItem(lsKey, networ
 //load available accounts
 accountManager.reload()
     .then(() => {
-        render(<Router history={navigation.history}/>, appContainer)
+        render(<Router/>, appContainer)
 
         //replace the preloader with an app content
         document.body.appendChild(appContainer)

@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {runInAction} from 'mobx'
 import {observer} from 'mobx-react'
-import {Memo} from '@stellar/stellar-base'
+import {Memo} from '@stellar/stellar-sdk'
 import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework'
 
 export const memoTypes = ['none', 'text', 'id', 'hash', 'return']

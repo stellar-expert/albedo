@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {navigation} from '@stellar-expert/navigation'
+import {navigation} from '@stellar-expert/ui-framework'
 import actionContext from '../../state/action-context'
 import SoloLayoutView from '../layout/solo-layout-view'
 import OnBoardingNotesStepView from './onboarding-notes-step-view'

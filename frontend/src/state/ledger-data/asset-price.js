@@ -1,7 +1,4 @@
-import {stringifyQuery} from '@stellar-expert/navigation'
-import {InMemoryClientCache} from '@stellar-expert/client-cache'
-
-const apiCache = new InMemoryClientCache({prefix: 'ac:'})
+import {stringifyQuery} from '@stellar-expert/ui-framework'
 
 /**
  * @param {'public'|'testnet'} network

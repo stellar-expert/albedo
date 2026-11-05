@@ -1,19 +1,11 @@
-import nacl from 'tweetnacl'
-
-/**
- * Derive a keypair suitable for signing from a hash of the encryption key.
- * @param {Buffer} hash - Hashed encryption key.
- * @return {nacl.SignKeyPair}
- */
-function deriveKeyPairFromHash(hash) {
-    return nacl.sign.keyPair.fromSeed(hash)
-}
+import {Keypair} from '@stellar/stellar-sdk'
+import {encodeBase64} from './base64'
 
 /**
  * Derive a public key from the plain password.
- * @param {Buffer} hash - Hashed encryption key.
+ * @param {Uint8Array} hash - Hashed encryption key.
  * @return {String}
  */
 export function derivePublicKeyFromSecret(hash) {
-    return Buffer.from(deriveKeyPairFromHash(hash).publicKey).toString('base64')
+    return encodeBase64(Keypair.fromRawEd25519Seed(hash).rawPublicKey())
 }

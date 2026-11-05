@@ -1,8 +1,13 @@
-import { registerMessageListeners } from '../../src/util/message-listeners'
-import { fakeWindow, setupFakeWindow } from '../util/fake-window'
-import actionContext from '../../src/state/action-context'
-import { setupAccountManager, publicKey, privateKey } from '../util/fake-account-manager'
-jest.mock('../../src/util/horizon-connector')
+/**
+ * @jest-environment ./test/jsdom-environment.js
+ */
+import {TransactionBuilder, Networks, Asset} from '@stellar/stellar-sdk'
+import {navigation} from '@stellar-expert/ui-framework'
+import {registerMessageListeners} from '../../src/util/message-listeners'
+import {fakeWindow, setupFakeWindow} from '../util/fake-window'
+import {setupFakeHorizon} from '../util/fake-horizon'
+import {sendIntent, confirmRequest} from '../util/intent-flow'
+import {setupAccountManager, publicKey} from '../util/fake-account-manager'
 
 const fakeIntent = {
     intent: 'trust',
@@ -11,10 +16,13 @@ const fakeIntent = {
 }
 
 describe('Intent - trust', () => {
+    let credentials
+
     beforeAll(async () => {
         setupFakeWindow()
+        setupFakeHorizon()
         registerMessageListeners(fakeWindow)
-        await setupAccountManager()
+        credentials = await setupAccountManager()
     })
 
     afterAll(() => {
@@ -23,25 +31,25 @@ describe('Intent - trust', () => {
     })
 
     it('should be able to set up trustline', async () => {
-        fakeWindow.callEventListenersWithParams({
-            data: {
-                ...fakeIntent
-            },
-            origin: '*',
-            source: '*'
-        }, this)
+        await sendIntent(fakeIntent)
 
-        expect(actionContext.intentErrors).toBeNull()
-        expect(fakeWindow.__history.push).toHaveBeenCalledWith('/confirm')
+        expect(navigation.path).toEqual('/confirm')
 
-        await actionContext.confirmRequest()
+        await confirmRequest(credentials)
 
-        //expect(actionContext.intentErrors).toBeNull()
         expect(fakeWindow.checkIfExpectedResultReturned({
             intent: 'trust',
-            pubkey: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2',
+            pubkey: publicKey,
             asset_code: 'TST',
             asset_issuer: 'GCAJ43GPGOK5ZZ4QRCVZ6DNFCP2KCVDSPU72IUJRH5UTGERHSCELUG6B'
         })).toBeTruthy()
+
+        const xdr = fakeWindow.getResults()[0].signed_envelope_xdr
+        const transaction = TransactionBuilder.fromXdr(xdr, Networks.PUBLIC)
+        expect(transaction.source).toBe(publicKey)
+        expect(transaction.operations.length).toBe(1)
+        expect(transaction.operations[0].type).toBe('changeTrust')
+        expect(transaction.operations[0].line.equals(new Asset(fakeIntent.asset_code, fakeIntent.asset_issuer))).toBe(true)
+        expect(transaction.operations[0].limit).toBe('922337203685.4775807')
     })
 })

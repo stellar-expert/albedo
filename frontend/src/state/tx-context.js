@@ -1,9 +1,9 @@
 import {observable, action, runInAction, computed, makeObservable} from 'mobx'
-import {Transaction} from '@stellar/stellar-base'
+import {Transaction, xdr} from '@stellar/stellar-sdk'
+import {signatureHintMatchesKey} from '@stellar-expert/ui-framework'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
 import standardErrors from '../util/errors'
 import {resolveAccountInfo} from '../util/account-info-resolver'
-import {hintMatchesKey} from '../util/signature-hint-utils'
 import {substituteSourceAccount, substituteSourceSequence, zeroAccount} from '../util/tx-replace-utils'
 import accountManager from './account-manager'
 
@@ -16,6 +16,7 @@ export default class TxContext {
      */
     constructor(transaction, intentParams, networkParams) {
         makeObservable(this, {
+            tx: observable.ref,
             availableSigners: observable.shallow,
             signatures: observable.shallow,
             signatureSchema: observable,
@@ -31,6 +32,7 @@ export default class TxContext {
         })
 
         this.tx = transaction
+        this.networkParams = networkParams
         //TODO: retrieve pre-set signatures from tx
         this.signatures = [...transaction.signatures]
         this.availableSigners = []
@@ -107,7 +109,7 @@ export default class TxContext {
      * @param {String} sourceAccountPublicKey
      */
     async setTxSourceAccount(sourceAccountPublicKey) {
-        substituteSourceAccount(this.tx, sourceAccountPublicKey)
+        this.tx = substituteSourceAccount(this.tx, sourceAccountPublicKey)
         await this.updateSignatureSchema()
         const newSequence = sourceAccountPublicKey === zeroAccount ? '0' : undefined
         await this.setTxSequence(newSequence)
@@ -124,7 +126,7 @@ export default class TxContext {
                 //set incremented tx sequence
                 newSequence = (BigInt(sourceAccount.sequenceNumber()) + 1n).toString()
             }
-            substituteSourceSequence(this.tx, newSequence)
+            this.tx = substituteSourceSequence(this.tx, newSequence)
         } catch (err) {
             console.error(err)
             if (err.response) { //treat as Horizon error
@@ -142,7 +144,7 @@ export default class TxContext {
      */
     findSignatureByKey(key) {
         for (let sig of this.signatures) {
-            if (hintMatchesKey(sig.hint(), key)) return sig
+            if (signatureHintMatchesKey(sig.hint, key)) return sig
         }
         return null
     }
@@ -166,10 +168,10 @@ export default class TxContext {
      * @param hint
      */
     removeSignatureByHint(hint) {
-        const hintAsHex = hint.toString('hex')
+        const hintAsHex = xdr.encodeBytes(hint, 'hex')
         for (let i = 0; i < this.signatures.length; i++) {
             let sig = this.signatures[i]
-            if (sig.hint().toString('hex') === hintAsHex) {
+            if (xdr.encodeBytes(sig.hint.toBytes(), 'hex') === hintAsHex) {
                 this.signatures.splice(i, 1)
                 return
             }
@@ -180,7 +182,7 @@ export default class TxContext {
         this.signatureSchema = null
         if (this.hasEmptyTxSource) return
         //TODO: pass preferred signers (belonging to current account)
-        const schema = await inspectTransactionSigners(this.tx, {horizon: this.horizon})
+        const schema = await inspectTransactionSigners(this.tx, {horizon: this.networkParams.horizon})
         runInAction(() => {
             this.signatureSchema = schema
             this.mapSignatureKeys()
@@ -225,8 +227,7 @@ export default class TxContext {
                 }
         }
         for (let s of this.signatures) {
-            const hint = s.hint()
-            const matchingKey = allSigners.find(s => hintMatchesKey(hint, s))
+            const matchingKey = allSigners.find(key => signatureHintMatchesKey(s.hint, key))
             if (matchingKey) {
                 s.pubKey = matchingKey
             }

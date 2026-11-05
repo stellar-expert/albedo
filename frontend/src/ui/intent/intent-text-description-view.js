@@ -1,7 +1,6 @@
 import React from 'react'
 import {observer} from 'mobx-react'
-import {AccountAddress, AssetLink, Amount} from '@stellar-expert/ui-framework'
-import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
+import {AccountAddress, AssetLink, Amount, parseAssetFromObject} from '@stellar-expert/ui-framework'
 import {intentInterface} from '@albedo-link/intent'
 import actionContext from '../../state/action-context'
 import TxDetailsView from './tx/tx-details-view'

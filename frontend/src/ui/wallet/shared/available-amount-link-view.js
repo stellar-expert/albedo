@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import PropTypes from 'prop-types'
-import {useStellarNetwork} from '@stellar-expert/ui-framework'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {useStellarNetwork, AssetDescriptor} from '@stellar-expert/ui-framework'
 import {formatWithAutoPrecision, fromStroops, toStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 

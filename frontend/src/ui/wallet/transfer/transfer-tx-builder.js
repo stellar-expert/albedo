@@ -1,5 +1,5 @@
-import {Operation, TransactionBuilder, Claimant, Address, XdrLargeInt, Contract, StrKey, Memo} from '@stellar/stellar-base'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {Operation, TransactionBuilder, Claimant, Address, XdrLargeInt, Contract, StrKey, Memo} from '@stellar/stellar-sdk'
+import {AssetDescriptor} from '@stellar-expert/ui-framework'
 import {toStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'

@@ -5,7 +5,7 @@ const isProduction = !process.argv.some(a => a === '--mode=development')
 
 const envVariables = ['STELLAR_BROKER_ORIGIN', 'STELLAR_BROKER_KEY', 'STELLAR_BROKER_QP', 'EXPLORER_API_ORIGIN']
 
-module.exports = initWebpackConfig({
+const buildConfig = initWebpackConfig({
     entries: {
         'albedo': {
             import: './src/app.js',
@@ -51,3 +51,14 @@ module.exports = initWebpackConfig({
         return false
     }
 })
+
+module.exports = function (env, argv) {
+    const config = buildConfig(env, argv)
+    //bip39 depends on @noble/hashes v1 while the hoisted top-level copy is v2 (required by @stellar/stellar-sdk),
+    //so resolve bip39 dependencies from its own node_modules instead of the project root
+    config.module.rules.push({
+        test: /[\\/]bip39[\\/]/,
+        resolve: {modules: ['node_modules']}
+    })
+    return config
+}

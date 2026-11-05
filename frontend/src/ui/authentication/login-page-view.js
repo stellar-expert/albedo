@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
-import {Button, Dropdown} from '@stellar-expert/ui-framework'
-import {navigation} from '@stellar-expert/navigation'
+import {Button, Dropdown, navigation} from '@stellar-expert/ui-framework'
 import accountManager from '../../state/account-manager'
 import {ACCOUNT_TYPES} from '../../state/account'
 import actionContext from '../../state/action-context'

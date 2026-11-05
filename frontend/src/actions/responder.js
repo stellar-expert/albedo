@@ -34,7 +34,7 @@ registerManagementActions(registerReaction)
 /**
  * Process confirmed intent and return execution result.
  * @param {ActionContext} actionContext - Current action context.
- * @return {Promise}
+ * @return {Promise<Boolean>} False if the request has been rejected due to intent errors
  */
 export async function processIntents(actionContext) {
     //init actions wrapper
@@ -66,8 +66,10 @@ export async function processIntents(actionContext) {
     const errors = aggregateIntentErrors(intentRequestErrors, actionContext.isBatchRequest)
     if (errors) {
         actionContext.setIntentError(errors)
-        return await actionContext.rejectRequest()
+        await actionContext.rejectRequest()
+        return false
     }
+    return true
 }
 
 /**

@@ -1,5 +1,5 @@
 import {observable, action, computed, makeObservable} from 'mobx'
-import {Keypair, StrKey} from '@stellar/stellar-base'
+import {Keypair, StrKey} from '@stellar/stellar-sdk'
 import {shortenString} from '@stellar-expert/formatter'
 import {encryptAccountSecret, decryptAccountSecret, persistAccountInBrowser} from '../storage/account-storage'
 import {currentStorageVersion} from '../storage/storage-version'

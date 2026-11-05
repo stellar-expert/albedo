@@ -1,5 +1,5 @@
 import {entropyToMnemonic, mnemonicToEntropy, validateMnemonic as validate, wordlists} from 'bip39'
-import {Keypair} from '@stellar/stellar-base'
+import {Keypair, xdr} from '@stellar/stellar-sdk'
 
 const mnemonicWordsList = wordlists.english
 
@@ -10,7 +10,7 @@ const mnemonicWordsList = wordlists.english
  */
 function secretToMnemonic(secret) {
     const kp = Keypair.fromSecret(secret)
-    return entropyToMnemonic(kp.rawSecretKey(), mnemonicWordsList)
+    return entropyToMnemonic(xdr.encodeBytes(kp.rawSecretKey(), 'hex'), mnemonicWordsList)
 }
 
 /**
@@ -21,7 +21,7 @@ function secretToMnemonic(secret) {
 function mnemonicToSecret(mnemonic) {
     try {
         const rawSecret = mnemonicToEntropy(mnemonic, mnemonicWordsList)
-        return Keypair.fromRawEd25519Seed(Buffer.from(rawSecret, 'hex')).secret()
+        return Keypair.fromRawEd25519Seed(xdr.decodeBytes(rawSecret, 'hex')).secret()
     } catch (e) {
         console.error(e)
         return null

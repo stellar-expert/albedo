@@ -1,7 +1,6 @@
 import React from 'react'
-import {useLocation} from 'react-router'
+import {useLocation, useStellarNetwork} from '@stellar-expert/ui-framework'
 import cn from 'classnames'
-import {useStellarNetwork} from '@stellar-expert/ui-framework'
 
 function NavLink({link, icon, title, current}) {
     return <a href={link} className={cn('condensed', {current})}>

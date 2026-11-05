@@ -1,3 +1,4 @@
+import {xdr} from '@stellar/stellar-sdk'
 import standardErrors from '../util/errors'
 
 export default function (registerReaction) {
@@ -8,8 +9,8 @@ export default function (registerReaction) {
             return {
                 pubkey: executionContext.publicKey,
                 signed_message: albedoSignatureBase,
-                message_signature: signature.toString('hex'),
-                signedMessage: signedMessage.toString('hex'),
+                message_signature: xdr.encodeBytes(signature, 'hex'),
+                signedMessage: xdr.encodeBytes(signedMessage, 'hex'),
                 signerAddress: executionContext.publicKey
             }
         } catch (e) {
@@ -27,7 +28,7 @@ export default function (registerReaction) {
             return {
                 pubkey: publicKey,
                 signed_message: albedoSignatureBase,
-                signature: signature.toString('hex')
+                signature: xdr.encodeBytes(signature, 'hex')
             }
         } catch (e) {
             console.error(e)

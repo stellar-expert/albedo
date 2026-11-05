@@ -1,5 +1,6 @@
-import {Asset, Memo, Operation, TransactionBuilder} from '@stellar/stellar-base'
+import {Asset, Memo, Operation, TransactionBuilder, NotFoundError, xdr} from '@stellar/stellar-sdk'
 import {intentInterface} from '@albedo-link/intent'
+import {fromStroops, toStroops} from '@stellar-expert/formatter'
 import {resolveNetworkParams} from '../util/network-resolver'
 import {estimateFee} from '../util/fee-estimator'
 import {resolveAccountInfo} from '../util/account-info-resolver'
@@ -72,7 +73,7 @@ async function prepareTxOperations(actionContext, source) {
                 try {
                     const acc = await resolveAccountInfo(destination, actionContext.networkParams)
                 } catch (e) {
-                    if (e.name === 'NotFoundError') {
+                    if (e instanceof NotFoundError) {
                         return [Operation.createAccount({startingBalance: amount, destination})]
                     }
                 }
@@ -96,7 +97,7 @@ async function prepareTxOperations(actionContext, source) {
                 operations = []
 
             //calculate send max amount from max price the user willing to pay
-            const sendMax = (BigInt(parseFloat(max_price) * 10000000 * amount) / 10000000n).toFixed(7)
+            const sendMax = fromStroops(toStroops(amount) * toStroops(max_price) / 10000000n)
 
             //check whether the trustline exists
             const trustlineExists = source.balances.some(balance =>
@@ -157,8 +158,8 @@ async function processTxIntent({actionContext, intentRequest, executionContext})
 
         //retrieve hash and tx envelope
         const {tx} = txContext,
-            hash = tx.hash().toString('hex'),
-            envelopeXdr = tx.toEnvelope().toXDR().toString('base64')
+            hash = xdr.encodeBytes(tx.hash(), 'hex'),
+            envelopeXdr = tx.toXdr()
 
         Object.assign(res, {
             tx_hash: hash,

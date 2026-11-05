@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import {observable, makeObservable, action, runInAction} from 'mobx'
-import {calculateAvailableBalance, useStellarNetwork} from '@stellar-expert/ui-framework'
-import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
+import {calculateAvailableBalance, useStellarNetwork, parseAssetFromObject} from '@stellar-expert/ui-framework'
+import {NotFoundError} from '@stellar/stellar-sdk'
 import {formatWithAutoPrecision} from '@stellar-expert/formatter'
 import {resolveNetworkParams} from '../../util/network-resolver'
 import {resolveAccountInfo} from '../../util/account-info-resolver'
@@ -198,7 +198,7 @@ async function fetchAccountHorizonData(network, address) {
     } catch (e) {
         let nonExisting = false,
             error
-        if (e.name === 'NotFoundError') {
+        if (e instanceof NotFoundError) {
             error = 'Account does not exist on the ledger'
             nonExisting = true
         } else {

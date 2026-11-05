@@ -1,9 +1,7 @@
 import {runInAction, makeAutoObservable} from 'mobx'
 import {debounce} from 'throttle-debounce'
-import {Horizon} from '@stellar/stellar-sdk'
-import {Asset, Keypair, TransactionBuilder, Networks} from '@stellar/stellar-base'
-import {navigation} from '@stellar-expert/navigation'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {Horizon, Asset, Keypair, TransactionBuilder, Networks} from '@stellar/stellar-sdk'
+import {navigation, AssetDescriptor} from '@stellar-expert/ui-framework'
 import {fromStroops, toStroops} from '@stellar-expert/formatter'
 import {StellarBrokerClient} from '@stellar-broker/client'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
@@ -309,9 +307,9 @@ export default class SwapSettings {
             authorization: async payload => {
                 //sign
                 if (payload.toEnvelope) { //transaction
-                    payload = TransactionBuilder.fromXDR(payload.toEnvelope().toXDR('base64'), Networks.PUBLIC)
+                    payload = TransactionBuilder.fromXdr(payload.toXdr(), Networks.PUBLIC)
                     payload.sign(this.keypair)
-                    return payload.toEnvelope().toXDR('base64')
+                    return payload.toXdr()
                 }
                 //auth entry
                 return this.keypair.sign(payload)

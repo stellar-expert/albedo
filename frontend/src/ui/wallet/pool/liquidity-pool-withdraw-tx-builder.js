@@ -1,5 +1,5 @@
-import {Operation, TransactionBuilder} from '@stellar/stellar-base'
-import {getLiquidityPoolAsset} from '@stellar-expert/asset-descriptor'
+import {Operation, TransactionBuilder} from '@stellar/stellar-sdk'
+import {getLiquidityPoolAsset} from '@stellar-expert/ui-framework'
 import {fromStroops} from '@stellar-expert/formatter'
 import accountLedgerData from '../../../state/ledger-data/account-ledger-data'
 import {resolveNetworkParams} from '../../../util/network-resolver'

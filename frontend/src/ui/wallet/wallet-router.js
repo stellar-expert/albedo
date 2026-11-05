@@ -1,5 +1,5 @@
 import React from 'react'
-import {Route, Switch, useRouteMatch} from 'react-router'
+import {Route, RouterSwitch, useRouteMatch} from '@stellar-expert/ui-framework'
 import AccountContextView from '../account/account-context-view'
 import SwapView from './swap/swap-view'
 import TransferView from './transfer/transfer-view'
@@ -13,7 +13,7 @@ import NotFound from '../pages/not-found-view'
 export default function WalletRouter() {
     const {path} = useRouteMatch()
     return <AccountContextView>
-        <Switch>
+        <RouterSwitch>
             <Route path={`${path}/add-trustline`} component={AddTrustlineView}/>
             <Route path={`${path}/remove-trustline`} component={RemoveTrustlineView}/>
             <Route path={`${path}/receive`} component={ReceiveView}/>
@@ -22,6 +22,6 @@ export default function WalletRouter() {
             <Route path={`${path}/liquidity-pool`} component={LiquidityPoolsRouter}/>
             <Route path={`${path}/scan`} component={ScanAutodetectView}/>
             <Route component={NotFound}/>
-        </Switch>
+        </RouterSwitch>
     </AccountContextView>
 }

@@ -3,9 +3,10 @@ import TxContext from './tx-context'
 import accountManager from './account-manager'
 
 export default class IntentRequest {
-    constructor(intent, intentParams) {
+    constructor(intent, intentParams, networkParams) {
         this.intent = intent
         this.intentParams = intentParams
+        this.networkParams = networkParams
         makeObservable(this, {
             intent: observable,
             intentParams: observable.shallow,
@@ -28,6 +29,12 @@ export default class IntentRequest {
      * @type {Object}
      */
     intentParams = null
+
+    /**
+     * Resolved Stellar network parameters.
+     * @type {StellarNetworkParams}
+     */
+    networkParams = null
 
     /**
      * Requested transaction context.
@@ -62,8 +69,8 @@ export default class IntentRequest {
      * @return {Promise<TxContext>}
      */
     async setTxContext(transaction, account) {
-        //set tx context, retrieve network params from intent params
-        const txContext = new TxContext(transaction, this.intentParams)
+        //set tx context
+        const txContext = new TxContext(transaction, this.intentParams, this.networkParams)
         //discover available signers using current account
         const availableSigners = !account ? [] : [account.publicKey]
         txContext.setAvailableSigners(availableSigners)

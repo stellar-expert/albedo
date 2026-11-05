@@ -1,3 +1,4 @@
+import {NotFoundError} from '@stellar/stellar-sdk'
 import standardErrors from '../util/errors'
 import {resolveAccountInfo} from '../util/account-info-resolver'
 
@@ -18,7 +19,7 @@ export function loadSelectedAccountInfo(actionContext) {
     //load the account
     const promise = resolveAccountInfo(pubkey, networkParams)
         .catch(err => {
-            if (err.name === 'NotFoundError') {
+            if (err instanceof NotFoundError) {
                 return {error: standardErrors.accountDoesNotExist}
             }
             console.error(err)

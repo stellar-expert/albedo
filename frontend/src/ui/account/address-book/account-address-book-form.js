@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react'
-import {StrKey} from '@stellar/stellar-base'
+import {StrKey} from '@stellar/stellar-sdk'
 import {Dropdown, useAutoFocusRef} from '@stellar-expert/ui-framework'
 import {getPlaceholder, memoTypes} from '../../wallet/tx/tx-memo-view'
 import {useDestinationAccountLedgerData} from '../../../state/ledger-data/account-ledger-data'

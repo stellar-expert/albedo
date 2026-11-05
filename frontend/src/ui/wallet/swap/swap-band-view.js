@@ -1,10 +1,9 @@
 import React, {useCallback} from 'react'
 import {observer} from 'mobx-react'
 import {formatPrice} from '@stellar-expert/formatter'
-import {isValidPoolId} from '@stellar-expert/asset-descriptor'
+import {isValidPoolId, InfoTooltip} from '@stellar-expert/ui-framework'
 import AvailableAmountLink from '../shared/available-amount-link-view'
 import './swap-band.scss'
-import {InfoTooltip} from '@stellar-expert/ui-framework'
 
 function extractCode(asset) {
     return asset.split('-')[0]

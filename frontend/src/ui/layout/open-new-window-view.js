@@ -1,5 +1,5 @@
 import React from 'react'
-import {useLocation} from 'react-router'
+import {useLocation} from '@stellar-expert/ui-framework'
 import {isInsideFrame} from '../../util/frame-utils'
 
 export default function OpenNewWindowView() {

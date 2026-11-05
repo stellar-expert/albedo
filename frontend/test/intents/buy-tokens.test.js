@@ -1,11 +1,13 @@
-import {Transaction, Asset} from '@stellar/stellar-base'
-
+/**
+ * @jest-environment ./test/jsdom-environment.js
+ */
+import {TransactionBuilder, Networks, Asset} from '@stellar/stellar-sdk'
+import {navigation} from '@stellar-expert/ui-framework'
 import {registerMessageListeners} from '../../src/util/message-listeners'
 import {fakeWindow, setupFakeWindow} from '../util/fake-window'
-import actionContext from '../../src/state/action-context'
-import {setupAccountManager, publicKey, privateKey} from '../util/fake-account-manager'
-
-jest.mock('../../src/util/horizon-connector')
+import {setupFakeHorizon} from '../util/fake-horizon'
+import {sendIntent, confirmRequest} from '../util/intent-flow'
+import {setupAccountManager, publicKey} from '../util/fake-account-manager'
 
 const fakeIntent = {
     intent: 'exchange',
@@ -16,10 +18,13 @@ const fakeIntent = {
 }
 
 describe('Intent - buy tokens', () => {
+    let credentials
+
     beforeAll(async () => {
         setupFakeWindow()
+        setupFakeHorizon()
         registerMessageListeners(fakeWindow)
-        await setupAccountManager()
+        credentials = await setupAccountManager()
     })
 
     afterAll(() => {
@@ -27,37 +32,30 @@ describe('Intent - buy tokens', () => {
         jest.restoreAllMocks()
     })
 
-    it('should be able to call basic info intent', async () => {
-        fakeWindow.callEventListenersWithParams({
-            data: {
-                ...fakeIntent
-            },
-            origin: '*',
-            source: '*'
-        }, this)
+    it('should be able to buy tokens', async () => {
+        await sendIntent(fakeIntent)
 
-        expect(actionContext.intentErrors).toBeNull()
-        expect(fakeWindow.__history.push).toHaveBeenCalledWith('/confirm')
+        expect(navigation.path).toEqual('/confirm')
 
-        await actionContext.confirmRequest()
+        await confirmRequest(credentials)
 
-        //expect(actionContext.intentErrors).toBeNull()
         expect(fakeWindow.checkIfExpectedResultReturned({
             intent: 'exchange',
-            pubkey: 'GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2'
+            pubkey: publicKey
         })).toBeTruthy()
 
         const xdr = fakeWindow.getResults()[0].signed_envelope_xdr
-        const transaction = new Transaction(xdr)
+        const transaction = TransactionBuilder.fromXdr(xdr, Networks.PUBLIC)
         const asset = new Asset(fakeIntent.buy_asset_code, fakeIntent.buy_asset_issuer)
         expect(transaction.source).toBe(publicKey)
         expect(transaction.operations.length).toBe(2)
+        //the account doesn't have a trustline yet
         expect(transaction.operations[0].type).toBe('changeTrust')
-        expect(transaction.operations[0].line).toStrictEqual(asset)
-        expect(transaction.operations[1].type).toBe('pathPayment')
-        expect(transaction.operations[1].destination).toBe('GCI5HWSNSUVF6NM572PTOSC6S4IMQJX3IHSCWRCEPPSILLTVQWNBGPC2')
-        expect(transaction.operations[1].sendAsset).toStrictEqual(Asset.native())
-        expect(transaction.operations[1].destAsset).toStrictEqual(asset)
+        expect(transaction.operations[0].line.equals(asset)).toBe(true)
+        expect(transaction.operations[1].type).toBe('pathPaymentStrictReceive')
+        expect(transaction.operations[1].destination).toBe(publicKey)
+        expect(transaction.operations[1].sendAsset.equals(Asset.native())).toBe(true)
+        expect(transaction.operations[1].destAsset.equals(asset)).toBe(true)
         expect(transaction.operations[1].sendMax).toBe('1.0000000')
         expect(transaction.operations[1].destAmount).toBe('1.0000000')
     })

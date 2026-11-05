@@ -1,5 +1,5 @@
 import React from 'react'
-import {parseAssetFromObject} from '@stellar-expert/asset-descriptor'
+import {parseAssetFromObject} from '@stellar-expert/ui-framework'
 import AccountAssetBalanceView from './account-asset-balance-view'
 import AccountPoolBalanceView from './account-pool-balance-view'
 import './account-balance.scss'

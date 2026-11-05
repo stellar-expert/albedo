@@ -1,4 +1,4 @@
-import {Memo} from '@stellar/stellar-base'
+import {Memo} from '@stellar/stellar-sdk'
 
 /**
  *

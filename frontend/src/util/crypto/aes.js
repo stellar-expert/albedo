@@ -1,10 +1,10 @@
 import AES from 'aes-js'
-import {decodeBase64} from './base64'
+import {encodeBase64, decodeBase64} from './base64'
 
 /**
  * AES-encrypt arbitrary data with a password provided by a user.
  * @param {String} plainData - Data to encrypt.
- * @param {Buffer|String} encryptionKey - Hash of the password.
+ * @param {Uint8Array|String} encryptionKey - Hash of the password.
  * @return {String}
  */
 export function encryptDataAes(plainData, encryptionKey) {
@@ -14,18 +14,18 @@ export function encryptDataAes(plainData, encryptionKey) {
         encryptionKey = decodeBase64(encryptionKey)
     }
     const aes = new AES.ModeOfOperation.ctr(encryptionKey)
-    return Buffer.from(aes.encrypt(rawData)).toString('base64')
+    return encodeBase64(aes.encrypt(rawData))
 }
 
 /**
  * AES-decrypt arbitrary data with a password provided by a user.
  * @param {String} encryptedData - Data to decrypt.
- * @param {Buffer|String} encryptionKey - A password provided by user.
+ * @param {Uint8Array|String} encryptionKey - A password provided by user.
  * @return {String}
  */
 export function decryptDataAes(encryptedData, encryptionKey) {
     validateNonEmpty(encryptedData, 'encryptedData')
-    const rawData = Buffer.from(encryptedData, 'base64')
+    const rawData = decodeBase64(encryptedData)
     if (typeof encryptionKey === 'string') {
         encryptionKey = decodeBase64(encryptionKey)
     }

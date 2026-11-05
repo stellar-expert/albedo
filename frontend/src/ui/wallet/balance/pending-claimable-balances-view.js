@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
-import {useStellarNetwork} from '@stellar-expert/ui-framework'
+import {AssetDescriptor, useStellarNetwork} from '@stellar-expert/ui-framework'
 import {formatWithAutoPrecision} from '@stellar-expert/formatter'
 import {createHorizon} from '../../../util/horizon-connector'
 import {fetchAssetPrices} from '../../../state/ledger-data/asset-price'

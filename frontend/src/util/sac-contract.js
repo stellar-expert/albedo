@@ -1,6 +1,5 @@
-import {Address, Contract, TransactionBuilder, StrKey, scValToNative, XdrLargeInt} from '@stellar/stellar-base'
-import {rpc} from '@stellar/stellar-sdk'
-import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
+import {Address, Contract, TransactionBuilder, StrKey, scValToNative, XdrLargeInt, rpc} from '@stellar/stellar-sdk'
+import {AssetDescriptor} from '@stellar-expert/ui-framework'
 import {resolveNetworkParams} from './network-resolver'
 
 /**
