@@ -22,8 +22,8 @@ export default function LoginPageView() {
                 const {password} = data
                 account = allAccounts.find(a => a.id === selectedAccount)
                 const credentials = await Credentials.create({account, password})
-
-                await account.load(credentials)
+                if (!credentials.checkPasswordCorrect())
+                    throw errors.invalidPassword
             } else {
                 account = await accountManager.loginHWAccount(data)
             }
@@ -35,7 +35,7 @@ export default function LoginPageView() {
             navigation.navigate(actionContext.intent ? '/confirm' : '/account')
         } catch (e) {
             console.error(e)
-            if (!e.status) {
+            if (e.code === undefined) {
                 e = errors.unhandledError()
             }
             setInProgress(false)
