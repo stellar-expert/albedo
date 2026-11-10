@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {observer} from 'mobx-react'
 import {StrKey} from '@stellar/stellar-sdk'
 import {AccountAddress, Dropdown, AccountIdenticon, useAutoFocusRef, navigation} from '@stellar-expert/ui-framework'
@@ -48,12 +48,11 @@ function AuthSelectorView() {
         }
     }
 
-    const directInputKeyDown = useCallback(e => {
+    function directInputKeyDown(e) {
         if (e.key === 'Enter' && directKeyInputSecret && actionContext.selectedAccount) {
             actionContext.confirmRequest()
         }
-    }, [])
-    actionContext.confirmRequest()
+    }
 
     function AuthActionLink({action, children}) {
         return <a href="#" onClick={e => handleAccountAction(action)}>{children}</a>
